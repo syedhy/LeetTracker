@@ -62,7 +62,7 @@ struct LeetTrackerWidgetEntryView: View {
     let entry: LeetTrackerEntry
 
     var body: some View {
-        Group {
+        WidgetContainer {
             if let username = entry.username {
                 switch family {
                 case .systemMedium:
@@ -71,10 +71,9 @@ struct LeetTrackerWidgetEntryView: View {
                     SmallWidgetView(username: username, stats: entry.stats)
                 }
             } else {
-                EmptyWidgetView()
+                WidgetEmptyStateView(message: "Set username in LeetTracker")
             }
         }
-        .containerBackground(.background, for: .widget)
     }
 }
 
@@ -102,23 +101,23 @@ private struct SmallWidgetView: View {
     let stats: CachedLeetCodeStats
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: LTWidgetSpacing.medium) {
             Text("LeetTracker")
-                .font(.headline)
+                .font(LTWidgetTypography.title)
 
             Spacer()
 
             Text("\(stats.totalSolved)")
-                .font(.system(size: 42, weight: .semibold, design: .rounded))
+                .font(LTWidgetTypography.primaryNumber)
                 .contentTransition(.numericText())
 
             Text("solved")
-                .font(.caption)
-                .foregroundStyle(.secondary)
+                .font(LTWidgetTypography.label)
+                .foregroundStyle(LTWidgetColor.secondary)
 
             Text(username)
-                .font(.caption)
-                .foregroundStyle(.secondary)
+                .font(LTWidgetTypography.label)
+                .foregroundStyle(LTWidgetColor.secondary)
                 .lineLimit(1)
         }
     }
@@ -129,69 +128,35 @@ private struct MediumWidgetView: View {
     let stats: CachedLeetCodeStats
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: LTWidgetSpacing.large) {
             HStack(alignment: .firstTextBaseline) {
-                VStack(alignment: .leading, spacing: 2) {
+                VStack(alignment: .leading, spacing: LTWidgetSpacing.xSmall) {
                     Text("LeetTracker")
-                        .font(.headline)
+                        .font(LTWidgetTypography.title)
 
                     Text(username)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .font(LTWidgetTypography.label)
+                        .foregroundStyle(LTWidgetColor.secondary)
                         .lineLimit(1)
                 }
 
                 Spacer()
 
-                VStack(alignment: .trailing, spacing: 2) {
+                VStack(alignment: .trailing, spacing: LTWidgetSpacing.xSmall) {
                     Text("\(stats.totalSolved)")
-                        .font(.title.weight(.semibold))
+                        .font(LTWidgetTypography.mediumNumber)
 
                     Text("solved")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                        .font(LTWidgetTypography.label)
+                        .foregroundStyle(LTWidgetColor.secondary)
                 }
             }
 
-            VStack(spacing: 8) {
-                DifficultyStatRow(title: "Easy", value: stats.easySolved)
-                DifficultyStatRow(title: "Medium", value: stats.mediumSolved)
-                DifficultyStatRow(title: "Hard", value: stats.hardSolved)
+            VStack(spacing: LTWidgetSpacing.medium) {
+                WidgetStatRow(title: "Easy", value: stats.easySolved)
+                WidgetStatRow(title: "Medium", value: stats.mediumSolved)
+                WidgetStatRow(title: "Hard", value: stats.hardSolved)
             }
-        }
-    }
-}
-
-private struct DifficultyStatRow: View {
-    let title: String
-    let value: Int
-
-    var body: some View {
-        HStack {
-            Text(title)
-                .font(.caption)
-                .foregroundStyle(.secondary)
-
-            Spacer()
-
-            Text("\(value)")
-                .font(.caption.weight(.semibold))
-        }
-    }
-}
-
-private struct EmptyWidgetView: View {
-    var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("LeetTracker")
-                .font(.headline)
-
-            Spacer()
-
-            Text("Set username in LeetTracker")
-                .font(.subheadline.weight(.medium))
-                .foregroundStyle(.secondary)
-                .fixedSize(horizontal: false, vertical: true)
         }
     }
 }

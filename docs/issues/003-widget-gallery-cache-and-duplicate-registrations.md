@@ -1,6 +1,6 @@
-# Issue 003: Widget gallery cache still does not show LeetTracker
+# Issue 003: Widget gallery cache did not show LeetTracker
 
-Status: Open
+Status: Resolved
 
 ## Problem
 
@@ -25,7 +25,12 @@ Duplicate registrations with the same widget extension identifier can leave Widg
 - Added App Sandbox entitlements.
 - Changed the widget kind to a reverse-DNS identifier.
 - Reload widget timelines when the host app launches.
+- Restarted Notification Center and `chronod`.
 
-## Next Steps
+## Resolution
 
-Move the temporary `/Applications/LeetTracker*.app` test copies to Trash, clear the widget daemon cache, rebuild, and register exactly one app bundle.
+After clearing stale LeetTracker widget registrations and restarting widget services, the widget appeared on the desktop and rendered the placeholder `LeetTracker / Widget ready` content.
+
+## Follow-Up
+
+An attempt was made to move the temporary `/Applications/LeetTracker*.app` test copies to Trash with Finder automation, but macOS left them in place. They are no longer registered as WidgetKit providers. Leave them alone unless they cause a future conflict, or remove them manually from Finder.

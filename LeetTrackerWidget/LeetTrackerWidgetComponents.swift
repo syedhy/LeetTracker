@@ -144,7 +144,34 @@ struct WidgetUpdatedText: View {
     }()
 }
 
+struct WidgetStatusPill: View {
+    let text: String
+    let tint: Color
+
+    var body: some View {
+        HStack(spacing: LTWidgetSpacing.compact) {
+            Circle()
+                .fill(tint)
+                .frame(width: LTWidgetSizing.difficultyDot, height: LTWidgetSizing.difficultyDot)
+
+            Text(text)
+                .font(LTWidgetTypography.label.weight(.medium))
+                .foregroundStyle(LTWidgetColor.secondary)
+                .lineLimit(1)
+                .minimumScaleFactor(0.78)
+        }
+        .padding(.horizontal, LTWidgetSpacing.medium)
+        .padding(.vertical, LTWidgetSpacing.small)
+        .background(LTWidgetColor.panel, in: Capsule())
+        .overlay {
+            Capsule()
+                .stroke(LTWidgetColor.panelStroke, lineWidth: 1)
+        }
+    }
+}
+
 struct WidgetEmptyStateView: View {
+    let title: String
     let message: String
 
     var body: some View {
@@ -153,10 +180,18 @@ struct WidgetEmptyStateView: View {
 
             Spacer()
 
-            Text(message)
-                .font(LTWidgetTypography.emptyState)
-                .foregroundStyle(LTWidgetColor.secondary)
-                .fixedSize(horizontal: false, vertical: true)
+            VStack(alignment: .leading, spacing: LTWidgetSpacing.small) {
+                Text(title)
+                    .font(LTWidgetTypography.stateTitle)
+                    .foregroundStyle(LTWidgetColor.primary)
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.8)
+
+                Text(message)
+                    .font(LTWidgetTypography.label)
+                    .foregroundStyle(LTWidgetColor.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
         }
     }
 }
@@ -167,20 +202,24 @@ struct WidgetErrorStateView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: LTWidgetSpacing.large) {
-            Text("LeetTracker")
-                .font(LTWidgetTypography.title)
-                .foregroundStyle(LTWidgetColor.brand)
+            WidgetHeader(showMark: true)
 
             Spacer()
 
-            Text(title)
-                .font(LTWidgetTypography.emptyState)
-                .foregroundStyle(LTWidgetColor.primary)
+            VStack(alignment: .leading, spacing: LTWidgetSpacing.small) {
+                WidgetStatusPill(text: "Needs attention", tint: LTWidgetColor.error)
 
-            Text(message)
-                .font(LTWidgetTypography.label)
-                .foregroundStyle(LTWidgetColor.secondary)
-                .fixedSize(horizontal: false, vertical: true)
+                Text(title)
+                    .font(LTWidgetTypography.stateTitle)
+                    .foregroundStyle(LTWidgetColor.primary)
+                    .lineLimit(2)
+                    .minimumScaleFactor(0.82)
+
+                Text(message)
+                    .font(LTWidgetTypography.label)
+                    .foregroundStyle(LTWidgetColor.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
         }
     }
 }
@@ -192,9 +231,25 @@ struct WidgetLoadingStateView: View {
 
             Spacer()
 
-            Text("Updating stats...")
-                .font(LTWidgetTypography.emptyState)
-                .foregroundStyle(LTWidgetColor.secondary)
+            VStack(alignment: .leading, spacing: LTWidgetSpacing.medium) {
+                Text("Updating stats")
+                    .font(LTWidgetTypography.stateTitle)
+                    .foregroundStyle(LTWidgetColor.primary)
+
+                VStack(alignment: .leading, spacing: LTWidgetSpacing.small) {
+                    RoundedRectangle(cornerRadius: LTWidgetRadius.metric)
+                        .fill(LTWidgetColor.panel)
+                        .frame(width: 92, height: 12)
+
+                    RoundedRectangle(cornerRadius: LTWidgetRadius.metric)
+                        .fill(LTWidgetColor.panel)
+                        .frame(width: 132, height: 12)
+
+                    RoundedRectangle(cornerRadius: LTWidgetRadius.metric)
+                        .fill(LTWidgetColor.panel)
+                        .frame(width: 72, height: 12)
+                }
+            }
         }
     }
 }

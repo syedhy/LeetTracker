@@ -5,6 +5,15 @@ struct LeetTrackerEntry: TimelineEntry {
     let date: Date
     let username: String?
     let stats: CachedLeetCodeStats
+    let state: LeetTrackerWidgetState
+}
+
+enum LeetTrackerWidgetState {
+    case loading
+    case empty
+    case success
+    case offline(message: String)
+    case error(title: String, message: String)
 }
 
 struct LeetTrackerTimelineProvider: TimelineProvider {
@@ -12,7 +21,12 @@ struct LeetTrackerTimelineProvider: TimelineProvider {
     private let sharedStore = SharedLeetTrackerStore()
 
     func placeholder(in context: Context) -> LeetTrackerEntry {
-        LeetTrackerEntry(date: Date(), username: "leetcode-user", stats: .placeholder)
+        LeetTrackerEntry(
+            date: Date(),
+            username: "leetcode-user",
+            stats: .placeholder,
+            state: .loading
+        )
     }
 
     func getSnapshot(in context: Context, completion: @escaping (LeetTrackerEntry) -> Void) {
@@ -28,30 +42,73 @@ struct LeetTrackerTimelineProvider: TimelineProvider {
     }
 
     private var cachedEntry: LeetTrackerEntry {
-        LeetTrackerEntry(
+        guard let username = sharedStore.username else {
+            return LeetTrackerEntry(date: Date(), username: nil, stats: .placeholder, state: .empty)
+        }
+
+        guard let cachedStats = sharedStore.cachedStats else {
+            return LeetTrackerEntry(date: Date(), username: username, stats: .placeholder, state: .loading)
+        }
+
+        return LeetTrackerEntry(
             date: Date(),
-            username: sharedStore.username,
-            stats: sharedStore.cachedStats ?? .placeholder
+            username: cachedStats.username,
+            stats: cachedStats,
+            state: .success
         )
     }
 
     private func refreshedEntry() async -> LeetTrackerEntry {
         guard let username = sharedStore.username else {
-            return LeetTrackerEntry(date: Date(), username: nil, stats: .placeholder)
+            return LeetTrackerEntry(date: Date(), username: nil, stats: .placeholder, state: .empty)
         }
 
         do {
             let stats = try await client.fetchStats(for: username)
             let cachedStats = stats.cachedStats
             sharedStore.saveCachedStats(cachedStats)
-            return LeetTrackerEntry(date: Date(), username: stats.username, stats: cachedStats)
+            return LeetTrackerEntry(
+                date: Date(),
+                username: stats.username,
+                stats: cachedStats,
+                state: .success
+            )
         } catch {
+            if let cachedStats = sharedStore.cachedStats {
+                return LeetTrackerEntry(
+                    date: Date(),
+                    username: cachedStats.username,
+                    stats: cachedStats,
+                    state: .offline(message: "Showing saved data")
+                )
+            }
+
             return LeetTrackerEntry(
                 date: Date(),
                 username: username,
-                stats: sharedStore.cachedStats ?? .placeholder
+                stats: .placeholder,
+                state: .error(title: "Could not update", message: widgetMessage(for: error))
             )
         }
+    }
+
+    private func widgetMessage(for error: Error) -> String {
+        if let profileError = error as? LeetCodeProfileError {
+            switch profileError {
+            case .invalidUsername:
+                return "Open LeetTracker and enter a valid username."
+            case .profileNotFound:
+                return "This LeetCode username was not found."
+            case .timeout:
+                return "LeetCode took too long to respond."
+            case .networkUnavailable:
+                return "Check your connection and try again later."
+            case .malformedResponse, .endpointChanged:
+                return "LeetCode returned an unexpected response."
+            }
+        }
+
+        return "Open LeetTracker and refresh when ready."
     }
 }
 
@@ -62,16 +119,53 @@ struct LeetTrackerWidgetEntryView: View {
 
     var body: some View {
         WidgetContainer {
-            if let username = entry.username {
-                switch family {
-                case .systemMedium:
-                    MediumWidgetView(username: username, stats: entry.stats)
-                default:
-                    SmallWidgetView(username: username, stats: entry.stats)
+            switch entry.state {
+            case .loading:
+                WidgetLoadingStateView()
+            case .empty:
+                WidgetEmptyStateView(
+                    title: "Add a username",
+                    message: "Open LeetTracker to start tracking your public LeetCode progress."
+                )
+            case .error(let title, let message):
+                WidgetErrorStateView(title: title, message: message)
+            case .success:
+                if let username = entry.username {
+                    statsView(username: username, stats: entry.stats)
+                } else {
+                    WidgetEmptyStateView(
+                        title: "Add a username",
+                        message: "Open LeetTracker to start tracking your public LeetCode progress."
+                    )
                 }
-            } else {
-                WidgetEmptyStateView(message: "Set username in LeetTracker")
+            case .offline(let message):
+                if let username = entry.username {
+                    statsView(
+                        username: username,
+                        stats: entry.stats,
+                        status: WidgetStatusPill(text: message, tint: LTWidgetColor.warning)
+                    )
+                } else {
+                    WidgetEmptyStateView(
+                        title: "Add a username",
+                        message: "Open LeetTracker to start tracking your public LeetCode progress."
+                    )
+                }
             }
+        }
+    }
+
+    @ViewBuilder
+    private func statsView(
+        username: String,
+        stats: CachedLeetCodeStats,
+        status: WidgetStatusPill? = nil
+    ) -> some View {
+        switch family {
+        case .systemMedium:
+            MediumWidgetView(username: username, stats: stats, status: status)
+        default:
+            SmallWidgetView(username: username, stats: stats, status: status)
         }
     }
 }
@@ -92,12 +186,21 @@ struct LeetTrackerWidget: Widget {
 #Preview(as: .systemSmall) {
     LeetTrackerWidget()
 } timeline: {
-    LeetTrackerEntry(date: Date(), username: "leetcode-user", stats: .placeholder)
+    LeetTrackerEntry(date: Date(), username: "leetcode-user", stats: .placeholder, state: .success)
+    LeetTrackerEntry(date: Date(), username: "leetcode-user", stats: .placeholder, state: .offline(message: "Showing saved data"))
+    LeetTrackerEntry(date: Date(), username: nil, stats: .placeholder, state: .empty)
 }
 
 private struct SmallWidgetView: View {
     let username: String
     let stats: CachedLeetCodeStats
+    let status: WidgetStatusPill?
+
+    init(username: String, stats: CachedLeetCodeStats, status: WidgetStatusPill? = nil) {
+        self.username = username
+        self.stats = stats
+        self.status = status
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: LTWidgetSpacing.medium) {
@@ -129,7 +232,11 @@ private struct SmallWidgetView: View {
 
             WidgetDifficultySummary(stats: stats)
 
-            WidgetUpdatedText(date: stats.lastUpdated)
+            if let status {
+                status
+            } else {
+                WidgetUpdatedText(date: stats.lastUpdated)
+            }
         }
     }
 }
@@ -137,6 +244,13 @@ private struct SmallWidgetView: View {
 private struct MediumWidgetView: View {
     let username: String
     let stats: CachedLeetCodeStats
+    let status: WidgetStatusPill?
+
+    init(username: String, stats: CachedLeetCodeStats, status: WidgetStatusPill? = nil) {
+        self.username = username
+        self.stats = stats
+        self.status = status
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: LTWidgetSpacing.large) {
@@ -172,6 +286,10 @@ private struct MediumWidgetView: View {
             }
 
             WidgetDifficultySummary(stats: stats)
+
+            if let status {
+                status
+            }
         }
     }
 }

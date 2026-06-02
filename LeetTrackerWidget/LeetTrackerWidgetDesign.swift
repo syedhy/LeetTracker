@@ -20,6 +20,7 @@ enum LTWidgetTypography {
     static let label = Font.caption
     static let statLabel = Font.caption.weight(.medium)
     static let emptyState = Font.subheadline.weight(.medium)
+    static let stateTitle = Font.headline.weight(.semibold)
 }
 
 enum LTWidgetColor {
@@ -41,6 +42,8 @@ enum LTWidgetColor {
     static let easy = Color(red: 0.30, green: 0.84, blue: 0.44)
     static let medium = Color(red: 1.00, green: 0.62, blue: 0.10)
     static let hard = Color(red: 1.00, green: 0.31, blue: 0.52)
+    static let warning = Color(red: 1.00, green: 0.70, blue: 0.24)
+    static let error = Color(red: 1.00, green: 0.34, blue: 0.44)
 }
 
 enum LTWidgetSizing {

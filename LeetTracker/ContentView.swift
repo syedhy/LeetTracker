@@ -153,6 +153,10 @@ private final class LeetTrackerViewModel: ObservableObject {
         }
 
         if let cachedStats = snapshot.cachedStats {
+            if username.isEmpty {
+                username = cachedStats.username
+            }
+
             stats = LeetCodeStats(cachedStats: cachedStats)
             statusMessage = "Loaded \(cachedStats.username). Updated \(formatted(cachedStats.lastUpdated))."
         }
@@ -182,11 +186,25 @@ private final class LeetTrackerViewModel: ObservableObject {
             statusMessage = "Updated \(freshStats.username). Last checked \(formatted(freshStats.lastUpdated))."
             return true
         } catch let error as LeetCodeProfileError {
-            statusMessage = error.localizedDescription
+            showCachedStatsAfterFailure(error)
             return false
         } catch {
-            statusMessage = LeetCodeProfileError.networkUnavailable.localizedDescription
+            showCachedStatsAfterFailure(.networkUnavailable)
             return false
+        }
+    }
+
+    private func showCachedStatsAfterFailure(_ error: LeetCodeProfileError) {
+        if let cachedStats = sharedStore.cachedStats {
+            stats = LeetCodeStats(cachedStats: cachedStats)
+
+            if trimmedUsername.isEmpty {
+                username = cachedStats.username
+            }
+
+            statusMessage = "\(error.localizedDescription) Showing saved stats from \(formatted(cachedStats.lastUpdated))."
+        } else {
+            statusMessage = "\(error.localizedDescription) No saved stats yet."
         }
     }
 

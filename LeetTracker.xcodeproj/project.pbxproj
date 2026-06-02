@@ -93,6 +93,9 @@
 			children = (
 				111111111111111111112001 /* LeetTrackerApp.swift */,
 				111111111111111111112002 /* ContentView.swift */,
+				111111111111111111112010 /* LeetCodeClient.swift */,
+				111111111111111111112011 /* LeetCodeStats.swift */,
+				111111111111111111112012 /* LeetCodeProfileError.swift */,
 				111111111111111111118003 /* Data */,
 				111111111111111111118004 /* Domain */,
 				111111111111111111118005 /* Presentation */,
@@ -106,7 +109,6 @@
 		111111111111111111118003 /* Data */ = {
 			isa = PBXGroup;
 			children = (
-				111111111111111111112010 /* LeetCodeClient.swift */,
 			);
 			path = Data;
 			sourceTree = "<group>";
@@ -114,8 +116,6 @@
 		111111111111111111118004 /* Domain */ = {
 			isa = PBXGroup;
 			children = (
-				111111111111111111112011 /* LeetCodeStats.swift */,
-				111111111111111111112012 /* LeetCodeProfileError.swift */,
 			);
 			path = Domain;
 			sourceTree = "<group>";

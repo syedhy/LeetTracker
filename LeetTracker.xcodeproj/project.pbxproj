@@ -17,7 +17,6 @@
 		111111111111111111111008 /* LeetCodeClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 111111111111111111112010 /* LeetCodeClient.swift */; };
 		111111111111111111111009 /* LeetCodeStats.swift in Sources */ = {isa = PBXBuildFile; fileRef = 111111111111111111112011 /* LeetCodeStats.swift */; };
 		111111111111111111111010 /* LeetCodeProfileError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 111111111111111111112012 /* LeetCodeProfileError.swift */; };
-		111111111111111111111011 /* LeetTrackerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 111111111111111111112013 /* LeetTrackerViewModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -57,7 +56,6 @@
 		111111111111111111112010 /* LeetCodeClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LeetCodeClient.swift; sourceTree = "<group>"; };
 		111111111111111111112011 /* LeetCodeStats.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LeetCodeStats.swift; sourceTree = "<group>"; };
 		111111111111111111112012 /* LeetCodeProfileError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LeetCodeProfileError.swift; sourceTree = "<group>"; };
-		111111111111111111112013 /* LeetTrackerViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LeetTrackerViewModel.swift; sourceTree = "<group>"; };
 		111111111111111111113001 /* LeetTracker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LeetTracker.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		111111111111111111113002 /* LeetTrackerWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = LeetTrackerWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -125,7 +123,6 @@
 		111111111111111111118005 /* Presentation */ = {
 			isa = PBXGroup;
 			children = (
-				111111111111111111112013 /* LeetTrackerViewModel.swift */,
 			);
 			path = Presentation;
 			sourceTree = "<group>";
@@ -285,7 +282,6 @@
 				111111111111111111111008 /* LeetCodeClient.swift in Sources */,
 				111111111111111111111009 /* LeetCodeStats.swift in Sources */,
 				111111111111111111111010 /* LeetCodeProfileError.swift in Sources */,
-				111111111111111111111011 /* LeetTrackerViewModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -1,14 +1,14 @@
-# Issue 002: Widget extension did not appear in macOS widget gallery
+# Issue 002: Widget was not showing up in the widget gallery
 
 Status: Resolved
 
 GitHub Issue: #2
 
-## Problem
+## What happened
 
-The app built and launched, and the widget extension was embedded in the app bundle, but macOS did not list `LeetTracker` in the desktop widget gallery.
+The app built and ran, and the widget extension was inside the app bundle, but macOS still did not show `LeetTracker` in the desktop widget gallery.
 
-## Evidence
+## What I checked
 
 `pluginkit` did not initially list:
 
@@ -16,14 +16,14 @@ The app built and launched, and the widget extension was embedded in the app bun
 com.hyder.LeetTracker.LeetTrackerWidgetExtension
 ```
 
-The extension bundle existed and had the WidgetKit extension point, so the failure was in system discovery/registration rather than Swift compilation.
+So the Swift code was not the problem. The system just was not registering the extension.
 
-## Resolution
+## Fix
 
-Added App Sandbox entitlements to both the app and the widget extension:
+Added App Sandbox entitlements to both targets:
 
 ```text
 com.apple.security.app-sandbox = true
 ```
 
-After rebuilding and re-registering, `pluginkit` listed the WidgetKit extension successfully.
+After rebuilding, macOS started registering the WidgetKit extension.

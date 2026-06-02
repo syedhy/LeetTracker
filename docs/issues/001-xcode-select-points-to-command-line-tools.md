@@ -1,33 +1,33 @@
-# Issue 001: Terminal xcodebuild uses Command Line Tools by default
+# Issue 001: Terminal xcodebuild points at Command Line Tools
 
 Status: Open
 
 GitHub Issue: #1
 
-## Problem
+## What happened
 
-Running `xcodebuild` directly fails because `xcode-select` currently points to:
+When I run `xcodebuild` directly, it uses:
 
 ```text
 /Library/Developer/CommandLineTools
 ```
 
-That developer directory cannot build native Xcode app projects with WidgetKit targets.
+That is fine for basic command line stuff, but it is not enough for this Xcode app + WidgetKit project.
 
-## Current Workaround
+## What works for now
 
-Use full Xcode explicitly:
+I can build by pointing the command at full Xcode:
 
 ```bash
 DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer xcodebuild -project LeetTracker.xcodeproj -scheme LeetTracker -destination 'platform=macOS' build
 ```
 
-## Possible Resolution
+## Fix when I want to
 
-Switch the active developer directory to full Xcode:
+If I want Terminal to always use full Xcode, run:
 
 ```bash
 sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
 ```
 
-Only do this if you want Terminal tools globally pointed at Xcode instead of Command Line Tools.
+Leaving this open for now because the workaround is good enough.

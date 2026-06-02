@@ -1,16 +1,16 @@
-# Issue 003: Widget gallery cache did not show LeetTracker
+# Issue 003: Widget gallery got stuck with stale registrations
 
 Status: Resolved
 
 GitHub Issue: #3
 
-## Problem
+## What happened
 
-`pluginkit` can register `com.hyder.LeetTracker.LeetTrackerWidgetExtension`, but the macOS desktop widget gallery still does not show `LeetTracker` in search.
+`pluginkit` was finally seeing the widget, but the widget gallery still did not show `LeetTracker` in search.
 
-## Evidence
+## What probably caused it
 
-The system has seen multiple app bundles with the same app and extension identifiers during debugging:
+During debugging I had a few app bundles with the same bundle IDs:
 
 ```text
 /Applications/LeetTracker.app
@@ -19,9 +19,9 @@ The system has seen multiple app bundles with the same app and extension identif
 DerivedData Debug and Release builds
 ```
 
-Duplicate registrations with the same widget extension identifier can leave WidgetKit/Notification Center in a confusing state.
+That seems to have confused WidgetKit/Notification Center.
 
-## Current Mitigation
+## What fixed it
 
 - Unregistered duplicate extension paths with `pluginkit -r`.
 - Added App Sandbox entitlements.
@@ -29,10 +29,8 @@ Duplicate registrations with the same widget extension identifier can leave Widg
 - Reload widget timelines when the host app launches.
 - Restarted Notification Center and `chronod`.
 
-## Resolution
-
-After clearing stale LeetTracker widget registrations and restarting widget services, the widget appeared on the desktop and rendered the placeholder `LeetTracker / Widget ready` content.
+After that, the widget appeared on the desktop and rendered `LeetTracker / Widget ready`.
 
 ## Follow-Up
 
-An attempt was made to move the temporary `/Applications/LeetTracker*.app` test copies to Trash with Finder automation, but macOS left them in place. They are no longer registered as WidgetKit providers. Leave them alone unless they cause a future conflict, or remove them manually from Finder.
+The temporary `/Applications/LeetTracker*.app` copies are still on disk, but they are no longer registered as WidgetKit providers. I will leave them alone unless they cause trouble again.

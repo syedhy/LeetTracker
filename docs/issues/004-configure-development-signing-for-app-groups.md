@@ -1,16 +1,16 @@
-# Issue 004: Configure Apple Development signing for App Groups
+# Issue 004: App Groups needed real Apple Development signing
 
-Status: Open
+Status: Resolved
 
 GitHub Issue: #4
 
-## Problem
+## What happened
 
-Phase 3 adds App Group entitlements so the macOS app and WidgetKit extension can share username and cached stats. Xcode can compile the project with signing disabled, but a normal signed build currently fails because no valid Apple Development code-signing identity is installed.
+After adding App Groups, the project stopped building with local ad-hoc signing. That makes sense: App Groups are a real entitlement, so Xcode needs an Apple Development identity and provisioning profile.
 
-## Evidence
+## What I saw before fixing it
 
-`security find-identity -v -p codesigning` reports:
+At first, the machine had no signing identity:
 
 ```text
 0 valid identities found
@@ -23,19 +23,12 @@ Normal build error:
 "LeetTrackerWidgetExtension" has entitlements that require signing with a development certificate.
 ```
 
-## Current Workaround
+## Fix
 
-Use this command to compile the Phase 3 code without signing:
+Added the Apple account in Xcode and selected the development team for both targets.
+
+Now `security find-identity -v -p codesigning` shows an Apple Development identity, and this normal signed build works:
 
 ```bash
-DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer xcodebuild -project LeetTracker.xcodeproj -scheme LeetTracker -destination 'platform=macOS' CODE_SIGNING_ALLOWED=NO build
+DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer xcodebuild -project LeetTracker.xcodeproj -scheme LeetTracker -destination 'platform=macOS' build
 ```
-
-## Resolution Path
-
-1. Open Xcode settings.
-2. Add an Apple ID under Accounts if one is not already present.
-3. Select the `LeetTracker` project.
-4. For both targets, select a development team under Signing & Capabilities.
-5. Ensure the App Group `group.com.hyder.LeetTracker` is available for both targets.
-6. Re-run a normal build without `CODE_SIGNING_ALLOWED=NO`.

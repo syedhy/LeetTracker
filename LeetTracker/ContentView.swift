@@ -6,14 +6,20 @@ struct ContentView: View {
     @StateObject private var viewModel = LeetTrackerViewModel()
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 24) {
-            header
-            usernameSection
-            placeholderStatsSection
-            statusSection
+        ZStack {
+            AppSurfaceBackground()
+
+            VStack(alignment: .leading, spacing: 24) {
+                header
+
+                HStack(alignment: .top, spacing: 20) {
+                    statsSection
+                    setupSection
+                }
+            }
+            .padding(28)
         }
-        .padding(28)
-        .frame(minWidth: 520, idealWidth: 560, minHeight: 420)
+        .frame(minWidth: 760, idealWidth: 860, minHeight: 520)
         .onAppear {
             viewModel.loadSavedState()
             requestWidgetReload()
@@ -21,60 +27,90 @@ struct ContentView: View {
     }
 
     private var header: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            Text("LeetTracker")
-                .font(.largeTitle.weight(.semibold))
+        HStack(alignment: .center, spacing: 14) {
+            AppIconMark()
 
-            Text("Desktop widget setup")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
+            VStack(alignment: .leading, spacing: 4) {
+                Text("LeetTracker")
+                    .font(.largeTitle.weight(.semibold))
+
+                Text("Desktop widget setup")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
+
+            Spacer()
+
+            StatusPill(
+                title: viewModel.isLoading ? "Syncing" : "Ready",
+                systemImage: viewModel.isLoading ? "arrow.triangle.2.circlepath" : "checkmark.circle.fill",
+                tint: viewModel.isLoading ? .orange : .green
+            )
         }
     }
 
-    private var usernameSection: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Text("LeetCode Username")
-                .font(.headline)
+    private var statsSection: some View {
+        VStack(alignment: .leading, spacing: 18) {
+            SectionHeader(title: "Progress", systemImage: "chart.bar.xaxis")
+
+            TotalSolvedCard(
+                total: viewModel.totalSolvedText,
+                username: viewModel.displayUsername,
+                lastUpdated: viewModel.lastUpdatedText
+            )
 
             HStack(spacing: 12) {
-                TextField("username", text: $viewModel.username)
-                    .textFieldStyle(.roundedBorder)
-                    .onSubmit(saveUsername)
+                DifficultyCard(title: "Easy", value: viewModel.easySolvedText, tint: AppColor.easy)
+                DifficultyCard(title: "Medium", value: viewModel.mediumSolvedText, tint: AppColor.medium)
+                DifficultyCard(title: "Hard", value: viewModel.hardSolvedText, tint: AppColor.hard)
+            }
+        }
+        .frame(minWidth: 330, maxWidth: .infinity)
+    }
 
-                Button("Save", action: saveUsername)
+    private var setupSection: some View {
+        Panel {
+            VStack(alignment: .leading, spacing: 18) {
+                SectionHeader(title: "Setup", systemImage: "person.crop.circle")
+
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("LeetCode Username")
+                        .font(.headline)
+
+                    TextField("username", text: $viewModel.username)
+                        .textFieldStyle(.plain)
+                        .font(.body)
+                        .padding(.horizontal, 13)
+                        .frame(height: 38)
+                        .background(.background.opacity(0.72), in: RoundedRectangle(cornerRadius: 10))
+                        .overlay {
+                            RoundedRectangle(cornerRadius: 10)
+                                .stroke(.quaternary, lineWidth: 1)
+                        }
+                        .onSubmit(saveUsername)
+                }
+
+                HStack(spacing: 10) {
+                    Button(action: saveUsername) {
+                        Label("Save", systemImage: "checkmark.circle.fill")
+                    }
+                    .buttonStyle(PrimaryActionButtonStyle())
                     .keyboardShortcut(.defaultAction)
                     .disabled(viewModel.trimmedUsername.isEmpty || viewModel.isLoading)
 
-                Button("Refresh", action: refreshStats)
+                    Button(action: refreshStats) {
+                        Label("Refresh", systemImage: "arrow.clockwise")
+                    }
+                    .buttonStyle(SecondaryActionButtonStyle())
                     .disabled(viewModel.trimmedUsername.isEmpty || viewModel.isLoading)
+                }
+
+                Divider()
+
+                StatusPanel(message: viewModel.statusMessage, isLoading: viewModel.isLoading)
             }
         }
-    }
-
-    private var placeholderStatsSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("Stats Preview")
-                .font(.headline)
-
-            HStack(spacing: 12) {
-                StatPlaceholder(title: "Total", value: viewModel.totalSolvedText)
-                StatPlaceholder(title: "Easy", value: viewModel.easySolvedText)
-                StatPlaceholder(title: "Medium", value: viewModel.mediumSolvedText)
-                StatPlaceholder(title: "Hard", value: viewModel.hardSolvedText)
-            }
-        }
-    }
-
-    private var statusSection: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("Status")
-                .font(.headline)
-
-            Text(viewModel.statusMessage)
-                .font(.body)
-                .foregroundStyle(.secondary)
-                .frame(maxWidth: .infinity, alignment: .leading)
-        }
+        .frame(width: 320)
     }
 
     private func saveUsername() {
@@ -101,22 +137,220 @@ struct ContentView: View {
     }
 }
 
-private struct StatPlaceholder: View {
+private enum AppColor {
+    static let brand = Color(red: 0.22, green: 0.58, blue: 0.98)
+    static let easy = Color(red: 0.18, green: 0.73, blue: 0.38)
+    static let medium = Color(red: 0.95, green: 0.58, blue: 0.08)
+    static let hard = Color(red: 0.92, green: 0.25, blue: 0.42)
+}
+
+private struct AppSurfaceBackground: View {
+    var body: some View {
+        LinearGradient(
+            colors: [
+                Color(nsColor: .windowBackgroundColor),
+                Color(nsColor: .controlBackgroundColor).opacity(0.72)
+            ],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+        .ignoresSafeArea()
+    }
+}
+
+private struct AppIconMark: View {
+    var body: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 14)
+                .fill(AppColor.brand.gradient)
+
+            Image(systemName: "chevron.left.forwardslash.chevron.right")
+                .font(.title3.weight(.bold))
+                .foregroundStyle(.white)
+        }
+        .frame(width: 48, height: 48)
+        .shadow(color: AppColor.brand.opacity(0.28), radius: 16, y: 8)
+    }
+}
+
+private struct StatusPill: View {
     let title: String
-    let value: String
+    let systemImage: String
+    let tint: Color
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 6) {
+        Label(title, systemImage: systemImage)
+            .font(.subheadline.weight(.semibold))
+            .foregroundStyle(tint)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 8)
+            .background(tint.opacity(0.12), in: Capsule())
+    }
+}
+
+private struct Panel<Content: View>: View {
+    private let content: Content
+
+    init(@ViewBuilder content: () -> Content) {
+        self.content = content()
+    }
+
+    var body: some View {
+        content
+            .padding(20)
+            .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 18))
+            .overlay {
+                RoundedRectangle(cornerRadius: 18)
+                    .stroke(.quaternary, lineWidth: 1)
+            }
+    }
+}
+
+private struct SectionHeader: View {
+    let title: String
+    let systemImage: String
+
+    var body: some View {
+        Label(title, systemImage: systemImage)
+            .font(.headline)
+            .foregroundStyle(.primary)
+    }
+}
+
+private struct TotalSolvedCard: View {
+    let total: String
+    let username: String
+    let lastUpdated: String
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            HStack(alignment: .top) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(username)
+                        .font(.headline)
+                        .foregroundStyle(.white.opacity(0.72))
+                        .lineLimit(1)
+
+                    Text(lastUpdated)
+                        .font(.caption)
+                        .foregroundStyle(.white.opacity(0.48))
+                }
+
+                Spacer()
+
+                Image(systemName: "checkmark.seal.fill")
+                    .font(.title2)
+                    .foregroundStyle(AppColor.brand)
+            }
+
+            HStack(alignment: .lastTextBaseline, spacing: 8) {
+                Text(total)
+                    .font(.system(size: 58, weight: .semibold, design: .rounded))
+                    .foregroundStyle(.white)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
+
+                Text("solved")
+                    .font(.title3.weight(.medium))
+                    .foregroundStyle(.white.opacity(0.62))
+            }
+        }
+        .padding(20)
+        .frame(maxWidth: .infinity, minHeight: 176, alignment: .leading)
+        .background(
+            LinearGradient(
+                colors: [
+                    Color(red: 0.08, green: 0.10, blue: 0.13),
+                    Color(red: 0.04, green: 0.06, blue: 0.08)
+                ],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            ),
+            in: RoundedRectangle(cornerRadius: 18)
+        )
+    }
+}
+
+private struct DifficultyCard: View {
+    let title: String
+    let value: String
+    let tint: Color
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Circle()
+                .fill(tint)
+                .frame(width: 10, height: 10)
+
             Text(value)
                 .font(.title2.weight(.semibold))
+                .foregroundStyle(.primary)
 
             Text(title)
-                .font(.caption)
+                .font(.caption.weight(.medium))
                 .foregroundStyle(.secondary)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(14)
-        .background(.quaternary, in: RoundedRectangle(cornerRadius: 8))
+        .background(tint.opacity(0.10), in: RoundedRectangle(cornerRadius: 14))
+        .overlay {
+            RoundedRectangle(cornerRadius: 14)
+                .stroke(tint.opacity(0.22), lineWidth: 1)
+        }
+    }
+}
+
+private struct StatusPanel: View {
+    let message: String
+    let isLoading: Bool
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 12) {
+            if isLoading {
+                ProgressView()
+                    .controlSize(.small)
+                    .padding(.top, 2)
+            } else {
+                Image(systemName: "info.circle.fill")
+                    .font(.body)
+                    .foregroundStyle(AppColor.brand)
+                    .padding(.top, 2)
+            }
+
+            Text(message)
+                .font(.callout)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        .padding(14)
+        .background(.quaternary.opacity(0.55), in: RoundedRectangle(cornerRadius: 14))
+    }
+}
+
+private struct PrimaryActionButtonStyle: ButtonStyle {
+    @Environment(\.isEnabled) private var isEnabled
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .font(.callout.weight(.semibold))
+            .foregroundStyle(.white)
+            .padding(.horizontal, 14)
+            .frame(height: 36)
+            .background(AppColor.brand.opacity(isEnabled ? (configuration.isPressed ? 0.72 : 1) : 0.42), in: RoundedRectangle(cornerRadius: 10))
+    }
+}
+
+private struct SecondaryActionButtonStyle: ButtonStyle {
+    @Environment(\.isEnabled) private var isEnabled
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .font(.callout.weight(.semibold))
+            .foregroundStyle(isEnabled ? .primary : .secondary)
+            .padding(.horizontal, 14)
+            .frame(height: 36)
+            .background(.quaternary.opacity(configuration.isPressed ? 0.9 : 0.62), in: RoundedRectangle(cornerRadius: 10))
     }
 }
 
@@ -160,6 +394,26 @@ private final class LeetTrackerViewModel: ObservableObject {
 
     var hardSolvedText: String {
         statText(stats?.hardSolved)
+    }
+
+    var displayUsername: String {
+        if let username = stats?.username, !username.isEmpty {
+            return username
+        }
+
+        if !trimmedUsername.isEmpty {
+            return trimmedUsername
+        }
+
+        return "No profile selected"
+    }
+
+    var lastUpdatedText: String {
+        guard let lastUpdated = stats?.lastUpdated else {
+            return "Not synced yet"
+        }
+
+        return "Updated \(formatted(lastUpdated))"
     }
 
     func loadSavedState() {

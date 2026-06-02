@@ -15,10 +15,6 @@ struct WidgetContainer<Content: View>: View {
             .containerBackground(for: .widget) {
                 LTWidgetColor.cardBackground
             }
-            .overlay {
-                RoundedRectangle(cornerRadius: LTWidgetRadius.card)
-                    .stroke(LTWidgetColor.cardStroke, lineWidth: 1)
-            }
     }
 }
 
@@ -130,15 +126,16 @@ struct WidgetUpdatedText: View {
     let date: Date
 
     var body: some View {
-        Text("Updated \(Self.relativeFormatter.localizedString(for: date, relativeTo: Date()))")
+        Text("Updated \(Self.timeFormatter.string(from: date))")
             .font(LTWidgetTypography.label)
             .foregroundStyle(LTWidgetColor.tertiary)
             .lineLimit(1)
     }
 
-    private static let relativeFormatter: RelativeDateTimeFormatter = {
-        let formatter = RelativeDateTimeFormatter()
-        formatter.unitsStyle = .short
+    private static let timeFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .none
+        formatter.timeStyle = .short
         return formatter
     }()
 }

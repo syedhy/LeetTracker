@@ -10,7 +10,6 @@ struct LeetTrackerEntry: TimelineEntry {
 struct LeetTrackerTimelineProvider: TimelineProvider {
     private let client = LeetCodeClient()
     private let sharedStore = SharedLeetTrackerStore()
-    private let refreshInterval: TimeInterval = 30 * 60
 
     func placeholder(in context: Context) -> LeetTrackerEntry {
         LeetTrackerEntry(date: Date(), username: "leetcode-user", stats: .placeholder)
@@ -23,7 +22,7 @@ struct LeetTrackerTimelineProvider: TimelineProvider {
     func getTimeline(in context: Context, completion: @escaping (Timeline<LeetTrackerEntry>) -> Void) {
         Task {
             let entry = await refreshedEntry()
-            let nextRefresh = Date().addingTimeInterval(refreshInterval)
+            let nextRefresh = Date().addingTimeInterval(LeetTrackerWidgetConfiguration.refreshInterval)
             completion(Timeline(entries: [entry], policy: .after(nextRefresh)))
         }
     }

@@ -23,6 +23,22 @@ final class LeetTrackerViewModel: ObservableObject {
         username.trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
+    var totalSolvedText: String {
+        statText(stats?.totalSolved)
+    }
+
+    var easySolvedText: String {
+        statText(stats?.easySolved)
+    }
+
+    var mediumSolvedText: String {
+        statText(stats?.mediumSolved)
+    }
+
+    var hardSolvedText: String {
+        statText(stats?.hardSolved)
+    }
+
     func loadSavedState() {
         let snapshot = sharedStore.snapshot
 
@@ -69,12 +85,12 @@ final class LeetTrackerViewModel: ObservableObject {
         }
     }
 
-    func statValue(_ keyPath: KeyPath<LeetCodeStats, Int>) -> String {
-        guard let stats else {
+    private func statText(_ value: Int?) -> String {
+        guard let value else {
             return "--"
         }
 
-        return "\(stats[keyPath: keyPath])"
+        return "\(value)"
     }
 
     private func formatted(_ date: Date) -> String {

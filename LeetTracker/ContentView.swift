@@ -53,10 +53,10 @@ struct ContentView: View {
                 .font(.headline)
 
             HStack(spacing: 12) {
-                StatPlaceholder(title: "Total", value: viewModel.statValue(\.totalSolved))
-                StatPlaceholder(title: "Easy", value: viewModel.statValue(\.easySolved))
-                StatPlaceholder(title: "Medium", value: viewModel.statValue(\.mediumSolved))
-                StatPlaceholder(title: "Hard", value: viewModel.statValue(\.hardSolved))
+                StatPlaceholder(title: "Total", value: viewModel.totalSolvedText)
+                StatPlaceholder(title: "Easy", value: viewModel.easySolvedText)
+                StatPlaceholder(title: "Medium", value: viewModel.mediumSolvedText)
+                StatPlaceholder(title: "Hard", value: viewModel.hardSolvedText)
             }
         }
     }

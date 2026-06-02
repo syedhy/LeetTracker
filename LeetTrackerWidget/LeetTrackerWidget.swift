@@ -100,12 +100,12 @@ private struct SmallWidgetView: View {
     let stats: CachedLeetCodeStats
 
     var body: some View {
-        VStack(alignment: .leading, spacing: LTWidgetSpacing.large) {
-            WidgetHeader(showMark: true)
+        VStack(alignment: .leading, spacing: LTWidgetSpacing.medium) {
+            WidgetHeader()
 
             Spacer(minLength: 0)
 
-            VStack(alignment: .leading, spacing: LTWidgetSpacing.xSmall) {
+            VStack(alignment: .leading, spacing: LTWidgetSpacing.compact) {
                 Text("\(stats.totalSolved)")
                     .font(LTWidgetTypography.primaryNumber)
                     .foregroundStyle(LTWidgetColor.primary)
@@ -113,12 +113,19 @@ private struct SmallWidgetView: View {
                     .lineLimit(1)
                     .minimumScaleFactor(0.72)
 
-                Text("Solved")
-                    .font(LTWidgetTypography.statLabel)
-                    .foregroundStyle(LTWidgetColor.secondary)
+                HStack(spacing: LTWidgetSpacing.small) {
+                    Text("solved")
+                        .font(LTWidgetTypography.user)
+                        .foregroundStyle(LTWidgetColor.secondary)
+
+                    Text(username)
+                        .font(LTWidgetTypography.label)
+                        .foregroundStyle(LTWidgetColor.tertiary)
+                        .lineLimit(1)
+                }
             }
 
-            WidgetHairline()
+            Spacer(minLength: 0)
 
             WidgetDifficultySummary(stats: stats)
 
@@ -133,22 +140,24 @@ private struct MediumWidgetView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: LTWidgetSpacing.large) {
-            HStack(alignment: .top) {
-                VStack(alignment: .leading, spacing: LTWidgetSpacing.compact) {
+            HStack(alignment: .top, spacing: LTWidgetSpacing.xLarge) {
+                VStack(alignment: .leading, spacing: LTWidgetSpacing.medium) {
                     WidgetHeader()
 
-                    Text(username)
-                        .font(LTWidgetTypography.user)
-                        .foregroundStyle(LTWidgetColor.primary)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.82)
+                    VStack(alignment: .leading, spacing: LTWidgetSpacing.xSmall) {
+                        Text(username)
+                            .font(LTWidgetTypography.user)
+                            .foregroundStyle(LTWidgetColor.secondary)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.82)
 
-                    WidgetUpdatedText(date: stats.lastUpdated)
+                        WidgetUpdatedText(date: stats.lastUpdated)
+                    }
                 }
 
-                Spacer()
+                Spacer(minLength: LTWidgetSpacing.medium)
 
-                VStack(alignment: .trailing, spacing: LTWidgetSpacing.xSmall) {
+                VStack(alignment: .trailing, spacing: LTWidgetSpacing.compact) {
                     Text("\(stats.totalSolved)")
                         .font(LTWidgetTypography.mediumNumber)
                         .foregroundStyle(LTWidgetColor.primary)
@@ -156,23 +165,13 @@ private struct MediumWidgetView: View {
                         .lineLimit(1)
                         .minimumScaleFactor(0.82)
 
-                    Text("Solved")
+                    Text("solved")
                         .font(LTWidgetTypography.statLabel)
                         .foregroundStyle(LTWidgetColor.secondary)
                 }
             }
 
-            WidgetHairline()
-
-            VStack(spacing: LTWidgetSpacing.small) {
-                WidgetStatRow(title: "Easy", value: stats.easySolved, tint: LTWidgetColor.easy)
-                WidgetHairline()
-                    .opacity(0.72)
-                WidgetStatRow(title: "Medium", value: stats.mediumSolved, tint: LTWidgetColor.medium)
-                WidgetHairline()
-                    .opacity(0.72)
-                WidgetStatRow(title: "Hard", value: stats.hardSolved, tint: LTWidgetColor.hard)
-            }
+            WidgetDifficultySummary(stats: stats)
         }
     }
 }

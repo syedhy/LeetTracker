@@ -22,7 +22,6 @@ struct ContentView: View {
         .frame(minWidth: 760, idealWidth: 860, minHeight: 520)
         .onAppear {
             viewModel.loadSavedState()
-            requestWidgetReload()
         }
     }
 

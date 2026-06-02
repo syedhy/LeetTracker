@@ -24,23 +24,7 @@ struct WidgetStatRow: View {
     let tint: Color
 
     var body: some View {
-        HStack(spacing: LTWidgetSpacing.medium) {
-            Circle()
-                .fill(tint)
-                .frame(width: LTWidgetSizing.difficultyDot, height: LTWidgetSizing.difficultyDot)
-
-            Text(title)
-                .font(LTWidgetTypography.statLabel)
-                .foregroundStyle(LTWidgetColor.primary)
-
-            Spacer(minLength: LTWidgetSpacing.medium)
-
-            Text("\(value)")
-                .font(LTWidgetTypography.statLabel.weight(.semibold))
-                .contentTransition(.numericText())
-                .foregroundStyle(tint)
-                .frame(minWidth: LTWidgetSizing.mediumValueWidth, alignment: .trailing)
-        }
+        WidgetDifficultyMetric(title: title, value: value, tint: tint)
     }
 }
 
@@ -48,25 +32,48 @@ struct WidgetDifficultySummary: View {
     let stats: CachedLeetCodeStats
 
     var body: some View {
-        HStack(alignment: .top, spacing: LTWidgetSpacing.large) {
-            difficultyColumn(title: "Easy", value: stats.easySolved, tint: LTWidgetColor.easy)
-            difficultyColumn(title: "Medium", value: stats.mediumSolved, tint: LTWidgetColor.medium)
-            difficultyColumn(title: "Hard", value: stats.hardSolved, tint: LTWidgetColor.hard)
+        HStack(alignment: .top, spacing: LTWidgetSpacing.medium) {
+            WidgetDifficultyMetric(title: "Easy", value: stats.easySolved, tint: LTWidgetColor.easy)
+            WidgetDifficultyMetric(title: "Medium", value: stats.mediumSolved, tint: LTWidgetColor.medium)
+            WidgetDifficultyMetric(title: "Hard", value: stats.hardSolved, tint: LTWidgetColor.hard)
         }
     }
+}
 
-    private func difficultyColumn(title: String, value: Int, tint: Color) -> some View {
-        VStack(alignment: .leading, spacing: LTWidgetSpacing.compact) {
+struct WidgetDifficultyMetric: View {
+    let title: String
+    let value: Int
+    let tint: Color
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: LTWidgetSpacing.small) {
+            HStack(spacing: LTWidgetSpacing.compact) {
+                Circle()
+                    .fill(tint)
+                    .frame(width: LTWidgetSizing.difficultyDot, height: LTWidgetSizing.difficultyDot)
+
+                Text(title)
+                    .font(LTWidgetTypography.statLabel)
+                    .foregroundStyle(LTWidgetColor.secondary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.78)
+            }
+
             Text("\(value)")
                 .font(LTWidgetTypography.statNumber)
                 .contentTransition(.numericText())
-                .foregroundStyle(tint)
-
-            Text(title)
-                .font(LTWidgetTypography.label)
-                .foregroundStyle(LTWidgetColor.secondary)
+                .foregroundStyle(LTWidgetColor.primary)
+                .lineLimit(1)
+                .minimumScaleFactor(0.72)
         }
+        .padding(.horizontal, LTWidgetSpacing.medium)
+        .padding(.vertical, LTWidgetSpacing.small)
         .frame(maxWidth: .infinity, alignment: .leading)
+        .background(LTWidgetColor.panel, in: RoundedRectangle(cornerRadius: LTWidgetRadius.metric))
+        .overlay {
+            RoundedRectangle(cornerRadius: LTWidgetRadius.metric)
+                .stroke(LTWidgetColor.panelStroke, lineWidth: 1)
+        }
     }
 }
 
@@ -81,14 +88,17 @@ struct WidgetHeader: View {
     var body: some View {
         if showMark {
             HStack(alignment: .center) {
+                WidgetBrandMark()
+
                 brandText
 
                 Spacer(minLength: LTWidgetSpacing.medium)
-
-                WidgetBrandMark()
             }
         } else {
-            brandText
+            HStack(alignment: .center, spacing: LTWidgetSpacing.small) {
+                WidgetBrandMark()
+                brandText
+            }
         }
     }
 
@@ -102,14 +112,8 @@ struct WidgetHeader: View {
 
 struct WidgetBrandMark: View {
     var body: some View {
-        ZStack {
-            Circle()
-                .fill(.white.opacity(0.08))
-
-            Image(systemName: "chevron.left.forwardslash.chevron.right")
-                .font(.caption.weight(.semibold))
-                .foregroundStyle(LTWidgetColor.medium)
-        }
+        Circle()
+            .fill(LTWidgetColor.brand)
         .frame(width: LTWidgetSizing.brandMark, height: LTWidgetSizing.brandMark)
     }
 }

@@ -2,6 +2,8 @@
 
 Status: Resolved
 
+GitHub Issue: #3
+
 ## Problem
 
 `pluginkit` can register `com.hyder.LeetTracker.LeetTrackerWidgetExtension`, but the macOS desktop widget gallery still does not show `LeetTracker` in search.

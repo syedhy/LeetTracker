@@ -3,19 +3,26 @@ import WidgetKit
 
 struct LeetTrackerEntry: TimelineEntry {
     let date: Date
+    let username: String?
 }
 
 struct LeetTrackerTimelineProvider: TimelineProvider {
+    private let sharedStore = SharedLeetTrackerStore()
+
     func placeholder(in context: Context) -> LeetTrackerEntry {
-        LeetTrackerEntry(date: Date())
+        LeetTrackerEntry(date: Date(), username: "leetcode-user")
     }
 
     func getSnapshot(in context: Context, completion: @escaping (LeetTrackerEntry) -> Void) {
-        completion(LeetTrackerEntry(date: Date()))
+        completion(currentEntry)
     }
 
     func getTimeline(in context: Context, completion: @escaping (Timeline<LeetTrackerEntry>) -> Void) {
-        completion(Timeline(entries: [LeetTrackerEntry(date: Date())], policy: .never))
+        completion(Timeline(entries: [currentEntry], policy: .never))
+    }
+
+    private var currentEntry: LeetTrackerEntry {
+        LeetTrackerEntry(date: Date(), username: sharedStore.username)
     }
 }
 
@@ -27,7 +34,7 @@ struct LeetTrackerWidgetEntryView: View {
             Text("LeetTracker")
                 .font(.headline)
 
-            Text("Widget ready")
+            Text(entry.username ?? "Set username in LeetTracker")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
         }
@@ -51,5 +58,5 @@ struct LeetTrackerWidget: Widget {
 #Preview(as: .systemSmall) {
     LeetTrackerWidget()
 } timeline: {
-    LeetTrackerEntry(date: Date())
+    LeetTrackerEntry(date: Date(), username: "leetcode-user")
 }

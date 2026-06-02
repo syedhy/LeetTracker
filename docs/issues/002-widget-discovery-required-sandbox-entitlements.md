@@ -2,6 +2,8 @@
 
 Status: Resolved
 
+GitHub Issue: #2
+
 ## Problem
 
 The app built and launched, and the widget extension was embedded in the app bundle, but macOS did not list `LeetTracker` in the desktop widget gallery.

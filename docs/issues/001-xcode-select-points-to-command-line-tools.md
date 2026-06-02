@@ -2,6 +2,8 @@
 
 Status: Open
 
+GitHub Issue: #1
+
 ## Problem
 
 Running `xcodebuild` directly fails because `xcode-select` currently points to:

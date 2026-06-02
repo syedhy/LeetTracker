@@ -2,7 +2,8 @@ import SwiftUI
 import WidgetKit
 
 struct ContentView: View {
-    @AppStorage("leetcodeUsername") private var savedUsername = ""
+    private let sharedStore = SharedLeetTrackerStore()
+
     @State private var username = ""
     @State private var statusMessage = "Enter a LeetCode username to prepare tracking."
 
@@ -16,8 +17,8 @@ struct ContentView: View {
         .padding(28)
         .frame(minWidth: 520, idealWidth: 560, minHeight: 420)
         .onAppear {
-            username = savedUsername
-            if !savedUsername.isEmpty {
+            if let savedUsername = sharedStore.username {
+                username = savedUsername
                 statusMessage = "Ready to track \(savedUsername)."
             }
             WidgetCenter.shared.reloadAllTimelines()
@@ -90,9 +91,9 @@ struct ContentView: View {
             return
         }
 
-        savedUsername = normalizedUsername
+        sharedStore.saveUsername(normalizedUsername)
         username = normalizedUsername
-        statusMessage = "Saved \(normalizedUsername). Stats fetching is coming in a later phase."
+        statusMessage = "Saved \(normalizedUsername). The widget can now read this username."
         WidgetCenter.shared.reloadAllTimelines()
     }
 }

@@ -44,6 +44,9 @@ struct ContentView: View {
                 Button("Save", action: saveUsername)
                     .keyboardShortcut(.defaultAction)
                     .disabled(viewModel.trimmedUsername.isEmpty || viewModel.isLoading)
+
+                Button("Refresh", action: refreshStats)
+                    .disabled(viewModel.trimmedUsername.isEmpty || viewModel.isLoading)
             }
         }
     }
@@ -75,9 +78,18 @@ struct ContentView: View {
     }
 
     private func saveUsername() {
+        fetchStatsAndRequestWidgetReload()
+    }
+
+    private func refreshStats() {
+        fetchStatsAndRequestWidgetReload()
+    }
+
+    private func fetchStatsAndRequestWidgetReload() {
         Task {
             if await viewModel.refreshStats() {
                 WidgetCenter.shared.reloadAllTimelines()
+                viewModel.markWidgetReloadRequested()
             }
         }
     }
@@ -192,6 +204,14 @@ private final class LeetTrackerViewModel: ObservableObject {
             showCachedStatsAfterFailure(.networkUnavailable)
             return false
         }
+    }
+
+    func markWidgetReloadRequested() {
+        guard let stats else {
+            return
+        }
+
+        statusMessage = "Updated \(stats.username). Widget refresh requested; macOS may update it shortly."
     }
 
     private func showCachedStatsAfterFailure(_ error: LeetCodeProfileError) {

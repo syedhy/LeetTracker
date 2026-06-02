@@ -18,18 +18,8 @@ struct WidgetContainer<Content: View>: View {
     }
 }
 
-struct WidgetStatRow: View {
-    let title: String
-    let value: Int
-    let tint: Color
-
-    var body: some View {
-        WidgetDifficultyMetric(title: title, value: value, tint: tint)
-    }
-}
-
 struct WidgetDifficultySummary: View {
-    let stats: CachedLeetCodeStats
+    let stats: WidgetStatsSnapshot
 
     var body: some View {
         HStack(alignment: .top, spacing: LTWidgetSpacing.medium) {
@@ -115,14 +105,6 @@ struct WidgetBrandMark: View {
         Circle()
             .fill(LTWidgetColor.brand)
         .frame(width: LTWidgetSizing.brandMark, height: LTWidgetSizing.brandMark)
-    }
-}
-
-struct WidgetHairline: View {
-    var body: some View {
-        Rectangle()
-            .fill(LTWidgetColor.divider)
-            .frame(height: 1)
     }
 }
 

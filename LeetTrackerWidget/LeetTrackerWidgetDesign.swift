@@ -7,8 +7,6 @@ enum LTWidgetSpacing {
     static let medium: CGFloat = 8
     static let large: CGFloat = 12
     static let xLarge: CGFloat = 16
-    static let xxLarge: CGFloat = 20
-    static let contentPadding: CGFloat = 0
 }
 
 enum LTWidgetTypography {
@@ -19,7 +17,6 @@ enum LTWidgetTypography {
     static let statNumber = Font.system(size: 18, weight: .semibold, design: .rounded)
     static let label = Font.caption
     static let statLabel = Font.caption.weight(.medium)
-    static let emptyState = Font.subheadline.weight(.medium)
     static let stateTitle = Font.headline.weight(.semibold)
 }
 
@@ -34,7 +31,6 @@ enum LTWidgetColor {
     )
     static let panel = Color.white.opacity(0.07)
     static let panelStroke = Color.white.opacity(0.08)
-    static let divider = Color.white.opacity(0.10)
     static let primary = Color.white
     static let secondary = Color.white.opacity(0.70)
     static let tertiary = Color.white.opacity(0.46)
@@ -47,13 +43,10 @@ enum LTWidgetColor {
 }
 
 enum LTWidgetSizing {
-    static let minimumReadableWidth: CGFloat = 44
-    static let mediumValueWidth: CGFloat = 64
     static let difficultyDot: CGFloat = 7
     static let brandMark: CGFloat = 8
 }
 
 enum LTWidgetRadius {
-    static let card: CGFloat = 22
     static let metric: CGFloat = 12
 }

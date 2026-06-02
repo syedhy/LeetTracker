@@ -8,26 +8,51 @@ struct LeetTrackerEntry: TimelineEntry {
 }
 
 struct LeetTrackerTimelineProvider: TimelineProvider {
+    private let client = LeetCodeClient()
     private let sharedStore = SharedLeetTrackerStore()
+    private let refreshInterval: TimeInterval = 30 * 60
 
     func placeholder(in context: Context) -> LeetTrackerEntry {
         LeetTrackerEntry(date: Date(), username: "leetcode-user", stats: .placeholder)
     }
 
     func getSnapshot(in context: Context, completion: @escaping (LeetTrackerEntry) -> Void) {
-        completion(currentEntry)
+        completion(cachedEntry)
     }
 
     func getTimeline(in context: Context, completion: @escaping (Timeline<LeetTrackerEntry>) -> Void) {
-        completion(Timeline(entries: [currentEntry], policy: .never))
+        Task {
+            let entry = await refreshedEntry()
+            let nextRefresh = Date().addingTimeInterval(refreshInterval)
+            completion(Timeline(entries: [entry], policy: .after(nextRefresh)))
+        }
     }
 
-    private var currentEntry: LeetTrackerEntry {
+    private var cachedEntry: LeetTrackerEntry {
         LeetTrackerEntry(
             date: Date(),
             username: sharedStore.username,
             stats: sharedStore.cachedStats ?? .placeholder
         )
+    }
+
+    private func refreshedEntry() async -> LeetTrackerEntry {
+        guard let username = sharedStore.username else {
+            return LeetTrackerEntry(date: Date(), username: nil, stats: .placeholder)
+        }
+
+        do {
+            let stats = try await client.fetchStats(for: username)
+            let cachedStats = stats.cachedStats
+            sharedStore.saveCachedStats(cachedStats)
+            return LeetTrackerEntry(date: Date(), username: stats.username, stats: cachedStats)
+        } catch {
+            return LeetTrackerEntry(
+                date: Date(),
+                username: username,
+                stats: sharedStore.cachedStats ?? .placeholder
+            )
+        }
     }
 }
 

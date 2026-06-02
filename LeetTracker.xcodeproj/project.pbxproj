@@ -17,6 +17,9 @@
 		111111111111111111111008 /* LeetCodeClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 111111111111111111112010 /* LeetCodeClient.swift */; };
 		111111111111111111111009 /* LeetCodeStats.swift in Sources */ = {isa = PBXBuildFile; fileRef = 111111111111111111112011 /* LeetCodeStats.swift */; };
 		111111111111111111111010 /* LeetCodeProfileError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 111111111111111111112012 /* LeetCodeProfileError.swift */; };
+		111111111111111111111011 /* LeetCodeClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 111111111111111111112010 /* LeetCodeClient.swift */; };
+		111111111111111111111012 /* LeetCodeStats.swift in Sources */ = {isa = PBXBuildFile; fileRef = 111111111111111111112011 /* LeetCodeStats.swift */; };
+		111111111111111111111013 /* LeetCodeProfileError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 111111111111111111112012 /* LeetCodeProfileError.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -292,6 +295,9 @@
 				111111111111111111111003 /* LeetTrackerWidgetBundle.swift in Sources */,
 				111111111111111111111004 /* LeetTrackerWidget.swift in Sources */,
 				111111111111111111111007 /* SharedLeetTrackerStore.swift in Sources */,
+				111111111111111111111011 /* LeetCodeClient.swift in Sources */,
+				111111111111111111111012 /* LeetCodeStats.swift in Sources */,
+				111111111111111111111013 /* LeetCodeProfileError.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

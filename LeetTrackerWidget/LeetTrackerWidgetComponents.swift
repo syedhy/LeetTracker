@@ -2,6 +2,37 @@ import Foundation
 import SwiftUI
 import WidgetKit
 
+struct WidgetStatsSnapshot: Equatable {
+    let username: String
+    let totalSolved: Int
+    let easySolved: Int
+    let mediumSolved: Int
+    let hardSolved: Int
+    let lastUpdated: Date
+}
+
+extension WidgetStatsSnapshot {
+    init(cachedStats: CachedLeetCodeStats) {
+        self.init(
+            username: cachedStats.username,
+            totalSolved: cachedStats.totalSolved,
+            easySolved: cachedStats.easySolved,
+            mediumSolved: cachedStats.mediumSolved,
+            hardSolved: cachedStats.hardSolved,
+            lastUpdated: cachedStats.lastUpdated
+        )
+    }
+
+    static let placeholder = WidgetStatsSnapshot(
+        username: "leetcode-user",
+        totalSolved: 128,
+        easySolved: 54,
+        mediumSolved: 61,
+        hardSolved: 13,
+        lastUpdated: Date()
+    )
+}
+
 struct WidgetContainer<Content: View>: View {
     private let content: Content
 

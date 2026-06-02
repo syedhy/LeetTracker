@@ -1,6 +1,21 @@
 import SwiftUI
 import WidgetKit
 
+struct LeetTrackerEntry: TimelineEntry {
+    let date: Date
+    let username: String?
+    let stats: WidgetStatsSnapshot
+    let state: LeetTrackerWidgetState
+}
+
+enum LeetTrackerWidgetState {
+    case loading
+    case empty
+    case success
+    case offline(message: String)
+    case error(title: String, message: String)
+}
+
 struct LeetTrackerTimelineProvider: TimelineProvider {
     private let client = LeetCodeClient()
     private let sharedStore = SharedLeetTrackerStore()

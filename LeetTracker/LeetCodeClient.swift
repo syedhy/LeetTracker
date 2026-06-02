@@ -1,10 +1,11 @@
 import Foundation
 
 struct LeetCodeClient {
-    private let endpoint = URL(string: "https://leetcode.com/graphql")!
+    private let endpoint: URL?
     private let session: URLSession
 
-    init(session: URLSession = .shared) {
+    init(endpoint: URL? = URL(string: "https://leetcode.com/graphql"), session: URLSession = .shared) {
+        self.endpoint = endpoint
         self.session = session
     }
 
@@ -13,6 +14,10 @@ struct LeetCodeClient {
 
         guard !normalizedUsername.isEmpty else {
             throw LeetCodeProfileError.invalidUsername
+        }
+
+        guard let endpoint else {
+            throw LeetCodeProfileError.endpointChanged
         }
 
         let payload = GraphQLRequest(
@@ -80,9 +85,9 @@ struct LeetCodeClient {
 
     private func stats(from matchedUser: MatchedUser) throws -> LeetCodeStats {
         let rows = matchedUser.submitStats.acSubmissionNum
-        let counts = Dictionary(uniqueKeysWithValues: rows.map { row in
-            (row.difficulty.lowercased(), row.count)
-        })
+        let counts = rows.reduce(into: [String: Int]()) { partialResult, row in
+            partialResult[row.difficulty.lowercased(), default: 0] += row.count
+        }
 
         guard
             let totalSolved = counts["all"],

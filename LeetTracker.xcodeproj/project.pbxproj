@@ -22,6 +22,8 @@
 		111111111111111111111013 /* LeetCodeProfileError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 111111111111111111112012 /* LeetCodeProfileError.swift */; };
 		111111111111111111111014 /* LeetTrackerWidgetDesign.swift in Sources */ = {isa = PBXBuildFile; fileRef = 111111111111111111112014 /* LeetTrackerWidgetDesign.swift */; };
 		111111111111111111111015 /* LeetTrackerWidgetComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 111111111111111111112015 /* LeetTrackerWidgetComponents.swift */; };
+		111111111111111111111016 /* LeetTrackerWidgetConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 111111111111111111112016 /* LeetTrackerWidgetConfiguration.swift */; };
+		111111111111111111111017 /* LeetTrackerWidgetConfiguration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 111111111111111111112016 /* LeetTrackerWidgetConfiguration.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -63,6 +65,7 @@
 		111111111111111111112012 /* LeetCodeProfileError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LeetCodeProfileError.swift; sourceTree = "<group>"; };
 		111111111111111111112014 /* LeetTrackerWidgetDesign.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LeetTrackerWidgetDesign.swift; sourceTree = "<group>"; };
 		111111111111111111112015 /* LeetTrackerWidgetComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LeetTrackerWidgetComponents.swift; sourceTree = "<group>"; };
+		111111111111111111112016 /* LeetTrackerWidgetConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LeetTrackerWidgetConfiguration.swift; sourceTree = "<group>"; };
 		111111111111111111113001 /* LeetTracker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LeetTracker.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		111111111111111111113002 /* LeetTrackerWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = LeetTrackerWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -174,6 +177,7 @@
 			isa = PBXGroup;
 			children = (
 				111111111111111111112009 /* SharedLeetTrackerStore.swift */,
+				111111111111111111112016 /* LeetTrackerWidgetConfiguration.swift */,
 			);
 			path = LeetTrackerShared;
 			sourceTree = "<group>";
@@ -288,6 +292,7 @@
 				111111111111111111111001 /* LeetTrackerApp.swift in Sources */,
 				111111111111111111111002 /* ContentView.swift in Sources */,
 				111111111111111111111006 /* SharedLeetTrackerStore.swift in Sources */,
+				111111111111111111111016 /* LeetTrackerWidgetConfiguration.swift in Sources */,
 				111111111111111111111008 /* LeetCodeClient.swift in Sources */,
 				111111111111111111111009 /* LeetCodeStats.swift in Sources */,
 				111111111111111111111010 /* LeetCodeProfileError.swift in Sources */,
@@ -301,6 +306,7 @@
 				111111111111111111111003 /* LeetTrackerWidgetBundle.swift in Sources */,
 				111111111111111111111004 /* LeetTrackerWidget.swift in Sources */,
 				111111111111111111111007 /* SharedLeetTrackerStore.swift in Sources */,
+				111111111111111111111017 /* LeetTrackerWidgetConfiguration.swift in Sources */,
 				111111111111111111111011 /* LeetCodeClient.swift in Sources */,
 				111111111111111111111012 /* LeetCodeStats.swift in Sources */,
 				111111111111111111111013 /* LeetCodeProfileError.swift in Sources */,

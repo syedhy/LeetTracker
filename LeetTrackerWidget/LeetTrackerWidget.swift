@@ -78,7 +78,7 @@ struct LeetTrackerWidgetEntryView: View {
 }
 
 struct LeetTrackerWidget: Widget {
-    let kind = "com.hyder.LeetTracker.widget"
+    let kind = LeetTrackerWidgetConfiguration.kind
 
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: kind, provider: LeetTrackerTimelineProvider()) { entry in

@@ -67,6 +67,7 @@ final class SharedLeetTrackerStore {
         let normalizedUsername = username.trimmingCharacters(in: .whitespacesAndNewlines)
         userDefaults.set(normalizedUsername, forKey: Keys.username)
         userDefaults.set(Date(), forKey: Keys.lastUpdated)
+        synchronize()
     }
 
     func saveCachedStats(_ stats: CachedLeetCodeStats) {
@@ -76,5 +77,11 @@ final class SharedLeetTrackerStore {
 
         userDefaults.set(data, forKey: Keys.cachedStats)
         userDefaults.set(stats.lastUpdated, forKey: Keys.lastUpdated)
+        synchronize()
+    }
+
+    @discardableResult
+    func synchronize() -> Bool {
+        userDefaults.synchronize()
     }
 }

@@ -16,7 +16,7 @@ struct ContentView: View {
         .frame(minWidth: 520, idealWidth: 560, minHeight: 420)
         .onAppear {
             viewModel.loadSavedState()
-            WidgetCenter.shared.reloadAllTimelines()
+            requestWidgetReload()
         }
     }
 
@@ -88,10 +88,16 @@ struct ContentView: View {
     private func fetchStatsAndRequestWidgetReload() {
         Task {
             if await viewModel.refreshStats() {
-                WidgetCenter.shared.reloadAllTimelines()
-                viewModel.markWidgetReloadRequested()
+                let requestedAt = Date()
+                requestWidgetReload()
+                viewModel.markWidgetReloadRequested(at: requestedAt)
             }
         }
+    }
+
+    private func requestWidgetReload() {
+        WidgetCenter.shared.reloadTimelines(ofKind: LeetTrackerWidgetConfiguration.kind)
+        WidgetCenter.shared.reloadAllTimelines()
     }
 }
 
@@ -206,12 +212,13 @@ private final class LeetTrackerViewModel: ObservableObject {
         }
     }
 
-    func markWidgetReloadRequested() {
+    func markWidgetReloadRequested(at date: Date) {
         guard let stats else {
             return
         }
 
-        statusMessage = "Updated \(stats.username). Widget refresh requested; macOS may update it shortly."
+        sharedStore.synchronize()
+        statusMessage = "Updated \(stats.username). Widget reload requested at \(formatted(date)). Saved \(stats.totalSolved) solved."
     }
 
     private func showCachedStatsAfterFailure(_ error: LeetCodeProfileError) {

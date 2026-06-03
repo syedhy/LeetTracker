@@ -14,10 +14,30 @@ struct CachedLeetCodeStats: Codable, Equatable {
     let lastUpdated: Date
 }
 
+struct SharedGoalSettings: Codable, Equatable {
+    var targetSolved: Int
+    var weeklyTarget: Int
+    var remindersEnabled: Bool
+    var reminderHour: Int
+    var reminderMinute: Int
+    var updatedAt: Date
+
+    static let `default` = SharedGoalSettings(
+        targetSolved: 50,
+        weeklyTarget: 5,
+        remindersEnabled: false,
+        reminderHour: 19,
+        reminderMinute: 0,
+        updatedAt: Date()
+    )
+}
+
 struct SharedLeetTrackerSnapshot: Equatable {
     let username: String?
     let cachedStats: CachedLeetCodeStats?
     let lastUpdated: Date?
+    let goalSettings: SharedGoalSettings
+    let hasGoalSettings: Bool
 }
 
 final class SharedLeetTrackerStore {
@@ -44,7 +64,9 @@ final class SharedLeetTrackerStore {
         return SharedLeetTrackerSnapshot(
             username: savedUsername,
             cachedStats: payload.cachedStats,
-            lastUpdated: payload.lastUpdated
+            lastUpdated: payload.lastUpdated,
+            goalSettings: payload.goalSettings ?? .default,
+            hasGoalSettings: payload.goalSettings != nil
         )
     }
 
@@ -67,6 +89,10 @@ final class SharedLeetTrackerStore {
         loadPayload().lastUpdated
     }
 
+    var goalSettings: SharedGoalSettings {
+        loadPayload().goalSettings ?? .default
+    }
+
     func saveUsername(_ username: String) {
         let normalizedUsername = username.trimmingCharacters(in: .whitespacesAndNewlines)
         var payload = loadPayload()
@@ -80,6 +106,12 @@ final class SharedLeetTrackerStore {
         payload.username = stats.username
         payload.cachedStats = stats
         payload.lastUpdated = stats.lastUpdated
+        savePayload(payload)
+    }
+
+    func saveGoalSettings(_ settings: SharedGoalSettings) {
+        var payload = loadPayload()
+        payload.goalSettings = settings
         savePayload(payload)
     }
 
@@ -159,4 +191,5 @@ private struct SharedLeetTrackerPayload: Codable, Equatable {
     var username: String?
     var cachedStats: CachedLeetCodeStats?
     var lastUpdated: Date?
+    var goalSettings: SharedGoalSettings?
 }

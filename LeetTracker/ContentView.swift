@@ -106,17 +106,42 @@ struct ContentView: View {
 
             ViewThatFits(in: .horizontal) {
                 HStack(alignment: .top, spacing: 20) {
-                    analyticsSection
+                    AnalyticsScorePanel(
+                        score: viewModel.readinessScore,
+                        title: viewModel.readinessTitle,
+                        detail: viewModel.readinessDetail
+                    )
+                    .frame(width: 300)
+
+                    FocusRecommendationPanel(
+                        title: viewModel.focusRecommendationTitle,
+                        detail: viewModel.focusRecommendationDetail,
+                        tint: viewModel.focusRecommendationTint
+                    )
+
                     DifficultyBreakdownPanel(stats: viewModel.statsSnapshot)
                         .frame(width: 360)
                 }
 
                 VStack(spacing: 20) {
+                    AnalyticsScorePanel(
+                        score: viewModel.readinessScore,
+                        title: viewModel.readinessTitle,
+                        detail: viewModel.readinessDetail
+                    )
+
+                    FocusRecommendationPanel(
+                        title: viewModel.focusRecommendationTitle,
+                        detail: viewModel.focusRecommendationDetail,
+                        tint: viewModel.focusRecommendationTint
+                    )
+
                     analyticsSection
                     DifficultyBreakdownPanel(stats: viewModel.statsSnapshot)
                 }
             }
 
+            analyticsSection
             AnalyticsNarrativePanel(summary: viewModel.analyticsSummary)
         }
     }
@@ -131,24 +156,53 @@ struct ContentView: View {
 
             ViewThatFits(in: .horizontal) {
                 HStack(alignment: .top, spacing: 20) {
+                    GoalEditorPanel(
+                        targetText: $viewModel.goalTargetText,
+                        weeklyTargetText: $viewModel.weeklyTargetText,
+                        remindersEnabled: $viewModel.remindersEnabled,
+                        reminderTime: $viewModel.reminderTime,
+                        statusText: viewModel.goalStatusMessage,
+                        saveAction: viewModel.saveGoalSettings
+                    )
+                    .frame(width: 360)
+
                     GoalPlanPanel(
                         title: viewModel.goalPlanTitle,
                         subtitle: viewModel.goalPlanSubtitle,
-                        progress: viewModel.milestoneProgress
+                        progress: viewModel.goalProgress,
+                        detailRows: viewModel.goalDetailRows
                     )
 
-                    ReminderPlanPanel(refreshText: viewModel.refreshCadenceText)
+                    ReminderPlanPanel(
+                        refreshText: viewModel.refreshCadenceText,
+                        remindersEnabled: viewModel.remindersEnabled,
+                        reminderTimeText: viewModel.reminderTimeText
+                    )
                         .frame(width: 340)
                 }
 
                 VStack(spacing: 20) {
+                    GoalEditorPanel(
+                        targetText: $viewModel.goalTargetText,
+                        weeklyTargetText: $viewModel.weeklyTargetText,
+                        remindersEnabled: $viewModel.remindersEnabled,
+                        reminderTime: $viewModel.reminderTime,
+                        statusText: viewModel.goalStatusMessage,
+                        saveAction: viewModel.saveGoalSettings
+                    )
+
                     GoalPlanPanel(
                         title: viewModel.goalPlanTitle,
                         subtitle: viewModel.goalPlanSubtitle,
-                        progress: viewModel.milestoneProgress
+                        progress: viewModel.goalProgress,
+                        detailRows: viewModel.goalDetailRows
                     )
 
-                    ReminderPlanPanel(refreshText: viewModel.refreshCadenceText)
+                    ReminderPlanPanel(
+                        refreshText: viewModel.refreshCadenceText,
+                        remindersEnabled: viewModel.remindersEnabled,
+                        reminderTimeText: viewModel.reminderTimeText
+                    )
                 }
             }
         }
@@ -307,14 +361,15 @@ struct ContentView: View {
 
                 HStack(spacing: 12) {
                     InsightCard(title: "Difficulty Mix", value: viewModel.difficultyMixText, tint: AppColor.brand)
-                    InsightCard(title: "Next Milestone", value: viewModel.nextMilestoneText, tint: AppColor.medium)
-                    InsightCard(title: "Remaining", value: viewModel.milestoneRemainingText, tint: AppColor.hard)
+                    InsightCard(title: "Goal Pace", value: viewModel.estimatedWeeksText, tint: AppColor.medium)
+                    InsightCard(title: "Remaining", value: viewModel.goalRemainingText, tint: AppColor.hard)
                 }
 
                 Divider()
 
                 VStack(alignment: .leading, spacing: 10) {
-                    DetailRow(title: "History", value: "Local snapshots")
+                    DetailRow(title: "Recommendation", value: viewModel.focusRecommendationTitle)
+                    DetailRow(title: "Target", value: viewModel.goalTargetDisplayText)
                     DetailRow(title: "Source", value: "Public profile")
                     DetailRow(title: "Widget", value: viewModel.refreshCadenceText)
                 }
@@ -327,12 +382,22 @@ struct ContentView: View {
         ViewThatFits(in: .horizontal) {
             HStack(alignment: .top, spacing: 20) {
                 DifficultyBreakdownPanel(stats: viewModel.statsSnapshot)
-                ReminderPlanPanel(refreshText: viewModel.refreshCadenceText)
+                GoalPlanPanel(
+                    title: viewModel.goalPlanTitle,
+                    subtitle: viewModel.goalPlanSubtitle,
+                    progress: viewModel.goalProgress,
+                    detailRows: viewModel.goalDetailRows
+                )
             }
 
             VStack(spacing: 20) {
                 DifficultyBreakdownPanel(stats: viewModel.statsSnapshot)
-                ReminderPlanPanel(refreshText: viewModel.refreshCadenceText)
+                GoalPlanPanel(
+                    title: viewModel.goalPlanTitle,
+                    subtitle: viewModel.goalPlanSubtitle,
+                    progress: viewModel.goalProgress,
+                    detailRows: viewModel.goalDetailRows
+                )
             }
         }
     }
@@ -364,17 +429,17 @@ struct ContentView: View {
                 SectionHeader(title: "Focus", systemImage: "target")
 
                 VStack(alignment: .leading, spacing: 6) {
-                    Text(viewModel.nextMilestoneText)
+                    Text(viewModel.goalTargetDisplayText)
                         .font(.title.weight(.semibold))
                         .lineLimit(1)
                         .minimumScaleFactor(0.78)
 
-                    Text("\(viewModel.milestoneRemainingText) remaining")
+                    Text("\(viewModel.goalRemainingText) remaining")
                         .font(.callout.weight(.medium))
                         .foregroundStyle(.secondary)
                 }
 
-                ProgressView(value: viewModel.milestoneProgress)
+                ProgressView(value: viewModel.goalProgress)
                     .tint(AppColor.brand)
             }
         }
@@ -850,10 +915,162 @@ private struct AnalyticsNarrativePanel: View {
     }
 }
 
+private struct AnalyticsScorePanel: View {
+    let score: Int
+    let title: String
+    let detail: String
+
+    private var progress: Double {
+        min(1, max(0, Double(score) / 100))
+    }
+
+    var body: some View {
+        Panel {
+            VStack(alignment: .leading, spacing: 18) {
+                SectionHeader(title: "Readiness", systemImage: "gauge.with.dots.needle.67percent")
+
+                HStack(alignment: .center, spacing: 18) {
+                    ZStack {
+                        Circle()
+                            .stroke(.quaternary.opacity(0.7), lineWidth: 12)
+
+                        Circle()
+                            .trim(from: 0, to: progress)
+                            .stroke(
+                                AppColor.brand.gradient,
+                                style: StrokeStyle(lineWidth: 12, lineCap: .round)
+                            )
+                            .rotationEffect(.degrees(-90))
+
+                        Text("\(score)")
+                            .font(.system(size: 34, weight: .semibold, design: .rounded))
+                            .monospacedDigit()
+                    }
+                    .frame(width: 104, height: 104)
+
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text(title)
+                            .font(.title3.weight(.semibold))
+                            .fixedSize(horizontal: false, vertical: true)
+
+                        Text(detail)
+                            .font(.callout)
+                            .foregroundStyle(.secondary)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                }
+            }
+        }
+    }
+}
+
+private struct FocusRecommendationPanel: View {
+    let title: String
+    let detail: String
+    let tint: Color
+
+    var body: some View {
+        Panel {
+            VStack(alignment: .leading, spacing: 18) {
+                SectionHeader(title: "Next Best Move", systemImage: "sparkles")
+
+                HStack(alignment: .top, spacing: 14) {
+                    Image(systemName: "arrow.up.right.circle.fill")
+                        .font(.title.weight(.semibold))
+                        .foregroundStyle(tint)
+                        .frame(width: 42, height: 42)
+                        .background(tint.opacity(0.12), in: RoundedRectangle(cornerRadius: 12))
+
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text(title)
+                            .font(.title3.weight(.semibold))
+
+                        Text(detail)
+                            .font(.callout)
+                            .foregroundStyle(.secondary)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                }
+            }
+        }
+    }
+}
+
+private struct GoalEditorPanel: View {
+    @Binding var targetText: String
+    @Binding var weeklyTargetText: String
+    @Binding var remindersEnabled: Bool
+    @Binding var reminderTime: Date
+
+    let statusText: String
+    let saveAction: () -> Void
+
+    var body: some View {
+        Panel {
+            VStack(alignment: .leading, spacing: 18) {
+                SectionHeader(title: "Set Goal", systemImage: "slider.horizontal.3")
+
+                VStack(alignment: .leading, spacing: 12) {
+                    GoalField(title: "Target solved", text: $targetText, systemImage: "target")
+                    GoalField(title: "Weekly target", text: $weeklyTargetText, systemImage: "calendar")
+
+                    Toggle(isOn: $remindersEnabled) {
+                        Label("Practice reminder", systemImage: "bell.badge")
+                    }
+                    .toggleStyle(.switch)
+
+                    DatePicker("Reminder time", selection: $reminderTime, displayedComponents: .hourAndMinute)
+                        .disabled(!remindersEnabled)
+                }
+
+                HStack(spacing: 10) {
+                    Button(action: saveAction) {
+                        Label("Save Goal", systemImage: "checkmark.circle.fill")
+                    }
+                    .buttonStyle(PrimaryActionButtonStyle())
+
+                    Text(statusText)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(2)
+                        .minimumScaleFactor(0.8)
+                }
+            }
+        }
+    }
+}
+
+private struct GoalField: View {
+    let title: String
+    @Binding var text: String
+    let systemImage: String
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 7) {
+            Label(title, systemImage: systemImage)
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(.secondary)
+
+            TextField(title, text: $text)
+                .textFieldStyle(.plain)
+                .font(.title3.weight(.semibold))
+                .monospacedDigit()
+                .padding(.horizontal, 12)
+                .frame(height: 40)
+                .background(.background.opacity(0.7), in: RoundedRectangle(cornerRadius: 10))
+                .overlay {
+                    RoundedRectangle(cornerRadius: 10)
+                        .stroke(.quaternary, lineWidth: 1)
+                }
+        }
+    }
+}
+
 private struct GoalPlanPanel: View {
     let title: String
     let subtitle: String
     let progress: Double
+    let detailRows: [(String, String)]
 
     var body: some View {
         Panel {
@@ -875,14 +1092,11 @@ private struct GoalPlanPanel: View {
                 ProgressView(value: progress)
                     .tint(AppColor.brand)
 
-                HStack(spacing: 10) {
-                    Label("Weekly target", systemImage: "calendar")
-                    Spacer()
-                    Text("Plan next")
-                        .fontWeight(.semibold)
+                VStack(alignment: .leading, spacing: 10) {
+                    ForEach(detailRows, id: \.0) { row in
+                        DetailRow(title: row.0, value: row.1)
+                    }
                 }
-                .font(.callout)
-                .foregroundStyle(.secondary)
             }
         }
     }
@@ -890,13 +1104,19 @@ private struct GoalPlanPanel: View {
 
 private struct ReminderPlanPanel: View {
     let refreshText: String
+    let remindersEnabled: Bool
+    let reminderTimeText: String
 
     var body: some View {
         Panel {
             VStack(alignment: .leading, spacing: 16) {
                 SectionHeader(title: "Reminders", systemImage: "bell.badge")
 
-                ReminderRow(title: "Daily practice", detail: "Pick a gentle time window", tint: AppColor.easy)
+                ReminderRow(
+                    title: "Daily practice",
+                    detail: remindersEnabled ? reminderTimeText : "Off",
+                    tint: remindersEnabled ? AppColor.easy : .secondary
+                )
                 ReminderRow(title: "Weekly review", detail: "Summarize progress and reset plan", tint: AppColor.brand)
                 ReminderRow(title: "Widget refresh", detail: refreshText, tint: AppColor.medium)
 
@@ -1015,12 +1235,19 @@ private struct SecondaryActionButtonStyle: ButtonStyle {
 @MainActor
 private final class LeetTrackerViewModel: ObservableObject {
     @Published var username = ""
+    @Published var goalTargetText = ""
+    @Published var weeklyTargetText = ""
+    @Published var remindersEnabled = false
+    @Published var reminderTime = Date()
     @Published private(set) var stats: LeetCodeStats?
     @Published private(set) var statusMessage = "Enter a LeetCode username to prepare tracking."
+    @Published private(set) var goalStatusMessage = "Goal settings are ready."
     @Published private(set) var isLoading = false
 
     private let client: LeetCodeClient
     private let sharedStore: SharedLeetTrackerStore
+    private var savedGoalSettings = SharedGoalSettings.default
+    private var hasSavedGoalSettings = false
 
     init(
         client: LeetCodeClient = LeetCodeClient(),
@@ -1096,24 +1323,43 @@ private final class LeetTrackerViewModel: ObservableObject {
         return "\(nextMilestone(after: totalSolved)) solved"
     }
 
-    var milestoneRemainingText: String {
+    var goalTargetDisplayText: String {
+        "\(goalTargetValue) solved"
+    }
+
+    var goalRemainingText: String {
         guard let totalSolved = stats?.totalSolved else {
             return "--"
         }
 
-        return "\(nextMilestone(after: totalSolved) - totalSolved)"
+        return "\(max(0, goalTargetValue - totalSolved))"
     }
 
-    var milestoneProgress: Double {
+    var goalProgress: Double {
         guard let totalSolved = stats?.totalSolved else {
             return 0
         }
 
-        let previousMilestone = max(0, (totalSolved / 10) * 10)
-        let nextMilestone = nextMilestone(after: totalSolved)
-        let span = max(1, nextMilestone - previousMilestone)
+        guard goalTargetValue > 0 else {
+            return 0
+        }
 
-        return Double(totalSolved - previousMilestone) / Double(span)
+        return min(1, Double(totalSolved) / Double(goalTargetValue))
+    }
+
+    var estimatedWeeksText: String {
+        guard let totalSolved = stats?.totalSolved else {
+            return "--"
+        }
+
+        let remaining = max(0, goalTargetValue - totalSolved)
+
+        guard remaining > 0 else {
+            return "Done"
+        }
+
+        let weeks = Int(ceil(Double(remaining) / Double(max(1, weeklyTargetValue))))
+        return weeks == 1 ? "1 week" : "\(weeks) weeks"
     }
 
     var cacheStatusText: String {
@@ -1133,6 +1379,102 @@ private final class LeetTrackerViewModel: ObservableObject {
         stats
     }
 
+    var goalDetailRows: [(String, String)] {
+        [
+            ("Target", goalTargetDisplayText),
+            ("Remaining", goalRemainingText),
+            ("Weekly pace", "\(weeklyTargetValue) problems"),
+            ("ETA", estimatedWeeksText)
+        ]
+    }
+
+    var readinessScore: Int {
+        guard let stats, stats.totalSolved > 0 else {
+            return 0
+        }
+
+        let goalComponent = min(45, Int((goalProgress * 45).rounded()))
+        let mediumHardRatio = Double(stats.mediumSolved + stats.hardSolved) / Double(stats.totalSolved)
+        let balanceComponent = min(35, Int((mediumHardRatio * 70).rounded()))
+        let hardComponent = min(20, stats.hardSolved * 2)
+
+        return min(100, max(0, goalComponent + balanceComponent + hardComponent))
+    }
+
+    var readinessTitle: String {
+        switch readinessScore {
+        case 80...:
+            return "Strong momentum"
+        case 55..<80:
+            return "Solid base"
+        case 25..<55:
+            return "Building up"
+        default:
+            return stats == nil ? "Waiting for data" : "Early stage"
+        }
+    }
+
+    var readinessDetail: String {
+        guard let stats, stats.totalSolved > 0 else {
+            return "Refresh a profile once to calculate a score from solved count, goal progress, and difficulty balance."
+        }
+
+        return "\(difficultyMixText) are Medium or Hard, with \(goalRemainingText) left for your current goal."
+    }
+
+    var focusRecommendationTitle: String {
+        guard let stats, stats.totalSolved > 0 else {
+            return "Load profile"
+        }
+
+        let mediumHard = stats.mediumSolved + stats.hardSolved
+        let mediumHardRatio = Double(mediumHard) / Double(stats.totalSolved)
+
+        if stats.hardSolved == 0, stats.totalSolved >= 20 {
+            return "Add one Hard"
+        }
+
+        if mediumHardRatio < 0.45 {
+            return "Lean into Medium"
+        }
+
+        if max(0, goalTargetValue - stats.totalSolved) <= weeklyTargetValue {
+            return "Finish the goal"
+        }
+
+        return "Keep balance"
+    }
+
+    var focusRecommendationDetail: String {
+        guard let stats, stats.totalSolved > 0 else {
+            return "Save your username and refresh to get a useful next action."
+        }
+
+        switch focusRecommendationTitle {
+        case "Add one Hard":
+            return "You have enough volume to try a carefully chosen Hard problem and learn from the pattern."
+        case "Lean into Medium":
+            return "Your solved mix is still easy-heavy. Medium problems should drive the next practice block."
+        case "Finish the goal":
+            return "You are within this week's pace. A short push can close the target cleanly."
+        default:
+            return "Keep Easy warmups short, make Medium the default, and use Hard problems deliberately."
+        }
+    }
+
+    var focusRecommendationTint: Color {
+        switch focusRecommendationTitle {
+        case "Add one Hard":
+            return AppColor.hard
+        case "Lean into Medium":
+            return AppColor.medium
+        case "Finish the goal":
+            return AppColor.easy
+        default:
+            return AppColor.brand
+        }
+    }
+
     var analyticsSummary: String {
         guard let stats, stats.totalSolved > 0 else {
             return "No profile data is loaded yet. Save your LeetCode username and refresh once so LeetTracker can turn your public solved counts into readable progress signals."
@@ -1140,18 +1482,17 @@ private final class LeetTrackerViewModel: ObservableObject {
 
         let mediumHard = stats.mediumSolved + stats.hardSolved
         let mediumHardPercentage = Int((Double(mediumHard) / Double(stats.totalSolved) * 100).rounded())
-        let next = nextMilestone(after: stats.totalSolved)
-        let remaining = next - stats.totalSolved
+        let remaining = max(0, goalTargetValue - stats.totalSolved)
 
-        return "You have solved \(stats.totalSolved) problems. \(mediumHardPercentage)% are Medium or Hard, which is the most useful signal for interview readiness. Your next clean milestone is \(next) solved, so \(remaining) more problem\(remaining == 1 ? "" : "s") gets you there."
+        return "You have solved \(stats.totalSolved) problems. \(mediumHardPercentage)% are Medium or Hard, which is the most useful signal for interview readiness. Your current goal is \(goalTargetValue) solved, so \(remaining) more problem\(remaining == 1 ? "" : "s") gets you there at about \(estimatedWeeksText)."
     }
 
     var goalPlanTitle: String {
-        guard let totalSolved = stats?.totalSolved else {
+        guard stats != nil else {
             return "Set your first goal"
         }
 
-        return "Reach \(nextMilestone(after: totalSolved)) solved"
+        return "Reach \(goalTargetValue) solved"
     }
 
     var goalPlanSubtitle: String {
@@ -1159,12 +1500,29 @@ private final class LeetTrackerViewModel: ObservableObject {
             return "After a profile refresh, LeetTracker will suggest a simple milestone goal from your current solved count."
         }
 
-        let remaining = nextMilestone(after: totalSolved) - totalSolved
-        return "\(remaining) problem\(remaining == 1 ? "" : "s") left. Keep this goal small, measurable, and visible on the widget."
+        let remaining = max(0, goalTargetValue - totalSolved)
+
+        if remaining == 0 {
+            return "Goal reached. Set the next target when you are ready."
+        }
+
+        return "\(remaining) problem\(remaining == 1 ? "" : "s") left at \(weeklyTargetValue) per week. Keep the goal small, measurable, and visible."
+    }
+
+    var reminderTimeText: String {
+        let formatter = DateFormatter()
+        formatter.timeStyle = .short
+        formatter.dateStyle = .none
+        return formatter.string(from: reminderTime)
     }
 
     func loadSavedState() {
         let snapshot = sharedStore.snapshot
+        hasSavedGoalSettings = snapshot.hasGoalSettings
+        applyGoalSettings(
+            snapshot.hasGoalSettings ? snapshot.goalSettings : suggestedGoalSettings(currentTotal: snapshot.cachedStats?.totalSolved),
+            status: snapshot.hasGoalSettings ? "Goal loaded." : "Suggested a starting goal."
+        )
 
         if let savedUsername = snapshot.username {
             username = savedUsername
@@ -1179,6 +1537,26 @@ private final class LeetTrackerViewModel: ObservableObject {
             stats = LeetCodeStats(cachedStats: cachedStats)
             statusMessage = "Loaded \(cachedStats.username). Updated \(formatted(cachedStats.lastUpdated))."
         }
+    }
+
+    func saveGoalSettings() {
+        let currentTotal = stats?.totalSolved ?? 0
+        let target = max(currentTotal + 1, parsePositiveInt(goalTargetText, fallback: savedGoalSettings.targetSolved))
+        let weeklyTarget = max(1, parsePositiveInt(weeklyTargetText, fallback: savedGoalSettings.weeklyTarget))
+        let components = Calendar.current.dateComponents([.hour, .minute], from: reminderTime)
+
+        let settings = SharedGoalSettings(
+            targetSolved: target,
+            weeklyTarget: weeklyTarget,
+            remindersEnabled: remindersEnabled,
+            reminderHour: components.hour ?? savedGoalSettings.reminderHour,
+            reminderMinute: components.minute ?? savedGoalSettings.reminderMinute,
+            updatedAt: Date()
+        )
+
+        sharedStore.saveGoalSettings(settings)
+        hasSavedGoalSettings = true
+        applyGoalSettings(settings, status: "Saved goal for \(target) solved.")
     }
 
     func refreshStats() async -> Bool {
@@ -1200,6 +1578,14 @@ private final class LeetTrackerViewModel: ObservableObject {
             let freshStats = try await client.fetchStats(for: normalizedUsername)
             username = freshStats.username
             stats = freshStats
+
+            if !hasSavedGoalSettings {
+                applyGoalSettings(
+                    suggestedGoalSettings(currentTotal: freshStats.totalSolved),
+                    status: "Suggested a starting goal."
+                )
+            }
+
             sharedStore.saveUsername(freshStats.username)
             sharedStore.saveCachedStats(freshStats.cachedStats)
             statusMessage = "Updated \(freshStats.username). Last checked \(formatted(freshStats.lastUpdated))."
@@ -1246,6 +1632,50 @@ private final class LeetTrackerViewModel: ObservableObject {
 
     private func nextMilestone(after totalSolved: Int) -> Int {
         ((totalSolved / 10) + 1) * 10
+    }
+
+    private func suggestedGoalSettings(currentTotal: Int?) -> SharedGoalSettings {
+        let target = currentTotal.map(nextMilestone) ?? SharedGoalSettings.default.targetSolved
+
+        return SharedGoalSettings(
+            targetSolved: target,
+            weeklyTarget: SharedGoalSettings.default.weeklyTarget,
+            remindersEnabled: SharedGoalSettings.default.remindersEnabled,
+            reminderHour: SharedGoalSettings.default.reminderHour,
+            reminderMinute: SharedGoalSettings.default.reminderMinute,
+            updatedAt: Date()
+        )
+    }
+
+    private var goalTargetValue: Int {
+        max(1, parsePositiveInt(goalTargetText, fallback: savedGoalSettings.targetSolved))
+    }
+
+    private var weeklyTargetValue: Int {
+        max(1, parsePositiveInt(weeklyTargetText, fallback: savedGoalSettings.weeklyTarget))
+    }
+
+    private func applyGoalSettings(_ settings: SharedGoalSettings, status: String) {
+        savedGoalSettings = settings
+        goalTargetText = "\(settings.targetSolved)"
+        weeklyTargetText = "\(settings.weeklyTarget)"
+        remindersEnabled = settings.remindersEnabled
+        reminderTime = reminderDate(hour: settings.reminderHour, minute: settings.reminderMinute)
+        goalStatusMessage = status
+    }
+
+    private func parsePositiveInt(_ text: String, fallback: Int) -> Int {
+        let digits = text.filter(\.isNumber)
+        return Int(digits) ?? fallback
+    }
+
+    private func reminderDate(hour: Int, minute: Int) -> Date {
+        Calendar.current.date(
+            bySettingHour: min(23, max(0, hour)),
+            minute: min(59, max(0, minute)),
+            second: 0,
+            of: Date()
+        ) ?? Date()
     }
 
     private func formatted(_ date: Date) -> String {

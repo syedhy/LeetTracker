@@ -42,15 +42,49 @@ struct WidgetContainer<Content: View>: View {
 
     var body: some View {
         content
-            .padding(1)
+            .padding(LTWidgetSpacing.compact)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
             .containerBackground(for: .widget) {
-                LTWidgetColor.cardBackground
+                ZStack {
+                    LTWidgetColor.cardBackground
+                    WidgetDoodleBackdrop()
+                        .stroke(LTWidgetColor.primary.opacity(0.08), lineWidth: 1)
+                        .padding(4)
+                }
             }
             .overlay {
                 RoundedRectangle(cornerRadius: LTWidgetRadius.metric)
-                    .stroke(LTWidgetColor.panelStroke, lineWidth: 1)
+                    .stroke(LTWidgetColor.primary.opacity(0.34), lineWidth: 1.2)
             }
+    }
+}
+
+struct WidgetDoodleBackdrop: Shape {
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+
+        path.move(to: CGPoint(x: rect.minX + 8, y: rect.minY + 18))
+        path.addCurve(
+            to: CGPoint(x: rect.maxX - 12, y: rect.minY + 28),
+            control1: CGPoint(x: rect.midX * 0.55, y: rect.minY + 4),
+            control2: CGPoint(x: rect.midX * 1.28, y: rect.minY + 42)
+        )
+
+        path.move(to: CGPoint(x: rect.minX + 10, y: rect.maxY - 22))
+        path.addCurve(
+            to: CGPoint(x: rect.maxX - 8, y: rect.maxY - 34),
+            control1: CGPoint(x: rect.midX * 0.65, y: rect.maxY - 44),
+            control2: CGPoint(x: rect.midX * 1.35, y: rect.maxY - 10)
+        )
+
+        path.move(to: CGPoint(x: rect.minX + 20, y: rect.minY + 8))
+        path.addCurve(
+            to: CGPoint(x: rect.minX + 30, y: rect.maxY - 8),
+            control1: CGPoint(x: rect.minX + 46, y: rect.midY * 0.76),
+            control2: CGPoint(x: rect.minX + 2, y: rect.midY * 1.22)
+        )
+
+        return path
     }
 }
 
@@ -98,7 +132,7 @@ struct WidgetDifficultyMetric: View {
         .background(LTWidgetColor.panel, in: RoundedRectangle(cornerRadius: LTWidgetRadius.metric))
         .overlay {
             RoundedRectangle(cornerRadius: LTWidgetRadius.metric)
-                .stroke(LTWidgetColor.panelStroke, lineWidth: 1)
+                .stroke(tint.opacity(0.72), lineWidth: 1.2)
         }
     }
 }
@@ -138,9 +172,16 @@ struct WidgetHeader: View {
 
 struct WidgetBrandMark: View {
     var body: some View {
-        Circle()
-            .fill(LTWidgetColor.brand)
-            .frame(width: LTWidgetSizing.brandMark, height: LTWidgetSizing.brandMark)
+        ZStack {
+            RoundedRectangle(cornerRadius: 4)
+                .fill(LTWidgetColor.primary)
+
+            Image(systemName: "chevron.left.forwardslash.chevron.right")
+                .font(.system(size: 8, weight: .heavy))
+                .foregroundStyle(Color(red: 0.98, green: 0.975, blue: 0.94))
+        }
+        .frame(width: LTWidgetSizing.brandMark, height: LTWidgetSizing.brandMark)
+        .rotationEffect(.degrees(-4))
     }
 }
 

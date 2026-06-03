@@ -10,10 +10,10 @@ enum LTWidgetSpacing {
 }
 
 enum LTWidgetTypography {
-    static let title = Font.caption.weight(.semibold)
-    static let user = Font.subheadline.weight(.medium)
-    static let primaryNumber = Font.system(size: 52, weight: .semibold, design: .rounded)
-    static let mediumNumber = Font.system(size: 58, weight: .semibold, design: .rounded)
+    static let title = Font.caption.weight(.bold)
+    static let user = Font.subheadline.weight(.semibold)
+    static let primaryNumber = Font.system(size: 54, weight: .bold, design: .rounded)
+    static let mediumNumber = Font.system(size: 60, weight: .bold, design: .rounded)
     static let statNumber = Font.system(size: 18, weight: .semibold, design: .rounded)
     static let label = Font.caption
     static let statLabel = Font.caption.weight(.medium)
@@ -44,7 +44,7 @@ enum LTWidgetColor {
 
 enum LTWidgetSizing {
     static let difficultyDot: CGFloat = 7
-    static let brandMark: CGFloat = 8
+    static let brandMark: CGFloat = 18
 }
 
 enum LTWidgetRadius {

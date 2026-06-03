@@ -17,7 +17,7 @@ struct SmallWidgetView: View {
 
             Spacer(minLength: 0)
 
-            VStack(alignment: .leading, spacing: LTWidgetSpacing.compact) {
+            VStack(alignment: .leading, spacing: LTWidgetSpacing.xSmall) {
                 Text("\(stats.totalSolved)")
                     .font(LTWidgetTypography.primaryNumber)
                     .foregroundStyle(LTWidgetColor.primary)
@@ -35,6 +35,14 @@ struct SmallWidgetView: View {
                         .foregroundStyle(LTWidgetColor.tertiary)
                         .lineLimit(1)
                 }
+            }
+            .padding(.horizontal, LTWidgetSpacing.medium)
+            .padding(.vertical, LTWidgetSpacing.small)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(LTWidgetColor.panel, in: RoundedRectangle(cornerRadius: LTWidgetRadius.metric))
+            .overlay {
+                RoundedRectangle(cornerRadius: LTWidgetRadius.metric)
+                    .stroke(LTWidgetColor.panelStroke, lineWidth: 1)
             }
 
             Spacer(minLength: 0)
@@ -91,6 +99,13 @@ struct MediumWidgetView: View {
                     Text("solved")
                         .font(LTWidgetTypography.statLabel)
                         .foregroundStyle(LTWidgetColor.secondary)
+                }
+                .padding(.horizontal, LTWidgetSpacing.large)
+                .padding(.vertical, LTWidgetSpacing.medium)
+                .background(LTWidgetColor.panel, in: RoundedRectangle(cornerRadius: LTWidgetRadius.metric))
+                .overlay {
+                    RoundedRectangle(cornerRadius: LTWidgetRadius.metric)
+                        .stroke(LTWidgetColor.panelStroke, lineWidth: 1)
                 }
             }
 

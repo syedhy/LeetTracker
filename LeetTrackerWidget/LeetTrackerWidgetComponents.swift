@@ -174,73 +174,11 @@ struct WidgetHeader: View {
     }
 
     var body: some View {
-        HStack(alignment: .center, spacing: style == .compact ? LTWidgetSpacing.small : LTWidgetSpacing.medium) {
-            WidgetBrandMark(style: style)
-
-            Text("LeetTracker")
-                .font(style == .compact ? LTWidgetTypography.compactTitle : LTWidgetTypography.title)
-                .foregroundStyle(LTWidgetColor.brand)
-                .lineLimit(1)
-                .minimumScaleFactor(0.65)
-        }
-    }
-}
-
-struct WidgetBrandMark: View {
-    let style: WidgetDifficultySummary.Style
-
-    private var markSize: CGFloat {
-        style == .compact ? LTWidgetSizing.compactBrandMark : LTWidgetSizing.brandMark
-    }
-
-    var body: some View {
-        VStack(spacing: style == .compact ? 1 : 3) {
-            WidgetCodeMarkShape()
-                .fill(LTWidgetColor.primary)
-                .frame(width: markSize, height: markSize * 0.70)
-
-            HStack(spacing: style == .compact ? 2 : 3) {
-                Circle()
-                    .fill(LTWidgetColor.easy)
-                Circle()
-                    .fill(LTWidgetColor.medium)
-                Circle()
-                    .fill(LTWidgetColor.hard)
-            }
-            .frame(width: markSize * 0.52, height: style == .compact ? 3 : 5)
-        }
-        .frame(width: markSize, height: markSize)
-    }
-}
-
-struct WidgetCodeMarkShape: Shape {
-    func path(in rect: CGRect) -> Path {
-        var path = Path()
-        let lineWidth = rect.height * 0.25
-        let leftX = rect.minX + rect.width * 0.29
-        let rightX = rect.minX + rect.width * 0.71
-        let midY = rect.midY
-        let chevronHeight = rect.height * 0.30
-        let chevronWidth = rect.width * 0.17
-
-        var left = Path()
-        left.move(to: CGPoint(x: leftX, y: midY - chevronHeight))
-        left.addLine(to: CGPoint(x: leftX - chevronWidth, y: midY))
-        left.addLine(to: CGPoint(x: leftX, y: midY + chevronHeight))
-        path.addPath(left.strokedPath(StrokeStyle(lineWidth: lineWidth, lineCap: .round, lineJoin: .round)))
-
-        var slash = Path()
-        slash.move(to: CGPoint(x: rect.midX + rect.width * 0.07, y: rect.minY + rect.height * 0.12))
-        slash.addLine(to: CGPoint(x: rect.midX - rect.width * 0.07, y: rect.maxY - rect.height * 0.12))
-        path.addPath(slash.strokedPath(StrokeStyle(lineWidth: lineWidth, lineCap: .round, lineJoin: .round)))
-
-        var right = Path()
-        right.move(to: CGPoint(x: rightX, y: midY - chevronHeight))
-        right.addLine(to: CGPoint(x: rightX + chevronWidth, y: midY))
-        right.addLine(to: CGPoint(x: rightX, y: midY + chevronHeight))
-        path.addPath(right.strokedPath(StrokeStyle(lineWidth: lineWidth, lineCap: .round, lineJoin: .round)))
-
-        return path
+        Text("LeetCode")
+            .font(style == .compact ? LTWidgetTypography.compactTitle : LTWidgetTypography.title)
+            .foregroundStyle(LTWidgetColor.brand)
+            .lineLimit(1)
+            .minimumScaleFactor(0.72)
     }
 }
 

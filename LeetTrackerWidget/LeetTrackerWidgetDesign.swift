@@ -12,8 +12,8 @@ enum LTWidgetSpacing {
 enum LTWidgetTypography {
     static let title = Font.caption.weight(.bold)
     static let user = Font.subheadline.weight(.semibold)
-    static let primaryNumber = Font.system(size: 54, weight: .bold, design: .rounded)
-    static let mediumNumber = Font.system(size: 60, weight: .bold, design: .rounded)
+    static let primaryNumber = Font.system(size: 52, weight: .bold, design: .rounded)
+    static let mediumNumber = Font.system(size: 58, weight: .bold, design: .rounded)
     static let statNumber = Font.system(size: 18, weight: .semibold, design: .rounded)
     static let label = Font.caption
     static let statLabel = Font.caption.weight(.medium)
@@ -23,14 +23,14 @@ enum LTWidgetTypography {
 enum LTWidgetColor {
     static let cardBackground = LinearGradient(
         colors: [
-            Color(red: 0.98, green: 0.975, blue: 0.94),
-            Color(red: 0.92, green: 0.91, blue: 0.86)
+            Color(red: 0.992, green: 0.992, blue: 0.976),
+            Color(red: 0.960, green: 0.960, blue: 0.936)
         ],
         startPoint: .topLeading,
         endPoint: .bottomTrailing
     )
-    static let panel = Color(red: 0.94, green: 0.93, blue: 0.88).opacity(0.85)
-    static let panelStroke = Color(red: 0.10, green: 0.10, blue: 0.09).opacity(0.28)
+    static let panel = Color(red: 0.985, green: 0.985, blue: 0.965).opacity(0.72)
+    static let panelStroke = Color(red: 0.10, green: 0.10, blue: 0.09).opacity(0.16)
     static let primary = Color(red: 0.08, green: 0.08, blue: 0.075)
     static let secondary = Color(red: 0.26, green: 0.26, blue: 0.24)
     static let tertiary = Color(red: 0.42, green: 0.42, blue: 0.39)
@@ -44,7 +44,7 @@ enum LTWidgetColor {
 
 enum LTWidgetSizing {
     static let difficultyDot: CGFloat = 7
-    static let brandMark: CGFloat = 18
+    static let brandMark: CGFloat = 17
 }
 
 enum LTWidgetRadius {

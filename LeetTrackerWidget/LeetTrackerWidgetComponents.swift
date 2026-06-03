@@ -42,19 +42,19 @@ struct WidgetContainer<Content: View>: View {
 
     var body: some View {
         content
-            .padding(LTWidgetSpacing.compact)
+            .padding(LTWidgetSpacing.medium)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
             .containerBackground(for: .widget) {
                 ZStack {
                     LTWidgetColor.cardBackground
                     WidgetDoodleBackdrop()
-                        .stroke(LTWidgetColor.primary.opacity(0.08), lineWidth: 1)
+                        .stroke(LTWidgetColor.primary.opacity(0.045), lineWidth: 1)
                         .padding(4)
                 }
             }
             .overlay {
                 RoundedRectangle(cornerRadius: LTWidgetRadius.metric)
-                    .stroke(LTWidgetColor.primary.opacity(0.34), lineWidth: 1.2)
+                    .stroke(LTWidgetColor.primary.opacity(0.14), lineWidth: 1)
             }
     }
 }
@@ -126,14 +126,8 @@ struct WidgetDifficultyMetric: View {
                 .lineLimit(1)
                 .minimumScaleFactor(0.72)
         }
-        .padding(.horizontal, LTWidgetSpacing.medium)
-        .padding(.vertical, LTWidgetSpacing.small)
+        .padding(.vertical, LTWidgetSpacing.xSmall)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(LTWidgetColor.panel, in: RoundedRectangle(cornerRadius: LTWidgetRadius.metric))
-        .overlay {
-            RoundedRectangle(cornerRadius: LTWidgetRadius.metric)
-                .stroke(tint.opacity(0.72), lineWidth: 1.2)
-        }
     }
 }
 
@@ -172,16 +166,32 @@ struct WidgetHeader: View {
 
 struct WidgetBrandMark: View {
     var body: some View {
-        ZStack {
-            RoundedRectangle(cornerRadius: 4)
-                .fill(LTWidgetColor.primary)
-
-            Image(systemName: "chevron.left.forwardslash.chevron.right")
-                .font(.system(size: 8, weight: .heavy))
-                .foregroundStyle(Color(red: 0.98, green: 0.975, blue: 0.94))
-        }
+        Image(systemName: "chevron.left.forwardslash.chevron.right")
+            .font(.system(size: 13, weight: .heavy))
+            .foregroundStyle(LTWidgetColor.primary)
+            .frame(width: LTWidgetSizing.brandMark, height: LTWidgetSizing.brandMark)
+            .overlay(alignment: .bottom) {
+                HStack(spacing: 2) {
+                    Circle()
+                        .fill(LTWidgetColor.easy)
+                    Circle()
+                        .fill(LTWidgetColor.medium)
+                    Circle()
+                        .fill(LTWidgetColor.hard)
+                }
+                .frame(width: 14, height: 3)
+                .offset(y: 3)
+            }
         .frame(width: LTWidgetSizing.brandMark, height: LTWidgetSizing.brandMark)
         .rotationEffect(.degrees(-4))
+    }
+}
+
+struct WidgetDivider: View {
+    var body: some View {
+        Rectangle()
+            .fill(LTWidgetColor.primary.opacity(0.14))
+            .frame(height: 1)
     }
 }
 

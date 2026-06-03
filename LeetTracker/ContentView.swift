@@ -487,8 +487,8 @@ struct ContentView: View {
 
 private enum AppColor {
     static let ink = Color(red: 0.08, green: 0.08, blue: 0.075)
-    static let paper = Color(red: 0.98, green: 0.975, blue: 0.94)
-    static let paperWarm = Color(red: 0.94, green: 0.93, blue: 0.88)
+    static let paper = Color(red: 0.992, green: 0.992, blue: 0.976)
+    static let paperWarm = Color(red: 0.960, green: 0.960, blue: 0.936)
     static let graphite = Color(red: 0.42, green: 0.42, blue: 0.39)
     static let line = Color(red: 0.12, green: 0.12, blue: 0.11)
     static let brand = ink
@@ -642,19 +642,34 @@ private struct AppIconMark: View {
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 14)
-                .fill(AppColor.ink)
+                .fill(AppColor.paper)
 
             Image(systemName: "chevron.left.forwardslash.chevron.right")
                 .font(.title3.weight(.bold))
-                .foregroundStyle(AppColor.paper)
+                .foregroundStyle(AppColor.ink)
+
+            VStack {
+                Spacer()
+
+                HStack(spacing: 4) {
+                    Circle()
+                        .fill(AppColor.easy)
+                    Circle()
+                        .fill(AppColor.medium)
+                    Circle()
+                        .fill(AppColor.hard)
+                }
+                .frame(width: 22, height: 5)
+                .padding(.bottom, 9)
+            }
         }
         .aspectRatio(1, contentMode: .fit)
         .frame(width: 48, height: 48)
         .overlay {
             RoundedRectangle(cornerRadius: 14)
-                .stroke(AppColor.paper.opacity(0.24), lineWidth: 1)
+                .stroke(AppColor.line.opacity(0.16), lineWidth: 1)
         }
-        .shadow(color: AppColor.ink.opacity(0.18), radius: 12, y: 7)
+        .shadow(color: AppColor.ink.opacity(0.08), radius: 10, y: 6)
     }
 }
 

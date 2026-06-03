@@ -12,47 +12,44 @@ struct SmallWidgetView: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: LTWidgetSpacing.medium) {
-            WidgetHeader()
-
-            Spacer(minLength: 0)
-
-            VStack(alignment: .leading, spacing: LTWidgetSpacing.xSmall) {
-                Text("\(stats.totalSolved)")
-                    .font(LTWidgetTypography.primaryNumber)
-                    .foregroundStyle(LTWidgetColor.primary)
-                    .contentTransition(.numericText())
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.72)
-
-                HStack(spacing: LTWidgetSpacing.small) {
-                    Text("solved")
-                        .font(LTWidgetTypography.user)
-                        .foregroundStyle(LTWidgetColor.secondary)
+        VStack(alignment: .leading, spacing: LTWidgetSpacing.large) {
+            HStack(alignment: .top, spacing: LTWidgetSpacing.medium) {
+                VStack(alignment: .leading, spacing: LTWidgetSpacing.compact) {
+                    WidgetHeader()
 
                     Text(username)
-                        .font(LTWidgetTypography.label)
-                        .foregroundStyle(LTWidgetColor.tertiary)
+                        .font(LTWidgetTypography.user)
+                        .foregroundStyle(LTWidgetColor.secondary)
                         .lineLimit(1)
+                        .minimumScaleFactor(0.78)
+
+                    WidgetUpdatedText(date: stats.lastUpdated)
+                }
+
+                Spacer(minLength: LTWidgetSpacing.small)
+
+                VStack(alignment: .trailing, spacing: LTWidgetSpacing.xSmall) {
+                    Text("\(stats.totalSolved)")
+                        .font(LTWidgetTypography.primaryNumber)
+                        .foregroundStyle(LTWidgetColor.primary)
+                        .contentTransition(.numericText())
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.72)
+
+                    Text("solved")
+                        .font(LTWidgetTypography.statLabel)
+                        .foregroundStyle(LTWidgetColor.secondary)
                 }
             }
-            .padding(.horizontal, LTWidgetSpacing.medium)
-            .padding(.vertical, LTWidgetSpacing.small)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .background(LTWidgetColor.panel, in: RoundedRectangle(cornerRadius: LTWidgetRadius.metric))
-            .overlay {
-                RoundedRectangle(cornerRadius: LTWidgetRadius.metric)
-                    .stroke(LTWidgetColor.panelStroke, lineWidth: 1)
-            }
 
-            Spacer(minLength: 0)
+            WidgetDivider()
 
             WidgetDifficultySummary(stats: stats)
 
+            Spacer(minLength: 0)
+
             if let status {
                 status
-            } else {
-                WidgetUpdatedText(date: stats.lastUpdated)
             }
         }
     }
@@ -70,7 +67,7 @@ struct MediumWidgetView: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: LTWidgetSpacing.large) {
+        VStack(alignment: .leading, spacing: LTWidgetSpacing.xLarge) {
             HStack(alignment: .top, spacing: LTWidgetSpacing.xLarge) {
                 VStack(alignment: .leading, spacing: LTWidgetSpacing.medium) {
                     WidgetHeader()
@@ -100,14 +97,9 @@ struct MediumWidgetView: View {
                         .font(LTWidgetTypography.statLabel)
                         .foregroundStyle(LTWidgetColor.secondary)
                 }
-                .padding(.horizontal, LTWidgetSpacing.large)
-                .padding(.vertical, LTWidgetSpacing.medium)
-                .background(LTWidgetColor.panel, in: RoundedRectangle(cornerRadius: LTWidgetRadius.metric))
-                .overlay {
-                    RoundedRectangle(cornerRadius: LTWidgetRadius.metric)
-                        .stroke(LTWidgetColor.panelStroke, lineWidth: 1)
-                }
             }
+
+            WidgetDivider()
 
             WidgetDifficultySummary(stats: stats)
 

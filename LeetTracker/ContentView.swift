@@ -43,6 +43,7 @@ struct ContentView: View {
                 ScrollView {
                     selectedContent
                         .padding(28)
+                        .frame(maxWidth: .infinity, alignment: .topLeading)
                 }
             }
         }
@@ -81,7 +82,7 @@ struct ContentView: View {
                         goalSection
                         dataHealthSection
                     }
-                    .frame(width: 300)
+                    .frame(minWidth: 300, idealWidth: 340, maxWidth: 380)
                 }
 
                 VStack(spacing: 20) {
@@ -93,14 +94,14 @@ struct ContentView: View {
 
             planningSnapshot
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
+        .frame(maxWidth: 1320, alignment: .leading)
     }
 
     private var analyticsPage: some View {
         VStack(alignment: .leading, spacing: 24) {
             pageHeader(
                 title: "Analytics",
-                subtitle: "Readable signals from your public LeetCode progress.",
+                subtitle: "Local practice signals from public solved counts.",
                 systemImage: "chart.line.uptrend.xyaxis"
             )
 
@@ -111,17 +112,10 @@ struct ContentView: View {
                         title: viewModel.readinessTitle,
                         detail: viewModel.readinessDetail
                     )
-                    .frame(width: 300)
+                    .frame(maxWidth: .infinity)
 
                     ProgressSignalsPanel(signals: viewModel.progressSignals)
                         .frame(maxWidth: .infinity)
-
-                    DifficultyBalancePanel(
-                        stats: viewModel.statsSnapshot,
-                        rows: viewModel.difficultyDistributionRows,
-                        balanceText: viewModel.balanceNarrative
-                    )
-                        .frame(width: 360)
                 }
 
                 VStack(spacing: 20) {
@@ -132,11 +126,39 @@ struct ContentView: View {
                     )
 
                     ProgressSignalsPanel(signals: viewModel.progressSignals)
+                }
+            }
 
+            ViewThatFits(in: .horizontal) {
+                HStack(alignment: .top, spacing: 20) {
                     DifficultyBalancePanel(
                         stats: viewModel.statsSnapshot,
                         rows: viewModel.difficultyDistributionRows,
                         balanceText: viewModel.balanceNarrative
+                    )
+                    .frame(maxWidth: .infinity)
+
+                    GoalProjectionPanel(
+                        currentSolved: viewModel.currentSolvedValue,
+                        targetSolved: viewModel.goalTargetNumber,
+                        weeklyTarget: viewModel.weeklyTargetNumber,
+                        completionText: viewModel.estimatedCompletionDateText
+                    )
+                    .frame(maxWidth: .infinity)
+                }
+
+                VStack(spacing: 20) {
+                    DifficultyBalancePanel(
+                        stats: viewModel.statsSnapshot,
+                        rows: viewModel.difficultyDistributionRows,
+                        balanceText: viewModel.balanceNarrative
+                    )
+
+                    GoalProjectionPanel(
+                        currentSolved: viewModel.currentSolvedValue,
+                        targetSolved: viewModel.goalTargetNumber,
+                        weeklyTarget: viewModel.weeklyTargetNumber,
+                        completionText: viewModel.estimatedCompletionDateText
                     )
                 }
             }
@@ -148,13 +170,14 @@ struct ContentView: View {
                         subtitle: viewModel.milestoneSubtitle,
                         rows: viewModel.milestoneRows
                     )
-                    .frame(width: 360)
+                    .frame(maxWidth: .infinity)
 
                     FocusRecommendationPanel(
                         title: viewModel.focusRecommendationTitle,
                         detail: viewModel.focusRecommendationDetail,
                         tint: viewModel.focusRecommendationTint
                     )
+                    .frame(maxWidth: .infinity)
                 }
 
                 VStack(spacing: 20) {
@@ -174,6 +197,7 @@ struct ContentView: View {
 
             AnalyticsNarrativePanel(summary: viewModel.analyticsSummary)
         }
+        .frame(maxWidth: 1320, alignment: .leading)
     }
 
     private var goalsPage: some View {
@@ -194,7 +218,7 @@ struct ContentView: View {
                         statusText: viewModel.goalStatusMessage,
                         saveAction: viewModel.saveGoalSettings
                     )
-                    .frame(width: 340)
+                    .frame(minWidth: 320, idealWidth: 340, maxWidth: 380)
 
                     VStack(spacing: 20) {
                         GoalPlanPanel(
@@ -219,7 +243,7 @@ struct ContentView: View {
                         weeklyReviewText: viewModel.weeklyReviewReminderText,
                         permissionText: viewModel.reminderPermissionText
                     )
-                        .frame(width: 340)
+                    .frame(minWidth: 320, idealWidth: 340, maxWidth: 380)
                 }
 
                 VStack(spacing: 20) {
@@ -256,6 +280,7 @@ struct ContentView: View {
                 }
             }
         }
+        .frame(maxWidth: 1320, alignment: .leading)
     }
 
     private var widgetsPage: some View {
@@ -297,6 +322,7 @@ struct ContentView: View {
                 }
             }
         }
+        .frame(maxWidth: 1320, alignment: .leading)
     }
 
     private var settingsPage: some View {
@@ -310,6 +336,7 @@ struct ContentView: View {
             setupSection
             dataHealthSection
         }
+        .frame(maxWidth: 1320, alignment: .leading)
     }
 
     private var header: some View {
@@ -499,12 +526,12 @@ struct ContentView: View {
                 SectionHeader(title: "Focus", systemImage: "target")
 
                 VStack(alignment: .leading, spacing: 6) {
-                    Text(viewModel.goalTargetDisplayText)
+                    Text(viewModel.focusGoalHeadline)
                         .font(.title.weight(.semibold))
                         .lineLimit(1)
                         .minimumScaleFactor(0.78)
 
-                    Text("\(viewModel.goalRemainingText) remaining")
+                    Text(viewModel.focusGoalSubtitle)
                         .font(.callout.weight(.medium))
                         .foregroundStyle(.secondary)
                 }
@@ -654,6 +681,22 @@ private final class LeetTrackerViewModel: ObservableObject {
         "\(goalTargetValue) solved"
     }
 
+    var focusGoalHeadline: String {
+        guard stats != nil else {
+            return "Set a target"
+        }
+
+        return "Target \(goalTargetValue)"
+    }
+
+    var focusGoalSubtitle: String {
+        guard let stats else {
+            return "Refresh a profile to start goal tracking."
+        }
+
+        return "\(stats.totalSolved) solved now · \(goalRemainingText) remaining"
+    }
+
     var goalRemainingText: String {
         guard let totalSolved = stats?.totalSolved else {
             return "--"
@@ -758,6 +801,18 @@ private final class LeetTrackerViewModel: ObservableObject {
         stats
     }
 
+    var currentSolvedValue: Int? {
+        stats?.totalSolved
+    }
+
+    var goalTargetNumber: Int {
+        goalTargetValue
+    }
+
+    var weeklyTargetNumber: Int {
+        weeklyTargetValue
+    }
+
     var difficultyDistributionRows: [DifficultyDistributionRow] {
         let total = stats?.totalSolved ?? 0
 
@@ -819,7 +874,7 @@ private final class LeetTrackerViewModel: ObservableObject {
             ProgressSignal(
                 title: "Difficulty balance",
                 value: "\(mediumHardPercentage)% M/H",
-                detail: "Useful interview progress usually comes from raising this without ignoring warmups.",
+                detail: "Useful practice progress usually comes from raising this without ignoring warmups.",
                 systemImage: "chart.bar.fill",
                 tint: focusRecommendationTint
             ),
@@ -957,10 +1012,10 @@ private final class LeetTrackerViewModel: ObservableObject {
 
     var readinessDetail: String {
         guard let stats, stats.totalSolved > 0 else {
-            return "Refresh a profile once to calculate a score from solved count, goal progress, and difficulty balance."
+            return "Refresh a profile once to calculate a local practice score from solved count, goal progress, and difficulty balance."
         }
 
-        return "\(difficultyMixText) are Medium or Hard, with \(goalRemainingText) left for your current goal."
+        return "\(difficultyMixText) are Medium or Hard. This is a local practice signal, not an official readiness score."
     }
 
     var focusRecommendationTitle: String {
@@ -1025,7 +1080,7 @@ private final class LeetTrackerViewModel: ObservableObject {
         let mediumHardPercentage = Int((Double(mediumHard) / Double(stats.totalSolved) * 100).rounded())
         let remaining = max(0, goalTargetValue - stats.totalSolved)
 
-        return "You have solved \(stats.totalSolved) problems. \(mediumHardPercentage)% are Medium or Hard, which is the most useful signal for interview readiness. Your current goal is \(goalTargetValue) solved, so \(remaining) more problem\(remaining == 1 ? "" : "s") gets you there at about \(estimatedWeeksText)."
+        return "Based only on public solved counts, you have solved \(stats.totalSolved) problems and \(mediumHardPercentage)% are Medium or Hard. Treat this as a practice-health signal, not an official ranking or readiness score. Your current target is \(goalTargetValue) solved, so \(remaining) more problem\(remaining == 1 ? "" : "s") gets you there at about \(estimatedWeeksText)."
     }
 
     var goalPlanTitle: String {

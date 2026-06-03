@@ -15,7 +15,7 @@ struct DifficultyBreakdownPanel: View {
                         DifficultyBarRow(title: "Hard", value: stats.hardSolved, total: stats.totalSolved, tint: AppColor.hard)
                     }
 
-                    Text("This shows where your solved count is concentrated. A healthier interview mix usually grows medium problems steadily while keeping easy warmups active.")
+                    Text("This shows where your solved count is concentrated. A stronger practice mix usually grows Medium problems steadily while keeping Easy warmups active.")
                         .font(.callout)
                         .foregroundStyle(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
@@ -115,40 +115,59 @@ struct AnalyticsScorePanel: View {
     var body: some View {
         Panel {
             VStack(alignment: .leading, spacing: 18) {
-                SectionHeader(title: "Readiness", systemImage: "gauge.with.dots.needle.67percent")
+                SectionHeader(title: "Practice Health", systemImage: "gauge.with.dots.needle.67percent")
 
-                HStack(alignment: .center, spacing: 18) {
-                    ZStack {
-                        Circle()
-                            .stroke(.quaternary.opacity(0.7), lineWidth: 12)
+                ViewThatFits(in: .horizontal) {
+                    HStack(alignment: .center, spacing: 20) {
+                        scoreRing
 
-                        Circle()
-                            .trim(from: 0, to: progress)
-                            .stroke(
-                                AppColor.ink.gradient,
-                                style: StrokeStyle(lineWidth: 12, lineCap: .round)
-                            )
-                            .rotationEffect(.degrees(-90))
+                        scoreCopy
 
-                        Text("\(score)")
-                            .font(.system(size: 34, weight: .semibold, design: .rounded))
-                            .monospacedDigit()
+                        Spacer(minLength: 0)
                     }
-                    .frame(width: 104, height: 104)
 
-                    VStack(alignment: .leading, spacing: 6) {
-                        Text(title)
-                            .font(.title3.weight(.semibold))
-                            .fixedSize(horizontal: false, vertical: true)
-
-                        Text(detail)
-                            .font(.callout)
-                            .foregroundStyle(.secondary)
-                            .fixedSize(horizontal: false, vertical: true)
+                    VStack(alignment: .leading, spacing: 16) {
+                        scoreRing
+                        scoreCopy
                     }
                 }
             }
         }
+    }
+
+    private var scoreRing: some View {
+        ZStack {
+            Circle()
+                .stroke(.quaternary.opacity(0.7), lineWidth: 12)
+
+            Circle()
+                .trim(from: 0, to: progress)
+                .stroke(
+                    AppColor.ink.gradient,
+                    style: StrokeStyle(lineWidth: 12, lineCap: .round)
+                )
+                .rotationEffect(.degrees(-90))
+                .animation(.spring(response: 0.45, dampingFraction: 0.82), value: progress)
+
+            Text("\(score)")
+                .font(.system(size: 34, weight: .semibold, design: .rounded))
+                .monospacedDigit()
+        }
+        .frame(width: 112, height: 112)
+    }
+
+    private var scoreCopy: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text(title)
+                .font(.title3.weight(.semibold))
+                .fixedSize(horizontal: false, vertical: true)
+
+            Text(detail)
+                .font(.callout)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
 

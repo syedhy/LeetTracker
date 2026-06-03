@@ -2,7 +2,7 @@ import Foundation
 
 enum LeetTrackerWidgetConfiguration {
     static let kind = "com.hyder.LeetTracker.widget"
-    static let refreshInterval: TimeInterval = 2 * 60
+    static let refreshInterval: TimeInterval = 30 * 60
 }
 
 struct CachedLeetCodeStats: Codable, Equatable {

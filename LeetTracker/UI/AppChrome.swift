@@ -126,6 +126,7 @@ struct Panel<Content: View>: View {
     var body: some View {
         content
             .padding(20)
+            .frame(maxWidth: .infinity, alignment: .leading)
             .background(AppColor.paper.opacity(0.94), in: RoundedRectangle(cornerRadius: 8))
             .overlay {
                 RoundedRectangle(cornerRadius: 8)
@@ -155,12 +156,14 @@ struct DetailRow: View {
             Text(title)
                 .font(.callout)
                 .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
 
             Spacer()
 
             Text(value)
                 .font(.callout.weight(.semibold))
-                .lineLimit(1)
+                .multilineTextAlignment(.trailing)
+                .lineLimit(2)
                 .minimumScaleFactor(0.8)
         }
     }

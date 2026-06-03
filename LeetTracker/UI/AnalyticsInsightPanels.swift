@@ -168,6 +168,116 @@ struct MilestonePanel: View {
     }
 }
 
+struct GoalProjectionPanel: View {
+    let currentSolved: Int?
+    let targetSolved: Int
+    let weeklyTarget: Int
+    let completionText: String
+
+    private var remaining: Int {
+        max(0, targetSolved - (currentSolved ?? 0))
+    }
+
+    private var progress: Double {
+        guard let currentSolved, targetSolved > 0 else {
+            return 0
+        }
+
+        return min(1, Double(currentSolved) / Double(targetSolved))
+    }
+
+    var body: some View {
+        Panel {
+            VStack(alignment: .leading, spacing: 18) {
+                SectionHeader(title: "Goal Projection", systemImage: "point.topleft.down.curvedto.point.bottomright.up")
+
+                if let currentSolved {
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack(alignment: .lastTextBaseline) {
+                            Text("\(remaining)")
+                                .font(.system(size: 44, weight: .semibold, design: .rounded))
+                                .monospacedDigit()
+
+                            Text(remaining == 1 ? "problem left" : "problems left")
+                                .font(.title3.weight(.medium))
+                                .foregroundStyle(.secondary)
+
+                            Spacer()
+
+                            Text(completionText)
+                                .font(.callout.weight(.semibold))
+                                .foregroundStyle(.secondary)
+                        }
+
+                        ProjectionTrack(progress: progress)
+
+                        HStack {
+                            ProjectionLabel(title: "Now", value: "\(currentSolved)")
+                            Spacer()
+                            ProjectionLabel(title: "Weekly pace", value: "\(weeklyTarget)")
+                            Spacer()
+                            ProjectionLabel(title: "Target", value: "\(targetSolved)")
+                        }
+                    }
+                } else {
+                    EmptyPanelMessage(
+                        title: "No projection yet",
+                        message: "Refresh once and set a target to see a simple goal path."
+                    )
+                }
+            }
+        }
+    }
+}
+
+struct ProjectionTrack: View {
+    let progress: Double
+
+    var body: some View {
+        GeometryReader { proxy in
+            let clampedProgress = min(1, max(0, progress))
+            let dotX = max(9, min(proxy.size.width - 9, proxy.size.width * clampedProgress))
+
+            ZStack(alignment: .leading) {
+                Capsule()
+                    .fill(AppColor.paperWarm.opacity(0.9))
+                    .frame(height: 12)
+
+                Capsule()
+                    .fill(AppColor.ink)
+                    .frame(width: max(12, proxy.size.width * clampedProgress), height: 12)
+
+                Circle()
+                    .fill(AppColor.paper)
+                    .frame(width: 18, height: 18)
+                    .overlay {
+                        Circle()
+                            .stroke(AppColor.ink, lineWidth: 3)
+                    }
+                    .offset(x: dotX - 9)
+                    .animation(.spring(response: 0.45, dampingFraction: 0.8), value: clampedProgress)
+            }
+        }
+        .frame(height: 22)
+    }
+}
+
+struct ProjectionLabel: View {
+    let title: String
+    let value: String
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 3) {
+            Text(title)
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(.secondary)
+
+            Text(value)
+                .font(.callout.weight(.semibold).monospacedDigit())
+        }
+    }
+}
+
 struct ProgressSignal: Identifiable {
     var id: String { title }
 

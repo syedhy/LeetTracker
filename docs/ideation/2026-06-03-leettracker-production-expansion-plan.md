@@ -410,7 +410,7 @@ Recommended structure:
 
 Storage recommendation:
 
-- Continue using app group `UserDefaults` for small shared widget state.
+- Continue using the App Group file-backed shared store for small widget state.
 - Use SwiftData or a lightweight local JSON store for goals, history snapshots, reminders, and preferences.
 - Store widget-specific snapshots separately so widget rendering stays fast.
 

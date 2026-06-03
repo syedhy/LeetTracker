@@ -41,14 +41,30 @@ struct ContentView: View {
                 Divider()
 
                 ScrollView {
-                    dashboard
+                    selectedContent
                         .padding(28)
                 }
             }
         }
-        .frame(minWidth: 980, idealWidth: 1120, minHeight: 660)
+        .frame(minWidth: 780, idealWidth: 1120, minHeight: 620)
         .onAppear {
             viewModel.loadSavedState()
+        }
+    }
+
+    @ViewBuilder
+    private var selectedContent: some View {
+        switch selectedSection {
+        case .dashboard:
+            dashboard
+        case .analytics:
+            analyticsPage
+        case .goals:
+            goalsPage
+        case .widgets:
+            widgetsPage
+        case .settings:
+            settingsPage
         }
     }
 
@@ -56,23 +72,140 @@ struct ContentView: View {
         VStack(alignment: .leading, spacing: 24) {
             header
 
-            HStack(alignment: .top, spacing: 20) {
-                statsSection
-                    .frame(maxWidth: .infinity)
+            ViewThatFits(in: .horizontal) {
+                HStack(alignment: .top, spacing: 20) {
+                    statsSection
+                        .frame(maxWidth: .infinity)
+
+                    VStack(spacing: 20) {
+                        goalSection
+                        dataHealthSection
+                    }
+                    .frame(width: 300)
+                }
 
                 VStack(spacing: 20) {
+                    statsSection
                     goalSection
                     dataHealthSection
                 }
-                .frame(width: 300)
             }
 
-            HStack(alignment: .top, spacing: 20) {
-                analyticsSection
-                setupSection
-            }
+            planningSnapshot
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private var analyticsPage: some View {
+        VStack(alignment: .leading, spacing: 24) {
+            pageHeader(
+                title: "Analytics",
+                subtitle: "Readable signals from your public LeetCode progress.",
+                systemImage: "chart.line.uptrend.xyaxis"
+            )
+
+            ViewThatFits(in: .horizontal) {
+                HStack(alignment: .top, spacing: 20) {
+                    analyticsSection
+                    DifficultyBreakdownPanel(stats: viewModel.statsSnapshot)
+                        .frame(width: 360)
+                }
+
+                VStack(spacing: 20) {
+                    analyticsSection
+                    DifficultyBreakdownPanel(stats: viewModel.statsSnapshot)
+                }
+            }
+
+            AnalyticsNarrativePanel(summary: viewModel.analyticsSummary)
+        }
+    }
+
+    private var goalsPage: some View {
+        VStack(alignment: .leading, spacing: 24) {
+            pageHeader(
+                title: "Goals",
+                subtitle: "Plan the next step without making the app noisy.",
+                systemImage: "target"
+            )
+
+            ViewThatFits(in: .horizontal) {
+                HStack(alignment: .top, spacing: 20) {
+                    GoalPlanPanel(
+                        title: viewModel.goalPlanTitle,
+                        subtitle: viewModel.goalPlanSubtitle,
+                        progress: viewModel.milestoneProgress
+                    )
+
+                    ReminderPlanPanel(refreshText: viewModel.refreshCadenceText)
+                        .frame(width: 340)
+                }
+
+                VStack(spacing: 20) {
+                    GoalPlanPanel(
+                        title: viewModel.goalPlanTitle,
+                        subtitle: viewModel.goalPlanSubtitle,
+                        progress: viewModel.milestoneProgress
+                    )
+
+                    ReminderPlanPanel(refreshText: viewModel.refreshCadenceText)
+                }
+            }
+        }
+    }
+
+    private var widgetsPage: some View {
+        VStack(alignment: .leading, spacing: 24) {
+            pageHeader(
+                title: "Widgets",
+                subtitle: "The desktop should show useful progress without opening the app.",
+                systemImage: "square.grid.2x2"
+            )
+
+            ViewThatFits(in: .horizontal) {
+                HStack(alignment: .top, spacing: 20) {
+                    WidgetIdeaPanel(
+                        title: "Progress",
+                        detail: "Current solved count, difficulty mix, and last updated time.",
+                        systemImage: "checkmark.seal.fill",
+                        tint: AppColor.brand
+                    )
+
+                    WidgetIdeaPanel(
+                        title: "Goal Pace",
+                        detail: "Milestone progress, remaining problems, and whether you are on track.",
+                        systemImage: "speedometer",
+                        tint: AppColor.medium
+                    )
+
+                    WidgetIdeaPanel(
+                        title: "Daily Focus",
+                        detail: "One small practice target with reminder timing.",
+                        systemImage: "calendar.badge.clock",
+                        tint: AppColor.easy
+                    )
+                }
+
+                VStack(spacing: 20) {
+                    WidgetIdeaPanel(title: "Progress", detail: "Current solved count, difficulty mix, and last updated time.", systemImage: "checkmark.seal.fill", tint: AppColor.brand)
+                    WidgetIdeaPanel(title: "Goal Pace", detail: "Milestone progress, remaining problems, and whether you are on track.", systemImage: "speedometer", tint: AppColor.medium)
+                    WidgetIdeaPanel(title: "Daily Focus", detail: "One small practice target with reminder timing.", systemImage: "calendar.badge.clock", tint: AppColor.easy)
+                }
+            }
+        }
+    }
+
+    private var settingsPage: some View {
+        VStack(alignment: .leading, spacing: 24) {
+            pageHeader(
+                title: "Settings",
+                subtitle: "Profile, refresh, cache, and local data controls.",
+                systemImage: "gearshape"
+            )
+
+            setupSection
+            dataHealthSection
+        }
     }
 
     private var header: some View {
@@ -188,6 +321,41 @@ struct ContentView: View {
             }
         }
         .frame(maxWidth: .infinity)
+    }
+
+    private var planningSnapshot: some View {
+        ViewThatFits(in: .horizontal) {
+            HStack(alignment: .top, spacing: 20) {
+                DifficultyBreakdownPanel(stats: viewModel.statsSnapshot)
+                ReminderPlanPanel(refreshText: viewModel.refreshCadenceText)
+            }
+
+            VStack(spacing: 20) {
+                DifficultyBreakdownPanel(stats: viewModel.statsSnapshot)
+                ReminderPlanPanel(refreshText: viewModel.refreshCadenceText)
+            }
+        }
+    }
+
+    private func pageHeader(title: String, subtitle: String, systemImage: String) -> some View {
+        HStack(alignment: .center, spacing: 14) {
+            Image(systemName: systemImage)
+                .font(.title2.weight(.semibold))
+                .foregroundStyle(AppColor.brand)
+                .frame(width: 44, height: 44)
+                .background(AppColor.brand.opacity(0.12), in: RoundedRectangle(cornerRadius: 12))
+
+            VStack(alignment: .leading, spacing: 4) {
+                Text(title)
+                    .font(.largeTitle.weight(.semibold))
+
+                Text(subtitle)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+            }
+
+            Spacer()
+        }
     }
 
     private var goalSection: some View {
@@ -579,6 +747,241 @@ private struct DetailRow: View {
     }
 }
 
+private struct DifficultyBreakdownPanel: View {
+    let stats: LeetCodeStats?
+
+    var body: some View {
+        Panel {
+            VStack(alignment: .leading, spacing: 18) {
+                SectionHeader(title: "Difficulty Breakdown", systemImage: "chart.bar.fill")
+
+                if let stats, stats.totalSolved > 0 {
+                    VStack(spacing: 12) {
+                        DifficultyBarRow(title: "Easy", value: stats.easySolved, total: stats.totalSolved, tint: AppColor.easy)
+                        DifficultyBarRow(title: "Medium", value: stats.mediumSolved, total: stats.totalSolved, tint: AppColor.medium)
+                        DifficultyBarRow(title: "Hard", value: stats.hardSolved, total: stats.totalSolved, tint: AppColor.hard)
+                    }
+
+                    Text("This shows where your solved count is concentrated. A healthier interview mix usually grows medium problems steadily while keeping easy warmups active.")
+                        .font(.callout)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                } else {
+                    EmptyPanelMessage(
+                        title: "No analytics yet",
+                        message: "Save a LeetCode username and refresh once to generate readable charts."
+                    )
+                }
+            }
+        }
+    }
+}
+
+private struct DifficultyBarRow: View {
+    let title: String
+    let value: Int
+    let total: Int
+    let tint: Color
+
+    private var percentage: Int {
+        guard total > 0 else {
+            return 0
+        }
+
+        return Int((Double(value) / Double(total) * 100).rounded())
+    }
+
+    private var progress: Double {
+        guard total > 0 else {
+            return 0
+        }
+
+        return Double(value) / Double(total)
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                HStack(spacing: 8) {
+                    Circle()
+                        .fill(tint)
+                        .frame(width: 9, height: 9)
+
+                    Text(title)
+                        .font(.callout.weight(.semibold))
+                }
+
+                Spacer()
+
+                Text("\(value) · \(percentage)%")
+                    .font(.callout.monospacedDigit())
+                    .foregroundStyle(.secondary)
+            }
+
+            GeometryReader { proxy in
+                ZStack(alignment: .leading) {
+                    RoundedRectangle(cornerRadius: 4)
+                        .fill(.quaternary.opacity(0.58))
+
+                    RoundedRectangle(cornerRadius: 4)
+                        .fill(tint.gradient)
+                        .frame(width: max(8, proxy.size.width * progress))
+                }
+            }
+            .frame(height: 8)
+        }
+    }
+}
+
+private struct AnalyticsNarrativePanel: View {
+    let summary: String
+
+    var body: some View {
+        Panel {
+            VStack(alignment: .leading, spacing: 14) {
+                SectionHeader(title: "What This Means", systemImage: "text.bubble")
+
+                Text(summary)
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+    }
+}
+
+private struct GoalPlanPanel: View {
+    let title: String
+    let subtitle: String
+    let progress: Double
+
+    var body: some View {
+        Panel {
+            VStack(alignment: .leading, spacing: 18) {
+                SectionHeader(title: "Active Goal", systemImage: "target")
+
+                VStack(alignment: .leading, spacing: 6) {
+                    Text(title)
+                        .font(.title.weight(.semibold))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.78)
+
+                    Text(subtitle)
+                        .font(.callout)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+
+                ProgressView(value: progress)
+                    .tint(AppColor.brand)
+
+                HStack(spacing: 10) {
+                    Label("Weekly target", systemImage: "calendar")
+                    Spacer()
+                    Text("Plan next")
+                        .fontWeight(.semibold)
+                }
+                .font(.callout)
+                .foregroundStyle(.secondary)
+            }
+        }
+    }
+}
+
+private struct ReminderPlanPanel: View {
+    let refreshText: String
+
+    var body: some View {
+        Panel {
+            VStack(alignment: .leading, spacing: 16) {
+                SectionHeader(title: "Reminders", systemImage: "bell.badge")
+
+                ReminderRow(title: "Daily practice", detail: "Pick a gentle time window", tint: AppColor.easy)
+                ReminderRow(title: "Weekly review", detail: "Summarize progress and reset plan", tint: AppColor.brand)
+                ReminderRow(title: "Widget refresh", detail: refreshText, tint: AppColor.medium)
+
+                Divider()
+
+                DetailRow(title: "Quiet hours", value: "Not set")
+                DetailRow(title: "Notification style", value: "Gentle")
+            }
+        }
+    }
+}
+
+private struct ReminderRow: View {
+    let title: String
+    let detail: String
+    let tint: Color
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 10) {
+            Circle()
+                .fill(tint)
+                .frame(width: 9, height: 9)
+                .padding(.top, 6)
+
+            VStack(alignment: .leading, spacing: 3) {
+                Text(title)
+                    .font(.callout.weight(.semibold))
+
+                Text(detail)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+
+            Spacer(minLength: 0)
+        }
+    }
+}
+
+private struct WidgetIdeaPanel: View {
+    let title: String
+    let detail: String
+    let systemImage: String
+    let tint: Color
+
+    var body: some View {
+        Panel {
+            VStack(alignment: .leading, spacing: 16) {
+                Image(systemName: systemImage)
+                    .font(.title2.weight(.semibold))
+                    .foregroundStyle(tint)
+                    .frame(width: 42, height: 42)
+                    .background(tint.opacity(0.12), in: RoundedRectangle(cornerRadius: 12))
+
+                VStack(alignment: .leading, spacing: 6) {
+                    Text(title)
+                        .font(.title3.weight(.semibold))
+
+                    Text(detail)
+                        .font(.callout)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+        }
+    }
+}
+
+private struct EmptyPanelMessage: View {
+    let title: String
+    let message: String
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text(title)
+                .font(.headline)
+
+            Text(message)
+                .font(.callout)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+    }
+}
+
 private struct PrimaryActionButtonStyle: ButtonStyle {
     @Environment(\.isEnabled) private var isEnabled
 
@@ -724,6 +1127,40 @@ private final class LeetTrackerViewModel: ObservableObject {
     var refreshCadenceText: String {
         let minutes = Int(LeetTrackerWidgetConfiguration.refreshInterval / 60)
         return "Every \(minutes) min"
+    }
+
+    var statsSnapshot: LeetCodeStats? {
+        stats
+    }
+
+    var analyticsSummary: String {
+        guard let stats, stats.totalSolved > 0 else {
+            return "No profile data is loaded yet. Save your LeetCode username and refresh once so LeetTracker can turn your public solved counts into readable progress signals."
+        }
+
+        let mediumHard = stats.mediumSolved + stats.hardSolved
+        let mediumHardPercentage = Int((Double(mediumHard) / Double(stats.totalSolved) * 100).rounded())
+        let next = nextMilestone(after: stats.totalSolved)
+        let remaining = next - stats.totalSolved
+
+        return "You have solved \(stats.totalSolved) problems. \(mediumHardPercentage)% are Medium or Hard, which is the most useful signal for interview readiness. Your next clean milestone is \(next) solved, so \(remaining) more problem\(remaining == 1 ? "" : "s") gets you there."
+    }
+
+    var goalPlanTitle: String {
+        guard let totalSolved = stats?.totalSolved else {
+            return "Set your first goal"
+        }
+
+        return "Reach \(nextMilestone(after: totalSolved)) solved"
+    }
+
+    var goalPlanSubtitle: String {
+        guard let totalSolved = stats?.totalSolved else {
+            return "After a profile refresh, LeetTracker will suggest a simple milestone goal from your current solved count."
+        }
+
+        let remaining = nextMilestone(after: totalSolved) - totalSolved
+        return "\(remaining) problem\(remaining == 1 ? "" : "s") left. Keep this goal small, measurable, and visible on the widget."
     }
 
     func loadSavedState() {

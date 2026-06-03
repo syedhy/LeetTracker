@@ -23,30 +23,33 @@ struct SharedLeetTrackerSnapshot: Equatable {
 final class SharedLeetTrackerStore {
     static let appGroupIdentifier = "group.com.hyder.LeetTracker"
 
-    private enum Keys {
-        static let username = "leetcodeUsername"
-        static let cachedStats = "cachedLeetCodeStats"
-        static let lastUpdated = "lastUpdated"
-    }
+    private static let storeFileName = "LeetTrackerSharedStore.json"
+    private static let legacyPreferencesPath = "Library/Preferences/\(appGroupIdentifier).plist"
 
-    private let userDefaults: UserDefaults
+    private let storeURL: URL
+    private let fileManager: FileManager
     private let encoder = JSONEncoder()
     private let decoder = JSONDecoder()
 
-    init(userDefaults: UserDefaults? = UserDefaults(suiteName: SharedLeetTrackerStore.appGroupIdentifier)) {
-        self.userDefaults = userDefaults ?? .standard
+    init(fileManager: FileManager = .default) {
+        self.fileManager = fileManager
+        self.storeURL = Self.resolveStoreURL(fileManager: fileManager)
     }
 
     var snapshot: SharedLeetTrackerSnapshot {
-        SharedLeetTrackerSnapshot(
-            username: username,
-            cachedStats: cachedStats,
-            lastUpdated: lastUpdated
+        let payload = loadPayload()
+        let normalizedUsername = payload.username?.trimmingCharacters(in: .whitespacesAndNewlines)
+        let savedUsername = normalizedUsername?.isEmpty == false ? normalizedUsername : nil
+
+        return SharedLeetTrackerSnapshot(
+            username: savedUsername,
+            cachedStats: payload.cachedStats,
+            lastUpdated: payload.lastUpdated
         )
     }
 
     var username: String? {
-        let storedUsername = userDefaults.string(forKey: Keys.username)?
+        let storedUsername = loadPayload().username?
             .trimmingCharacters(in: .whitespacesAndNewlines)
 
         guard let storedUsername, !storedUsername.isEmpty else {
@@ -57,36 +60,103 @@ final class SharedLeetTrackerStore {
     }
 
     var cachedStats: CachedLeetCodeStats? {
-        guard let data = userDefaults.data(forKey: Keys.cachedStats) else {
-            return nil
-        }
-
-        return try? decoder.decode(CachedLeetCodeStats.self, from: data)
+        loadPayload().cachedStats
     }
 
     var lastUpdated: Date? {
-        userDefaults.object(forKey: Keys.lastUpdated) as? Date
+        loadPayload().lastUpdated
     }
 
     func saveUsername(_ username: String) {
         let normalizedUsername = username.trimmingCharacters(in: .whitespacesAndNewlines)
-        userDefaults.set(normalizedUsername, forKey: Keys.username)
-        userDefaults.set(Date(), forKey: Keys.lastUpdated)
-        synchronize()
+        var payload = loadPayload()
+        payload.username = normalizedUsername
+        payload.lastUpdated = Date()
+        savePayload(payload)
     }
 
     func saveCachedStats(_ stats: CachedLeetCodeStats) {
-        guard let data = try? encoder.encode(stats) else {
-            return
-        }
-
-        userDefaults.set(data, forKey: Keys.cachedStats)
-        userDefaults.set(stats.lastUpdated, forKey: Keys.lastUpdated)
-        synchronize()
+        var payload = loadPayload()
+        payload.username = stats.username
+        payload.cachedStats = stats
+        payload.lastUpdated = stats.lastUpdated
+        savePayload(payload)
     }
 
     @discardableResult
     func synchronize() -> Bool {
-        userDefaults.synchronize()
+        true
     }
+
+    private static func resolveStoreURL(fileManager: FileManager) -> URL {
+        let baseURL = fileManager.containerURL(forSecurityApplicationGroupIdentifier: appGroupIdentifier)
+            ?? fileManager.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
+                .appendingPathComponent("LeetTracker", isDirectory: true)
+
+        return baseURL.appendingPathComponent(storeFileName)
+    }
+
+    private func loadPayload() -> SharedLeetTrackerPayload {
+        if
+            let data = try? Data(contentsOf: storeURL),
+            let payload = try? decoder.decode(SharedLeetTrackerPayload.self, from: data)
+        {
+            return payload
+        }
+
+        if let legacyPayload = loadLegacyPayload() {
+            savePayload(legacyPayload)
+            return legacyPayload
+        }
+
+        return SharedLeetTrackerPayload()
+    }
+
+    private func savePayload(_ payload: SharedLeetTrackerPayload) {
+        guard let data = try? encoder.encode(payload) else {
+            return
+        }
+
+        do {
+            try fileManager.createDirectory(at: storeURL.deletingLastPathComponent(), withIntermediateDirectories: true)
+            try data.write(to: storeURL, options: [.atomic])
+        } catch {
+            return
+        }
+    }
+
+    private func loadLegacyPayload() -> SharedLeetTrackerPayload? {
+        let preferencesURL = storeURL.deletingLastPathComponent()
+            .appendingPathComponent(Self.legacyPreferencesPath)
+
+        guard
+            let data = try? Data(contentsOf: preferencesURL),
+            let plist = try? PropertyListSerialization.propertyList(from: data, format: nil),
+            let preferences = plist as? [String: Any]
+        else {
+            return nil
+        }
+
+        let username = (preferences["leetcodeUsername"] as? String)?
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+        let cachedStatsData = preferences["cachedLeetCodeStats"] as? Data
+        let cachedStats = cachedStatsData.flatMap { try? decoder.decode(CachedLeetCodeStats.self, from: $0) }
+        let lastUpdated = (preferences["lastUpdated"] as? Date) ?? cachedStats?.lastUpdated
+
+        guard username?.isEmpty == false || cachedStats != nil || lastUpdated != nil else {
+            return nil
+        }
+
+        return SharedLeetTrackerPayload(
+            username: username?.isEmpty == false ? username : cachedStats?.username,
+            cachedStats: cachedStats,
+            lastUpdated: lastUpdated
+        )
+    }
+}
+
+private struct SharedLeetTrackerPayload: Codable, Equatable {
+    var username: String?
+    var cachedStats: CachedLeetCodeStats?
+    var lastUpdated: Date?
 }

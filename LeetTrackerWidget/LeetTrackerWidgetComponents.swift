@@ -89,7 +89,7 @@ struct WidgetDifficultySummary: View {
             case .compact:
                 return LTWidgetSpacing.small
             case .spacious:
-                return LTWidgetSpacing.xLarge
+                return 0
             }
         }
     }
@@ -108,6 +108,7 @@ struct WidgetDifficultySummary: View {
             WidgetDifficultyMetric(title: "Medium", value: stats.mediumSolved, tint: LTWidgetColor.medium, style: style)
             WidgetDifficultyMetric(title: "Hard", value: stats.hardSolved, tint: LTWidgetColor.hard, style: style)
         }
+        .frame(maxWidth: .infinity, alignment: style == .compact ? .leading : .center)
     }
 }
 
@@ -138,8 +139,16 @@ struct WidgetDifficultyMetric: View {
         }
     }
 
+    private var metricAlignment: HorizontalAlignment {
+        style == .compact ? .leading : .center
+    }
+
+    private var frameAlignment: Alignment {
+        style == .compact ? .leading : .center
+    }
+
     var body: some View {
-        VStack(alignment: .leading, spacing: LTWidgetSpacing.small) {
+        VStack(alignment: metricAlignment, spacing: LTWidgetSpacing.small) {
             HStack(spacing: LTWidgetSpacing.compact) {
                 Circle()
                     .fill(tint)
@@ -162,7 +171,7 @@ struct WidgetDifficultyMetric: View {
                 .background(tint.opacity(0.24), in: RoundedRectangle(cornerRadius: 8))
         }
         .padding(.vertical, LTWidgetSpacing.xSmall)
-        .frame(maxWidth: .infinity, alignment: .leading)
+        .frame(maxWidth: .infinity, alignment: frameAlignment)
     }
 }
 

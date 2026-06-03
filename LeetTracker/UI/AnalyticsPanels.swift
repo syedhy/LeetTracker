@@ -2,7 +2,6 @@ import SwiftUI
 
 struct AnalyticsHeroPanel: View {
     let stats: LeetCodeStats?
-    let history: [LeetCodeStats]
     let rows: [DifficultyDistributionRow]
     let score: Int
     let title: String
@@ -50,7 +49,7 @@ struct AnalyticsHeroPanel: View {
                             .foregroundStyle(.secondary)
                     }
 
-                    Text("Actual trend")
+                    Text("Goal runway")
                         .font(.caption.weight(.semibold))
                         .foregroundStyle(.secondary)
                 }
@@ -68,8 +67,8 @@ struct AnalyticsHeroPanel: View {
                 }
             }
 
-            PracticeTrendLineGraph(
-                samples: graphSamples,
+            GoalRunwayLineGraph(
+                stats: stats,
                 targetSolved: targetSolved,
                 weeklyTarget: weeklyTarget,
                 rows: rows
@@ -82,11 +81,6 @@ struct AnalyticsHeroPanel: View {
                 AnalyticsHeroBadge(title: "Finish", value: completionText)
             }
         }
-    }
-
-    private var graphSamples: [LeetCodeStats] {
-        let samples = history.isEmpty ? stats.map { [$0] } ?? [] : history
-        return Array(samples.suffix(12))
     }
 
     private var heroCopy: some View {
@@ -169,34 +163,88 @@ struct AnalyticsHeroBadge: View {
     }
 }
 
-struct PracticeTrendLineGraph: View {
-    let samples: [LeetCodeStats]
+struct GoalRunwayLineGraph: View {
+    let stats: LeetCodeStats?
     let targetSolved: Int
     let weeklyTarget: Int
     let rows: [DifficultyDistributionRow]
 
+    private struct ProjectionPoint {
+        let week: Int
+        let value: Int
+    }
+
     private var minValue: Int {
-        max(0, values.min() ?? 0)
+        max(0, currentSolved - max(1, rangePadding))
     }
 
     private var maxValue: Int {
-        max(values.max() ?? 1, targetSolved, 1)
+        max(currentSolved + rangePadding, targetSolved, projectedFirstWeek, 1)
     }
 
     private var range: Int {
         max(1, maxValue - minValue)
     }
 
-    private var values: [Int] {
-        samples.map(\.totalSolved)
-    }
-
     private var currentSolved: Int {
-        samples.last?.totalSolved ?? 0
+        stats?.totalSolved ?? 0
     }
 
-    private var projectedSolved: Int {
+    private var remaining: Int {
+        max(0, targetSolved - currentSolved)
+    }
+
+    private var weeksToTarget: Int {
+        guard remaining > 0 else {
+            return 1
+        }
+
+        return max(1, Int(ceil(Double(remaining) / Double(max(1, weeklyTarget)))))
+    }
+
+    private var projectedFirstWeek: Int {
         min(max(targetSolved, currentSolved), currentSolved + max(1, weeklyTarget))
+    }
+
+    private var rangePadding: Int {
+        max(2, Int((Double(max(1, targetSolved - currentSolved)) * 0.12).rounded(.up)))
+    }
+
+    private var projectionPoints: [ProjectionPoint] {
+        guard stats != nil else {
+            return [
+                ProjectionPoint(week: 0, value: 0),
+                ProjectionPoint(week: 1, value: max(1, weeklyTarget))
+            ]
+        }
+
+        guard remaining > 0 else {
+            return [
+                ProjectionPoint(week: 0, value: currentSolved),
+                ProjectionPoint(week: 1, value: currentSolved)
+            ]
+        }
+
+        let candidateWeeks: [Int]
+
+        if weeksToTarget <= 4 {
+            candidateWeeks = Array(0...weeksToTarget)
+        } else {
+            candidateWeeks = [
+                0,
+                max(1, weeksToTarget / 3),
+                max(2, (weeksToTarget * 2) / 3),
+                weeksToTarget
+            ]
+        }
+
+        let uniqueWeeks = Array(Set(candidateWeeks)).sorted()
+        return uniqueWeeks.map { week in
+            ProjectionPoint(
+                week: week,
+                value: min(targetSolved, currentSolved + week * max(1, weeklyTarget))
+            )
+        }
     }
 
     var body: some View {
@@ -215,20 +263,17 @@ struct PracticeTrendLineGraph: View {
 
                     graphGrid(in: chartRect)
 
-                    targetPath(in: chartRect)
+                    runwayPath(in: chartRect)
                         .stroke(
-                            AppColor.line.opacity(0.36),
-                            style: StrokeStyle(lineWidth: 2, lineCap: .round, lineJoin: .round, dash: [5, 5])
+                            AppColor.ink,
+                            style: StrokeStyle(lineWidth: 3, lineCap: .round, lineJoin: .round)
                         )
 
-                    actualPath(in: chartRect)
-                        .stroke(AppColor.ink, style: StrokeStyle(lineWidth: 3, lineCap: .round, lineJoin: .round))
-
-                    ForEach(Array(samples.enumerated()), id: \.element.lastUpdated) { index, sample in
-                        let position = actualPointPosition(index: index, value: sample.totalSolved, rect: chartRect)
+                    ForEach(Array(projectionPoints.enumerated()), id: \.offset) { index, point in
+                        let position = pointPosition(index: index, value: point.value, rect: chartRect)
 
                         VStack(spacing: 5) {
-                            Text("\(sample.totalSolved)")
+                            Text(pointLabel(for: point))
                                 .font(.caption.weight(.semibold).monospacedDigit())
                                 .padding(.horizontal, 7)
                                 .padding(.vertical, 3)
@@ -239,8 +284,8 @@ struct PracticeTrendLineGraph: View {
                                 }
 
                             Circle()
-                                .fill(index == samples.count - 1 ? AppColor.ink : AppColor.graphite)
-                                .frame(width: 13, height: 13)
+                                .fill(pointTint(for: index))
+                                .frame(width: index == 0 ? 14 : 12, height: index == 0 ? 14 : 12)
                                 .overlay {
                                     Circle()
                                         .stroke(AppColor.paper, lineWidth: 3)
@@ -248,8 +293,6 @@ struct PracticeTrendLineGraph: View {
                         }
                         .position(x: position.x, y: max(20, position.y - 22))
                     }
-
-                    targetMarker(in: chartRect)
 
                     Text(axisStartLabel)
                         .font(.caption.weight(.semibold))
@@ -269,16 +312,16 @@ struct PracticeTrendLineGraph: View {
                         .fill(AppColor.ink)
                         .frame(width: 18, height: 3)
 
-                    Text("Actual")
+                    Text("Projected from current LeetCode stats")
                         .font(.caption.weight(.semibold))
                 }
 
                 HStack(spacing: 6) {
-                    Capsule()
-                        .fill(AppColor.line.opacity(0.36))
-                        .frame(width: 18, height: 3)
+                    Circle()
+                        .fill(AppColor.medium)
+                        .frame(width: 8, height: 8)
 
-                    Text("Target pace")
+                    Text("\(weeklyTarget)/week")
                         .font(.caption.weight(.semibold))
                         .foregroundStyle(.secondary)
                 }
@@ -306,23 +349,19 @@ struct PracticeTrendLineGraph: View {
     }
 
     private var axisStartLabel: String {
-        guard let first = samples.first else {
-            return "No data"
-        }
-
-        if samples.count == 1 {
-            return "First sample"
-        }
-
-        return timeLabel(for: first.lastUpdated)
+        stats == nil ? "Load profile" : "Now"
     }
 
     private var axisEndLabel: String {
-        guard let last = samples.last else {
-            return "Refresh"
+        guard stats != nil else {
+            return "Set target"
         }
 
-        return timeLabel(for: last.lastUpdated)
+        if remaining == 0 {
+            return "Goal reached"
+        }
+
+        return weeksToTarget == 1 ? "1 week" : "\(weeksToTarget) weeks"
     }
 
     private func graphGrid(in rect: CGRect) -> some View {
@@ -336,15 +375,15 @@ struct PracticeTrendLineGraph: View {
         .stroke(AppColor.line.opacity(0.12), lineWidth: 1)
     }
 
-    private func actualPath(in rect: CGRect) -> Path {
+    private func runwayPath(in rect: CGRect) -> Path {
         var path = Path()
 
-        guard !samples.isEmpty else {
+        guard !projectionPoints.isEmpty else {
             return path
         }
 
-        for (index, sample) in samples.enumerated() {
-            let position = actualPointPosition(index: index, value: sample.totalSolved, rect: rect)
+        for (index, point) in projectionPoints.enumerated() {
+            let position = pointPosition(index: index, value: point.value, rect: rect)
 
             if index == 0 {
                 path.move(to: position)
@@ -356,53 +395,8 @@ struct PracticeTrendLineGraph: View {
         return path
     }
 
-    private func targetPath(in rect: CGRect) -> Path {
-        var path = Path()
-        let start = CGPoint(
-            x: rect.minX,
-            y: yPosition(for: currentSolved, rect: rect)
-        )
-        let end = CGPoint(
-            x: rect.maxX,
-            y: yPosition(for: projectedSolved, rect: rect)
-        )
-
-        path.move(to: start)
-        path.addLine(to: end)
-        return path
-    }
-
-    private func targetMarker(in rect: CGRect) -> some View {
-        let position = CGPoint(
-            x: rect.maxX,
-            y: yPosition(for: projectedSolved, rect: rect)
-        )
-
-        return VStack(spacing: 5) {
-            Text("\(projectedSolved)")
-                .font(.caption.weight(.semibold).monospacedDigit())
-                .foregroundStyle(.secondary)
-                .padding(.horizontal, 7)
-                .padding(.vertical, 3)
-                .background(AppColor.paper, in: Capsule())
-                .overlay {
-                    Capsule()
-                        .stroke(AppColor.line.opacity(0.22), lineWidth: 1)
-                }
-
-            Circle()
-                .fill(AppColor.medium)
-                .frame(width: 11, height: 11)
-                .overlay {
-                    Circle()
-                        .stroke(AppColor.paper, lineWidth: 3)
-                }
-        }
-        .position(x: position.x, y: max(20, position.y - 22))
-    }
-
-    private func actualPointPosition(index: Int, value: Int, rect: CGRect) -> CGPoint {
-        let count = max(1, samples.count - 1)
+    private func pointPosition(index: Int, value: Int, rect: CGRect) -> CGPoint {
+        let count = max(1, projectionPoints.count - 1)
         let x = rect.minX + rect.width * CGFloat(index) / CGFloat(count)
         let y = yPosition(for: value, rect: rect)
         return CGPoint(x: x, y: y)
@@ -414,11 +408,40 @@ struct PracticeTrendLineGraph: View {
         return y
     }
 
-    private func timeLabel(for date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.timeStyle = .short
-        formatter.dateStyle = .none
-        return formatter.string(from: date)
+    private func pointLabel(for point: ProjectionPoint) -> String {
+        if stats == nil {
+            return "?"
+        }
+
+        if point.week == 0 {
+            return "\(point.value)"
+        }
+
+        if remaining == 0 {
+            return "Done"
+        }
+
+        return point.week == weeksToTarget ? "\(targetSolved)" : "+\(point.week)w"
+    }
+
+    private func pointTint(for index: Int) -> Color {
+        guard stats != nil else {
+            return AppColor.graphite
+        }
+
+        if remaining == 0 {
+            return AppColor.easy
+        }
+
+        if index == 0 {
+            return AppColor.ink
+        }
+
+        if index == projectionPoints.count - 1 {
+            return AppColor.easy
+        }
+
+        return AppColor.medium
     }
 }
 

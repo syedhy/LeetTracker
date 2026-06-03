@@ -119,7 +119,6 @@ struct ContentView: View {
 
             AnalyticsHeroPanel(
                 stats: viewModel.statsSnapshot,
-                history: viewModel.statHistory,
                 rows: viewModel.difficultyDistributionRows,
                 score: viewModel.readinessScore,
                 title: viewModel.analyticsHeroTitle,
@@ -633,7 +632,6 @@ private final class LeetTrackerViewModel: ObservableObject {
     @Published var remindersEnabled = false
     @Published var reminderTime = Date()
     @Published private(set) var stats: LeetCodeStats?
-    @Published private(set) var statHistory: [LeetCodeStats] = []
     @Published private(set) var statusMessage = "Enter a LeetCode username to prepare tracking."
     @Published private(set) var goalStatusMessage = "Goal settings are ready."
     @Published private(set) var reminderPermissionText = "Notifications not requested yet."
@@ -1240,7 +1238,6 @@ private final class LeetTrackerViewModel: ObservableObject {
             }
 
             stats = LeetCodeStats(cachedStats: cachedStats)
-            statHistory = snapshot.statHistory.map(LeetCodeStats.init(cachedStats:))
             statusMessage = "Loaded \(cachedStats.username). Updated \(formatted(cachedStats.lastUpdated))."
         }
     }
@@ -1299,7 +1296,6 @@ private final class LeetTrackerViewModel: ObservableObject {
 
             sharedStore.saveUsername(freshStats.username)
             sharedStore.saveCachedStats(freshStats.cachedStats)
-            statHistory = sharedStore.statHistory.map(LeetCodeStats.init(cachedStats:))
             statusMessage = "Updated \(freshStats.username). Last checked \(formatted(freshStats.lastUpdated))."
             return true
         } catch let error as LeetCodeProfileError {
@@ -1323,7 +1319,6 @@ private final class LeetTrackerViewModel: ObservableObject {
     private func showCachedStatsAfterFailure(_ error: LeetCodeProfileError) {
         if let cachedStats = sharedStore.cachedStats {
             stats = LeetCodeStats(cachedStats: cachedStats)
-            statHistory = sharedStore.statHistory.map(LeetCodeStats.init(cachedStats:))
 
             if trimmedUsername.isEmpty {
                 username = cachedStats.username

@@ -185,7 +185,9 @@ struct ContentView: View {
                     ReminderPlanPanel(
                         refreshText: viewModel.refreshCadenceText,
                         remindersEnabled: viewModel.remindersEnabled,
-                        reminderTimeText: viewModel.reminderTimeText
+                        reminderTimeText: viewModel.reminderTimeText,
+                        weeklyReviewText: viewModel.weeklyReviewReminderText,
+                        permissionText: viewModel.reminderPermissionText
                     )
                         .frame(width: 340)
                 }
@@ -217,7 +219,9 @@ struct ContentView: View {
                     ReminderPlanPanel(
                         refreshText: viewModel.refreshCadenceText,
                         remindersEnabled: viewModel.remindersEnabled,
-                        reminderTimeText: viewModel.reminderTimeText
+                        reminderTimeText: viewModel.reminderTimeText,
+                        weeklyReviewText: viewModel.weeklyReviewReminderText,
+                        permissionText: viewModel.reminderPermissionText
                     )
                 }
             }
@@ -531,19 +535,23 @@ private final class LeetTrackerViewModel: ObservableObject {
     @Published private(set) var stats: LeetCodeStats?
     @Published private(set) var statusMessage = "Enter a LeetCode username to prepare tracking."
     @Published private(set) var goalStatusMessage = "Goal settings are ready."
+    @Published private(set) var reminderPermissionText = "Notifications not requested yet."
     @Published private(set) var isLoading = false
 
     private let client: LeetCodeClient
     private let sharedStore: SharedLeetTrackerStore
+    private let reminderScheduler: ReminderScheduler
     private var savedGoalSettings = SharedGoalSettings.default
     private var hasSavedGoalSettings = false
 
     init(
         client: LeetCodeClient = LeetCodeClient(),
-        sharedStore: SharedLeetTrackerStore = SharedLeetTrackerStore()
+        sharedStore: SharedLeetTrackerStore = SharedLeetTrackerStore(),
+        reminderScheduler: ReminderScheduler = ReminderScheduler()
     ) {
         self.client = client
         self.sharedStore = sharedStore
+        self.reminderScheduler = reminderScheduler
     }
 
     var trimmedUsername: String {
@@ -887,6 +895,10 @@ private final class LeetTrackerViewModel: ObservableObject {
         return formatter.string(from: reminderTime)
     }
 
+    var weeklyReviewReminderText: String {
+        remindersEnabled ? "Sundays at \(reminderTimeText)" : "Off"
+    }
+
     func loadSavedState() {
         let snapshot = sharedStore.snapshot
         hasSavedGoalSettings = snapshot.hasGoalSettings
@@ -894,6 +906,7 @@ private final class LeetTrackerViewModel: ObservableObject {
             snapshot.hasGoalSettings ? snapshot.goalSettings : suggestedGoalSettings(currentTotal: snapshot.cachedStats?.totalSolved),
             status: snapshot.hasGoalSettings ? "Goal loaded." : "Suggested a starting goal."
         )
+        syncReminderPermissionStatus()
 
         if let savedUsername = snapshot.username {
             username = savedUsername
@@ -928,6 +941,7 @@ private final class LeetTrackerViewModel: ObservableObject {
         sharedStore.saveGoalSettings(settings)
         hasSavedGoalSettings = true
         applyGoalSettings(settings, status: "Saved goal for \(target) solved.")
+        updateReminderSchedule(settings, statusPrefix: "Saved goal for \(target) solved.")
     }
 
     func refreshStats() async -> Bool {
@@ -1033,6 +1047,29 @@ private final class LeetTrackerViewModel: ObservableObject {
         remindersEnabled = settings.remindersEnabled
         reminderTime = reminderDate(hour: settings.reminderHour, minute: settings.reminderMinute)
         goalStatusMessage = status
+    }
+
+    private func syncReminderPermissionStatus() {
+        Task {
+            reminderPermissionText = await reminderScheduler.currentPermissionText()
+        }
+    }
+
+    private func updateReminderSchedule(_ settings: SharedGoalSettings, statusPrefix: String) {
+        Task {
+            do {
+                let result = try await reminderScheduler.apply(
+                    settings: settings,
+                    username: displayUsername,
+                    weeklyMix: weeklyPracticeMixText
+                )
+                goalStatusMessage = "\(statusPrefix) \(result.statusText)"
+                reminderPermissionText = result.permissionText
+            } catch {
+                goalStatusMessage = "\(statusPrefix) \(error.localizedDescription)"
+                reminderPermissionText = error.localizedDescription
+            }
+        }
     }
 
     private func parsePositiveInt(_ text: String, fallback: Int) -> Int {

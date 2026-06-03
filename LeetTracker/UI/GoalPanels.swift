@@ -156,6 +156,8 @@ struct ReminderPlanPanel: View {
     let refreshText: String
     let remindersEnabled: Bool
     let reminderTimeText: String
+    let weeklyReviewText: String
+    let permissionText: String
 
     var body: some View {
         Panel {
@@ -164,16 +166,20 @@ struct ReminderPlanPanel: View {
 
                 ReminderRow(
                     title: "Daily practice",
-                    detail: remindersEnabled ? reminderTimeText : "Off",
+                    detail: remindersEnabled ? "Daily at \(reminderTimeText)" : "Off",
                     tint: remindersEnabled ? AppColor.easy : .secondary
                 )
-                ReminderRow(title: "Weekly review", detail: "Summarize progress and reset plan", tint: AppColor.brand)
+                ReminderRow(
+                    title: "Weekly review",
+                    detail: weeklyReviewText,
+                    tint: remindersEnabled ? AppColor.brand : .secondary
+                )
                 ReminderRow(title: "Widget refresh", detail: refreshText, tint: AppColor.medium)
 
                 Divider()
 
-                DetailRow(title: "Quiet hours", value: "Not set")
-                DetailRow(title: "Notification style", value: "Gentle")
+                DetailRow(title: "Permission", value: permissionText)
+                DetailRow(title: "Copy style", value: "Gentle")
             }
         }
     }

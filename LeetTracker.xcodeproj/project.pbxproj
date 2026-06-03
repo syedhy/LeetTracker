@@ -29,6 +29,7 @@
 		111111111111111111111021 /* DashboardPanels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 111111111111111111112021 /* DashboardPanels.swift */; };
 		111111111111111111111022 /* AnalyticsPanels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 111111111111111111112022 /* AnalyticsPanels.swift */; };
 		111111111111111111111023 /* GoalPanels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 111111111111111111112023 /* GoalPanels.swift */; };
+		111111111111111111111024 /* ReminderScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 111111111111111111112024 /* ReminderScheduler.swift */; };
 		1BCFE48B2FCF8B3400138000 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1BCFE48A2FCF8B3400138000 /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
@@ -78,6 +79,7 @@
 		111111111111111111112021 /* DashboardPanels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardPanels.swift; sourceTree = "<group>"; };
 		111111111111111111112022 /* AnalyticsPanels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsPanels.swift; sourceTree = "<group>"; };
 		111111111111111111112023 /* GoalPanels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalPanels.swift; sourceTree = "<group>"; };
+		111111111111111111112024 /* ReminderScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReminderScheduler.swift; sourceTree = "<group>"; };
 		111111111111111111113001 /* LeetTracker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LeetTracker.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		111111111111111111113002 /* LeetTrackerWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = LeetTrackerWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		1BCFE48A2FCF8B3400138000 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -117,6 +119,7 @@
 			children = (
 				111111111111111111112001 /* LeetTrackerApp.swift */,
 				111111111111111111112018 /* BackgroundRefreshRunner.swift */,
+				111111111111111111112024 /* ReminderScheduler.swift */,
 				111111111111111111112002 /* ContentView.swift */,
 				111111111111111111112010 /* LeetCodeClient.swift */,
 				111111111111111111112011 /* LeetCodeStats.swift */,
@@ -312,6 +315,7 @@
 			files = (
 				111111111111111111111001 /* LeetTrackerApp.swift in Sources */,
 				111111111111111111111018 /* BackgroundRefreshRunner.swift in Sources */,
+				111111111111111111111024 /* ReminderScheduler.swift in Sources */,
 				111111111111111111111002 /* ContentView.swift in Sources */,
 				111111111111111111111019 /* AppTheme.swift in Sources */,
 				111111111111111111111020 /* AppChrome.swift in Sources */,

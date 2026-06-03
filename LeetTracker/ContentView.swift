@@ -2,27 +2,77 @@ import Foundation
 import SwiftUI
 import WidgetKit
 
+private enum AppSection: String, CaseIterable, Identifiable {
+    case dashboard = "Dashboard"
+    case analytics = "Analytics"
+    case goals = "Goals"
+    case widgets = "Widgets"
+    case settings = "Settings"
+
+    var id: String { rawValue }
+
+    var systemImage: String {
+        switch self {
+        case .dashboard:
+            return "rectangle.3.group"
+        case .analytics:
+            return "chart.xyaxis.line"
+        case .goals:
+            return "target"
+        case .widgets:
+            return "square.grid.2x2"
+        case .settings:
+            return "gearshape"
+        }
+    }
+}
+
 struct ContentView: View {
     @StateObject private var viewModel = LeetTrackerViewModel()
+    @State private var selectedSection = AppSection.dashboard
 
     var body: some View {
         ZStack {
             AppSurfaceBackground()
 
-            VStack(alignment: .leading, spacing: 24) {
-                header
+            HStack(spacing: 0) {
+                AppSidebar(selectedSection: $selectedSection)
 
-                HStack(alignment: .top, spacing: 20) {
-                    statsSection
-                    setupSection
+                Divider()
+
+                ScrollView {
+                    dashboard
+                        .padding(28)
                 }
             }
-            .padding(28)
         }
-        .frame(minWidth: 760, idealWidth: 860, minHeight: 520)
+        .frame(minWidth: 980, idealWidth: 1120, minHeight: 660)
         .onAppear {
             viewModel.loadSavedState()
         }
+    }
+
+    private var dashboard: some View {
+        VStack(alignment: .leading, spacing: 24) {
+            header
+
+            HStack(alignment: .top, spacing: 20) {
+                statsSection
+                    .frame(maxWidth: .infinity)
+
+                VStack(spacing: 20) {
+                    goalSection
+                    dataHealthSection
+                }
+                .frame(width: 300)
+            }
+
+            HStack(alignment: .top, spacing: 20) {
+                analyticsSection
+                setupSection
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     private var header: some View {
@@ -33,12 +83,18 @@ struct ContentView: View {
                 Text("LeetTracker")
                     .font(.largeTitle.weight(.semibold))
 
-                Text("Desktop widget setup")
+                Text(viewModel.dashboardSubtitle)
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
             }
 
             Spacer()
+
+            Button(action: refreshStats) {
+                Label("Refresh", systemImage: "arrow.clockwise")
+            }
+            .buttonStyle(SecondaryActionButtonStyle())
+            .disabled(viewModel.trimmedUsername.isEmpty || viewModel.isLoading)
 
             StatusPill(
                 title: viewModel.isLoading ? "Syncing" : "Ready",
@@ -50,7 +106,7 @@ struct ContentView: View {
 
     private var statsSection: some View {
         VStack(alignment: .leading, spacing: 18) {
-            SectionHeader(title: "Progress", systemImage: "chart.bar.xaxis")
+            SectionHeader(title: "Dashboard", systemImage: "chart.bar.xaxis")
 
             TotalSolvedCard(
                 total: viewModel.totalSolvedText,
@@ -64,13 +120,12 @@ struct ContentView: View {
                 DifficultyCard(title: "Hard", value: viewModel.hardSolvedText, tint: AppColor.hard)
             }
         }
-        .frame(minWidth: 330, maxWidth: .infinity)
     }
 
     private var setupSection: some View {
         Panel {
             VStack(alignment: .leading, spacing: 18) {
-                SectionHeader(title: "Setup", systemImage: "person.crop.circle")
+                SectionHeader(title: "Profile", systemImage: "person.crop.circle")
 
                 VStack(alignment: .leading, spacing: 8) {
                     Text("LeetCode Username")
@@ -109,7 +164,64 @@ struct ContentView: View {
                 StatusPanel(message: viewModel.statusMessage, isLoading: viewModel.isLoading)
             }
         }
-        .frame(width: 320)
+        .frame(maxWidth: .infinity)
+    }
+
+    private var analyticsSection: some View {
+        Panel {
+            VStack(alignment: .leading, spacing: 18) {
+                SectionHeader(title: "Analytics", systemImage: "chart.line.uptrend.xyaxis")
+
+                HStack(spacing: 12) {
+                    InsightCard(title: "Difficulty Mix", value: viewModel.difficultyMixText, tint: AppColor.brand)
+                    InsightCard(title: "Next Milestone", value: viewModel.nextMilestoneText, tint: AppColor.medium)
+                    InsightCard(title: "Remaining", value: viewModel.milestoneRemainingText, tint: AppColor.hard)
+                }
+
+                Divider()
+
+                VStack(alignment: .leading, spacing: 10) {
+                    DetailRow(title: "History", value: "Local snapshots")
+                    DetailRow(title: "Source", value: "Public profile")
+                    DetailRow(title: "Widget", value: viewModel.refreshCadenceText)
+                }
+            }
+        }
+        .frame(maxWidth: .infinity)
+    }
+
+    private var goalSection: some View {
+        Panel {
+            VStack(alignment: .leading, spacing: 16) {
+                SectionHeader(title: "Focus", systemImage: "target")
+
+                VStack(alignment: .leading, spacing: 6) {
+                    Text(viewModel.nextMilestoneText)
+                        .font(.title.weight(.semibold))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.78)
+
+                    Text("\(viewModel.milestoneRemainingText) remaining")
+                        .font(.callout.weight(.medium))
+                        .foregroundStyle(.secondary)
+                }
+
+                ProgressView(value: viewModel.milestoneProgress)
+                    .tint(AppColor.brand)
+            }
+        }
+    }
+
+    private var dataHealthSection: some View {
+        Panel {
+            VStack(alignment: .leading, spacing: 14) {
+                SectionHeader(title: "Data Health", systemImage: "waveform.path.ecg")
+
+                DetailRow(title: "Cache", value: viewModel.cacheStatusText)
+                DetailRow(title: "Auto refresh", value: viewModel.refreshCadenceText)
+                DetailRow(title: "Background", value: "Helper ready")
+            }
+        }
     }
 
     private func saveUsername() {
@@ -143,6 +255,94 @@ private enum AppColor {
     static let hard = Color(red: 0.92, green: 0.25, blue: 0.42)
 }
 
+private struct AppSidebar: View {
+    @Binding var selectedSection: AppSection
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 18) {
+            HStack(spacing: 12) {
+                AppIconMark()
+                    .frame(width: 38, height: 38)
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("LeetTracker")
+                        .font(.headline.weight(.semibold))
+
+                    Text("Practice OS")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            }
+            .padding(.bottom, 8)
+
+            VStack(spacing: 6) {
+                ForEach(AppSection.allCases) { section in
+                    Button {
+                        selectedSection = section
+                    } label: {
+                        HStack(spacing: 10) {
+                            Image(systemName: section.systemImage)
+                                .frame(width: 18)
+
+                            Text(section.rawValue)
+                                .lineLimit(1)
+
+                            Spacer()
+                        }
+                    }
+                    .buttonStyle(SidebarButtonStyle(isSelected: selectedSection == section))
+                }
+            }
+
+            Spacer()
+
+            VStack(alignment: .leading, spacing: 6) {
+                Text("Auto Refresh")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.secondary)
+
+                HStack(spacing: 8) {
+                    Circle()
+                        .fill(AppColor.easy)
+                        .frame(width: 8, height: 8)
+
+                    Text("Every 2 min")
+                        .font(.callout.weight(.medium))
+                }
+            }
+            .padding(12)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(.quaternary.opacity(0.45), in: RoundedRectangle(cornerRadius: 12))
+        }
+        .padding(20)
+        .frame(width: 214)
+        .background(.ultraThinMaterial)
+    }
+}
+
+private struct SidebarButtonStyle: ButtonStyle {
+    let isSelected: Bool
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .font(.callout.weight(isSelected ? .semibold : .regular))
+            .foregroundStyle(isSelected ? .primary : .secondary)
+            .padding(.horizontal, 12)
+            .frame(height: 36)
+            .background(
+                isSelected ? AppColor.brand.opacity(configuration.isPressed ? 0.18 : 0.14) : .clear,
+                in: RoundedRectangle(cornerRadius: 10)
+            )
+            .overlay(alignment: .leading) {
+                if isSelected {
+                    RoundedRectangle(cornerRadius: 2)
+                        .fill(AppColor.brand)
+                        .frame(width: 3, height: 18)
+                }
+            }
+    }
+}
+
 private struct AppSurfaceBackground: View {
     var body: some View {
         LinearGradient(
@@ -167,6 +367,7 @@ private struct AppIconMark: View {
                 .font(.title3.weight(.bold))
                 .foregroundStyle(.white)
         }
+        .aspectRatio(1, contentMode: .fit)
         .frame(width: 48, height: 48)
         .shadow(color: AppColor.brand.opacity(0.28), radius: 16, y: 8)
     }
@@ -327,6 +528,57 @@ private struct StatusPanel: View {
     }
 }
 
+private struct InsightCard: View {
+    let title: String
+    let value: String
+    let tint: Color
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Circle()
+                .fill(tint)
+                .frame(width: 9, height: 9)
+
+            Text(value)
+                .font(.title3.weight(.semibold))
+                .lineLimit(1)
+                .minimumScaleFactor(0.74)
+
+            Text(title)
+                .font(.caption.weight(.medium))
+                .foregroundStyle(.secondary)
+                .lineLimit(1)
+        }
+        .padding(14)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(tint.opacity(0.10), in: RoundedRectangle(cornerRadius: 14))
+        .overlay {
+            RoundedRectangle(cornerRadius: 14)
+                .stroke(tint.opacity(0.18), lineWidth: 1)
+        }
+    }
+}
+
+private struct DetailRow: View {
+    let title: String
+    let value: String
+
+    var body: some View {
+        HStack {
+            Text(title)
+                .font(.callout)
+                .foregroundStyle(.secondary)
+
+            Spacer()
+
+            Text(value)
+                .font(.callout.weight(.semibold))
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
+        }
+    }
+}
+
 private struct PrimaryActionButtonStyle: ButtonStyle {
     @Environment(\.isEnabled) private var isEnabled
 
@@ -415,6 +667,65 @@ private final class LeetTrackerViewModel: ObservableObject {
         return "Updated \(formatted(lastUpdated))"
     }
 
+    var dashboardSubtitle: String {
+        guard let stats else {
+            return "Public LeetCode progress dashboard"
+        }
+
+        return "\(stats.username) · \(stats.totalSolved) solved"
+    }
+
+    var difficultyMixText: String {
+        guard let stats, stats.totalSolved > 0 else {
+            return "--"
+        }
+
+        let mediumHard = stats.mediumSolved + stats.hardSolved
+        let percentage = Int((Double(mediumHard) / Double(stats.totalSolved) * 100).rounded())
+        return "\(percentage)% M/H"
+    }
+
+    var nextMilestoneText: String {
+        guard let totalSolved = stats?.totalSolved else {
+            return "--"
+        }
+
+        return "\(nextMilestone(after: totalSolved)) solved"
+    }
+
+    var milestoneRemainingText: String {
+        guard let totalSolved = stats?.totalSolved else {
+            return "--"
+        }
+
+        return "\(nextMilestone(after: totalSolved) - totalSolved)"
+    }
+
+    var milestoneProgress: Double {
+        guard let totalSolved = stats?.totalSolved else {
+            return 0
+        }
+
+        let previousMilestone = max(0, (totalSolved / 10) * 10)
+        let nextMilestone = nextMilestone(after: totalSolved)
+        let span = max(1, nextMilestone - previousMilestone)
+
+        return Double(totalSolved - previousMilestone) / Double(span)
+    }
+
+    var cacheStatusText: String {
+        guard let lastUpdated = stats?.lastUpdated else {
+            return "Empty"
+        }
+
+        return formatted(lastUpdated)
+    }
+
+    var refreshCadenceText: String {
+        let minutes = Int(LeetTrackerWidgetConfiguration.refreshInterval / 60)
+        return "Every \(minutes) min"
+    }
+
     func loadSavedState() {
         let snapshot = sharedStore.snapshot
 
@@ -494,6 +805,10 @@ private final class LeetTrackerViewModel: ObservableObject {
         }
 
         return "\(value)"
+    }
+
+    private func nextMilestone(after totalSolved: Int) -> Int {
+        ((totalSolved / 10) + 1) * 10
     }
 
     private func formatted(_ date: Date) -> String {

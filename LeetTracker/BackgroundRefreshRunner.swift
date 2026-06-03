@@ -17,26 +17,24 @@ enum BackgroundRefreshRunner {
 
     private static func runSynchronously() -> RefreshResult {
         let semaphore = DispatchSemaphore(value: 0)
-        let lock = NSLock()
+        let resultQueue = DispatchQueue(label: "com.hyder.LeetTracker.background-refresh.result")
         var result = RefreshResult(message: "LeetTracker background refresh timed out.", exitCode: EXIT_FAILURE)
 
         Task {
             let refreshResult = await refreshWidgetData()
 
-            lock.lock()
-            result = refreshResult
-            lock.unlock()
+            resultQueue.sync {
+                result = refreshResult
+            }
 
             semaphore.signal()
         }
 
         _ = semaphore.wait(timeout: .now() + .seconds(25))
 
-        lock.lock()
-        let finalResult = result
-        lock.unlock()
-
-        return finalResult
+        return resultQueue.sync {
+            result
+        }
     }
 
     private static func refreshWidgetData() async -> RefreshResult {

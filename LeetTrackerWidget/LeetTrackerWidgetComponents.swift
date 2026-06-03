@@ -135,7 +135,7 @@ struct WidgetDifficultyMetric: View {
         case .compact:
             return CGSize(width: 31, height: 25)
         case .spacious:
-            return CGSize(width: 39, height: 28)
+            return CGSize(width: 36, height: 26)
         }
     }
 

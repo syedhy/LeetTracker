@@ -56,9 +56,9 @@ struct MediumWidgetView: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: LTWidgetSpacing.large) {
+        VStack(alignment: .leading, spacing: LTWidgetSpacing.medium) {
             HStack(alignment: .top, spacing: LTWidgetSpacing.large) {
-                VStack(alignment: .leading, spacing: LTWidgetSpacing.large) {
+                VStack(alignment: .leading, spacing: LTWidgetSpacing.medium) {
                     WidgetHeader(style: .spacious)
 
                     VStack(alignment: .leading, spacing: LTWidgetSpacing.compact) {
@@ -92,12 +92,11 @@ struct MediumWidgetView: View {
 
             WidgetDifficultySummary(stats: stats, style: .spacious)
 
-            Spacer(minLength: 0)
-
             if let status {
                 status
             }
         }
-        .padding(LTWidgetSpacing.mediumWidgetPadding)
+        .padding(.horizontal, LTWidgetSpacing.mediumWidgetHorizontal)
+        .padding(.vertical, LTWidgetSpacing.mediumWidgetVertical)
     }
 }

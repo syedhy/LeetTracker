@@ -113,13 +113,14 @@ struct ContentView: View {
                     )
                     .frame(width: 300)
 
-                    FocusRecommendationPanel(
-                        title: viewModel.focusRecommendationTitle,
-                        detail: viewModel.focusRecommendationDetail,
-                        tint: viewModel.focusRecommendationTint
-                    )
+                    ProgressSignalsPanel(signals: viewModel.progressSignals)
+                        .frame(maxWidth: .infinity)
 
-                    DifficultyBreakdownPanel(stats: viewModel.statsSnapshot)
+                    DifficultyBalancePanel(
+                        stats: viewModel.statsSnapshot,
+                        rows: viewModel.difficultyDistributionRows,
+                        balanceText: viewModel.balanceNarrative
+                    )
                         .frame(width: 360)
                 }
 
@@ -130,18 +131,47 @@ struct ContentView: View {
                         detail: viewModel.readinessDetail
                     )
 
+                    ProgressSignalsPanel(signals: viewModel.progressSignals)
+
+                    DifficultyBalancePanel(
+                        stats: viewModel.statsSnapshot,
+                        rows: viewModel.difficultyDistributionRows,
+                        balanceText: viewModel.balanceNarrative
+                    )
+                }
+            }
+
+            ViewThatFits(in: .horizontal) {
+                HStack(alignment: .top, spacing: 20) {
+                    MilestonePanel(
+                        title: viewModel.milestoneTitle,
+                        subtitle: viewModel.milestoneSubtitle,
+                        rows: viewModel.milestoneRows
+                    )
+                    .frame(width: 360)
+
                     FocusRecommendationPanel(
                         title: viewModel.focusRecommendationTitle,
                         detail: viewModel.focusRecommendationDetail,
                         tint: viewModel.focusRecommendationTint
                     )
+                }
 
-                    analyticsSection
-                    DifficultyBreakdownPanel(stats: viewModel.statsSnapshot)
+                VStack(spacing: 20) {
+                    MilestonePanel(
+                        title: viewModel.milestoneTitle,
+                        subtitle: viewModel.milestoneSubtitle,
+                        rows: viewModel.milestoneRows
+                    )
+
+                    FocusRecommendationPanel(
+                        title: viewModel.focusRecommendationTitle,
+                        detail: viewModel.focusRecommendationDetail,
+                        tint: viewModel.focusRecommendationTint
+                    )
                 }
             }
 
-            analyticsSection
             AnalyticsNarrativePanel(summary: viewModel.analyticsSummary)
         }
     }
@@ -726,6 +756,138 @@ private final class LeetTrackerViewModel: ObservableObject {
 
     var statsSnapshot: LeetCodeStats? {
         stats
+    }
+
+    var difficultyDistributionRows: [DifficultyDistributionRow] {
+        let total = stats?.totalSolved ?? 0
+
+        return [
+            DifficultyDistributionRow(title: "Easy", value: stats?.easySolved ?? 0, total: total, tint: AppColor.easy),
+            DifficultyDistributionRow(title: "Medium", value: stats?.mediumSolved ?? 0, total: total, tint: AppColor.medium),
+            DifficultyDistributionRow(title: "Hard", value: stats?.hardSolved ?? 0, total: total, tint: AppColor.hard)
+        ]
+    }
+
+    var balanceNarrative: String {
+        guard let stats, stats.totalSolved > 0 else {
+            return "Balance appears after the first successful refresh."
+        }
+
+        let mediumHard = stats.mediumSolved + stats.hardSolved
+        let mediumHardPercentage = Int((Double(mediumHard) / Double(stats.totalSolved) * 100).rounded())
+
+        if stats.hardSolved == 0, stats.totalSolved >= 20 {
+            return "Your volume is growing, but Hard is still empty. Add one carefully reviewed Hard problem when you have enough time to study the pattern."
+        }
+
+        if mediumHardPercentage < 45 {
+            return "Your solved count is still easy-heavy. That is fine for warmups, but the next useful improvement is more Medium practice."
+        }
+
+        if mediumHardPercentage >= 65 {
+            return "Your mix is challenge-heavy. Keep Medium as the default and use Easy problems only to stay warm."
+        }
+
+        return "Your difficulty mix is balanced enough for steady practice. Keep the weekly target consistent and avoid overcorrecting."
+    }
+
+    var progressSignals: [ProgressSignal] {
+        guard let stats, stats.totalSolved > 0 else {
+            return [
+                ProgressSignal(
+                    title: "Profile",
+                    value: "Empty",
+                    detail: "Save a username and refresh once to unlock analytics.",
+                    systemImage: "person.crop.circle.badge.questionmark",
+                    tint: AppColor.ink
+                ),
+                ProgressSignal(
+                    title: "Data source",
+                    value: "Public",
+                    detail: "LeetTracker only uses public profile-level solved counts.",
+                    systemImage: "lock.open",
+                    tint: AppColor.ink
+                )
+            ]
+        }
+
+        let remaining = max(0, goalTargetValue - stats.totalSolved)
+        let mediumHard = stats.mediumSolved + stats.hardSolved
+        let mediumHardPercentage = Int((Double(mediumHard) / Double(stats.totalSolved) * 100).rounded())
+
+        return [
+            ProgressSignal(
+                title: "Difficulty balance",
+                value: "\(mediumHardPercentage)% M/H",
+                detail: "Useful interview progress usually comes from raising this without ignoring warmups.",
+                systemImage: "chart.bar.fill",
+                tint: focusRecommendationTint
+            ),
+            ProgressSignal(
+                title: "Goal distance",
+                value: remaining == 0 ? "Reached" : "\(remaining) left",
+                detail: remaining == 0 ? "Set a new target to keep the next milestone visible." : "\(estimatedWeeksText) at your saved weekly pace.",
+                systemImage: "target",
+                tint: remaining == 0 ? AppColor.easy : AppColor.ink
+            ),
+            ProgressSignal(
+                title: "Practice rhythm",
+                value: dailyPaceText,
+                detail: "\(weeklyPracticeMixText) keeps the week concrete instead of vague.",
+                systemImage: "calendar.badge.clock",
+                tint: AppColor.medium
+            ),
+            ProgressSignal(
+                title: "Next milestone",
+                value: nextMilestoneText,
+                detail: "A small visible milestone is easier to finish than a huge abstract target.",
+                systemImage: "flag.checkered",
+                tint: AppColor.ink
+            )
+        ]
+    }
+
+    var milestoneTitle: String {
+        guard let stats else {
+            return "Refresh to find the next milestone"
+        }
+
+        return "\(stats.totalSolved) → \(nextMilestone(after: stats.totalSolved)) solved"
+    }
+
+    var milestoneSubtitle: String {
+        guard let stats else {
+            return "LeetTracker will use your current solved count to suggest the next small visible target."
+        }
+
+        let next = nextMilestone(after: stats.totalSolved)
+        let remaining = max(0, next - stats.totalSolved)
+
+        if remaining == 1 {
+            return "One problem closes the next milestone. Make it intentional."
+        }
+
+        return "\(remaining) problems closes the next milestone. Keep the scope small and finishable."
+    }
+
+    var milestoneRows: [(String, String)] {
+        guard let stats else {
+            return [
+                ("Current", "--"),
+                ("Next", "--"),
+                ("Milestone gap", "--")
+            ]
+        }
+
+        let next = nextMilestone(after: stats.totalSolved)
+        let remaining = max(0, next - stats.totalSolved)
+
+        return [
+            ("Current", "\(stats.totalSolved) solved"),
+            ("Next", "\(next) solved"),
+            ("Milestone gap", remaining == 1 ? "1 problem" : "\(remaining) problems"),
+            ("Suggested mix", weeklyPracticeMixText)
+        ]
     }
 
     var goalDetailRows: [(String, String)] {

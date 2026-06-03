@@ -2,8 +2,8 @@ import SwiftUI
 
 enum AppColor {
     static let ink = Color(red: 0.08, green: 0.08, blue: 0.075)
-    static let paper = Color(red: 0.992, green: 0.992, blue: 0.976)
-    static let paperWarm = Color(red: 0.966, green: 0.966, blue: 0.946)
+    static let paper = Color(red: 0.998, green: 0.998, blue: 0.994)
+    static let paperWarm = Color(red: 0.988, green: 0.988, blue: 0.982)
     static let graphite = Color(red: 0.42, green: 0.42, blue: 0.39)
     static let line = Color(red: 0.12, green: 0.12, blue: 0.11)
     static let brand = ink
@@ -18,7 +18,7 @@ struct AppSurfaceBackground: View {
             AppColor.paper
 
             PaperGridBackdrop()
-                .stroke(AppColor.line.opacity(0.045), lineWidth: 1)
+                .stroke(AppColor.line.opacity(0.02), lineWidth: 1)
                 .padding(18)
         }
         .ignoresSafeArea()
@@ -28,7 +28,7 @@ struct AppSurfaceBackground: View {
 struct PaperGridBackdrop: Shape {
     func path(in rect: CGRect) -> Path {
         var path = Path()
-        let step: CGFloat = 32
+        let step: CGFloat = 48
 
         var x = rect.minX
         while x <= rect.maxX {
@@ -45,6 +45,33 @@ struct PaperGridBackdrop: Shape {
         }
 
         return path
+    }
+}
+
+struct SectionEntranceModifier: ViewModifier {
+    let trigger: String
+    @State private var isVisible = false
+
+    func body(content: Content) -> some View {
+        content
+            .opacity(isVisible ? 1 : 0)
+            .animation(.easeOut(duration: 0.12), value: isVisible)
+            .onAppear {
+                isVisible = true
+            }
+            .onChange(of: trigger) { _, _ in
+                isVisible = false
+
+                DispatchQueue.main.async {
+                    isVisible = true
+                }
+            }
+    }
+}
+
+extension View {
+    func sectionEntrance(trigger: String) -> some View {
+        modifier(SectionEntranceModifier(trigger: trigger))
     }
 }
 

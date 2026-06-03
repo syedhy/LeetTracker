@@ -2,7 +2,7 @@ import Foundation
 
 enum LeetTrackerWidgetConfiguration {
     static let kind = "com.hyder.LeetTracker.widget"
-    static let refreshInterval: TimeInterval = 30 * 60
+    static let refreshInterval: TimeInterval = 2 * 60
 }
 
 struct CachedLeetCodeStats: Codable, Equatable {
@@ -17,6 +17,9 @@ struct CachedLeetCodeStats: Codable, Equatable {
 struct SharedGoalSettings: Codable, Equatable {
     var targetSolved: Int
     var weeklyTarget: Int
+    var weeklyEasyTarget: Int?
+    var weeklyMediumTarget: Int?
+    var weeklyHardTarget: Int?
     var remindersEnabled: Bool
     var reminderHour: Int
     var reminderMinute: Int
@@ -25,6 +28,9 @@ struct SharedGoalSettings: Codable, Equatable {
     static let `default` = SharedGoalSettings(
         targetSolved: 50,
         weeklyTarget: 5,
+        weeklyEasyTarget: 1,
+        weeklyMediumTarget: 3,
+        weeklyHardTarget: 1,
         remindersEnabled: false,
         reminderHour: 19,
         reminderMinute: 0,
@@ -35,6 +41,7 @@ struct SharedGoalSettings: Codable, Equatable {
 struct SharedLeetTrackerSnapshot: Equatable {
     let username: String?
     let cachedStats: CachedLeetCodeStats?
+    let statHistory: [CachedLeetCodeStats]
     let lastUpdated: Date?
     let goalSettings: SharedGoalSettings
     let hasGoalSettings: Bool
@@ -64,6 +71,7 @@ final class SharedLeetTrackerStore {
         return SharedLeetTrackerSnapshot(
             username: savedUsername,
             cachedStats: payload.cachedStats,
+            statHistory: payload.normalizedStatHistory,
             lastUpdated: payload.lastUpdated,
             goalSettings: payload.goalSettings ?? .default,
             hasGoalSettings: payload.goalSettings != nil
@@ -83,6 +91,10 @@ final class SharedLeetTrackerStore {
 
     var cachedStats: CachedLeetCodeStats? {
         loadPayload().cachedStats
+    }
+
+    var statHistory: [CachedLeetCodeStats] {
+        loadPayload().normalizedStatHistory
     }
 
     var lastUpdated: Date? {
@@ -105,6 +117,7 @@ final class SharedLeetTrackerStore {
         var payload = loadPayload()
         payload.username = stats.username
         payload.cachedStats = stats
+        payload.statHistory = updatedHistory(from: payload.normalizedStatHistory, appending: stats)
         payload.lastUpdated = stats.lastUpdated
         savePayload(payload)
     }
@@ -182,14 +195,49 @@ final class SharedLeetTrackerStore {
         return SharedLeetTrackerPayload(
             username: username?.isEmpty == false ? username : cachedStats?.username,
             cachedStats: cachedStats,
+            statHistory: cachedStats.map { [$0] },
             lastUpdated: lastUpdated
         )
+    }
+
+    private func updatedHistory(
+        from history: [CachedLeetCodeStats],
+        appending stats: CachedLeetCodeStats
+    ) -> [CachedLeetCodeStats] {
+        let shouldAppend: Bool
+
+        if let previous = history.last {
+            let valuesChanged = previous.totalSolved != stats.totalSolved
+                || previous.easySolved != stats.easySolved
+                || previous.mediumSolved != stats.mediumSolved
+                || previous.hardSolved != stats.hardSolved
+            let staleSample = stats.lastUpdated.timeIntervalSince(previous.lastUpdated) >= 60 * 60
+            shouldAppend = valuesChanged || staleSample
+        } else {
+            shouldAppend = true
+        }
+
+        let nextHistory = shouldAppend ? history + [stats] : Array(history.dropLast()) + [stats]
+        return Array(nextHistory.suffix(80))
     }
 }
 
 private struct SharedLeetTrackerPayload: Codable, Equatable {
     var username: String?
     var cachedStats: CachedLeetCodeStats?
+    var statHistory: [CachedLeetCodeStats]?
     var lastUpdated: Date?
     var goalSettings: SharedGoalSettings?
+
+    var normalizedStatHistory: [CachedLeetCodeStats] {
+        if let statHistory, !statHistory.isEmpty {
+            return statHistory
+        }
+
+        if let cachedStats {
+            return [cachedStats]
+        }
+
+        return []
+    }
 }

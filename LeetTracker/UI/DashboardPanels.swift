@@ -1,5 +1,115 @@
 import SwiftUI
 
+struct DashboardCommandCenterPanel: View {
+    let goalTitle: String
+    let goalDetail: String
+    let analyticsTitle: String
+    let analyticsDetail: String
+    let reminderTitle: String
+    let reminderDetail: String
+    let widgetTitle: String
+    let widgetDetail: String
+
+    var body: some View {
+        Panel {
+            VStack(alignment: .leading, spacing: 16) {
+                SectionHeader(title: "Command Center", systemImage: "sparkle.magnifyingglass")
+
+                ViewThatFits(in: .horizontal) {
+                    HStack(spacing: 12) {
+                        DashboardSignalTile(
+                            title: "Target",
+                            value: goalTitle,
+                            detail: goalDetail,
+                            systemImage: "target",
+                            tint: AppColor.ink
+                        )
+
+                        DashboardSignalTile(
+                            title: "Analytics",
+                            value: analyticsTitle,
+                            detail: analyticsDetail,
+                            systemImage: "chart.xyaxis.line",
+                            tint: AppColor.ink
+                        )
+
+                        DashboardSignalTile(
+                            title: "Reminders",
+                            value: reminderTitle,
+                            detail: reminderDetail,
+                            systemImage: "bell.badge",
+                            tint: AppColor.medium
+                        )
+
+                        DashboardSignalTile(
+                            title: "Widget",
+                            value: widgetTitle,
+                            detail: widgetDetail,
+                            systemImage: "square.grid.2x2",
+                            tint: AppColor.ink
+                        )
+                    }
+
+                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 210), spacing: 12)], spacing: 12) {
+                        DashboardSignalTile(title: "Target", value: goalTitle, detail: goalDetail, systemImage: "target", tint: AppColor.ink)
+                        DashboardSignalTile(title: "Analytics", value: analyticsTitle, detail: analyticsDetail, systemImage: "chart.xyaxis.line", tint: AppColor.ink)
+                        DashboardSignalTile(title: "Reminders", value: reminderTitle, detail: reminderDetail, systemImage: "bell.badge", tint: AppColor.medium)
+                        DashboardSignalTile(title: "Widget", value: widgetTitle, detail: widgetDetail, systemImage: "square.grid.2x2", tint: AppColor.ink)
+                    }
+                }
+            }
+        }
+    }
+}
+
+struct DashboardSignalTile: View {
+    let title: String
+    let value: String
+    let detail: String
+    let systemImage: String
+    let tint: Color
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 11) {
+            HStack(spacing: 8) {
+                Image(systemName: systemImage)
+                    .font(.callout.weight(.semibold))
+                    .foregroundStyle(tint)
+                    .frame(width: 24, height: 24)
+                    .background(AppColor.paper, in: RoundedRectangle(cornerRadius: 6))
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 6)
+                            .stroke(tint.opacity(0.34), lineWidth: 1)
+                    }
+
+                Text(title)
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+            }
+
+            Text(value)
+                .font(.title3.weight(.semibold))
+                .monospacedDigit()
+                .lineLimit(1)
+                .minimumScaleFactor(0.78)
+
+            Text(detail)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .lineLimit(2)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(14)
+        .frame(maxWidth: .infinity, minHeight: 116, alignment: .leading)
+        .background(AppColor.paperWarm.opacity(0.56), in: RoundedRectangle(cornerRadius: 8))
+        .overlay {
+            RoundedRectangle(cornerRadius: 8)
+                .stroke(AppColor.line.opacity(0.22), lineWidth: 1)
+        }
+    }
+}
+
 struct TotalSolvedCard: View {
     let total: String
     let username: String

@@ -44,6 +44,7 @@ struct ContentView: View {
                     selectedContent
                         .padding(28)
                         .frame(maxWidth: .infinity, alignment: .topLeading)
+                        .sectionEntrance(trigger: selectedSection.rawValue)
                 }
             }
         }
@@ -72,6 +73,17 @@ struct ContentView: View {
     private var dashboard: some View {
         VStack(alignment: .leading, spacing: 24) {
             header
+
+            DashboardCommandCenterPanel(
+                goalTitle: viewModel.goalDashboardSummaryTitle,
+                goalDetail: viewModel.goalDashboardSummaryDetail,
+                analyticsTitle: viewModel.analyticsDashboardSummaryTitle,
+                analyticsDetail: viewModel.analyticsDashboardSummaryDetail,
+                reminderTitle: viewModel.reminderDashboardSummaryTitle,
+                reminderDetail: viewModel.reminderDashboardSummaryDetail,
+                widgetTitle: viewModel.widgetDashboardSummaryTitle,
+                widgetDetail: viewModel.widgetDashboardSummaryDetail
+            )
 
             ViewThatFits(in: .horizontal) {
                 HStack(alignment: .top, spacing: 20) {
@@ -103,6 +115,20 @@ struct ContentView: View {
                 title: "Analytics",
                 subtitle: "Local practice signals from public solved counts.",
                 systemImage: "chart.line.uptrend.xyaxis"
+            )
+
+            AnalyticsHeroPanel(
+                stats: viewModel.statsSnapshot,
+                history: viewModel.statHistory,
+                rows: viewModel.difficultyDistributionRows,
+                score: viewModel.readinessScore,
+                title: viewModel.analyticsHeroTitle,
+                detail: viewModel.analyticsHeroDetail,
+                targetSolved: viewModel.goalTargetNumber,
+                weeklyTarget: viewModel.weeklyTargetNumber,
+                completionText: viewModel.estimatedCompletionDateText,
+                focusTitle: viewModel.focusRecommendationTitle,
+                focusDetail: viewModel.focusRecommendationDetail
             )
 
             ViewThatFits(in: .horizontal) {
@@ -213,45 +239,36 @@ struct ContentView: View {
                     GoalEditorPanel(
                         targetText: $viewModel.goalTargetText,
                         weeklyTargetText: $viewModel.weeklyTargetText,
+                        weeklyEasyTargetText: $viewModel.weeklyEasyTargetText,
+                        weeklyMediumTargetText: $viewModel.weeklyMediumTargetText,
+                        weeklyHardTargetText: $viewModel.weeklyHardTargetText,
                         remindersEnabled: $viewModel.remindersEnabled,
                         reminderTime: $viewModel.reminderTime,
+                        projectedMixText: viewModel.weeklyPracticeMixText,
                         statusText: viewModel.goalStatusMessage,
                         saveAction: viewModel.saveGoalSettings
                     )
-                    .frame(minWidth: 320, idealWidth: 340, maxWidth: 380)
+                    .frame(minWidth: 340, idealWidth: 390, maxWidth: 430)
 
-                    VStack(spacing: 20) {
-                        GoalPlanPanel(
-                            title: viewModel.goalPlanTitle,
-                            subtitle: viewModel.goalPlanSubtitle,
-                            progress: viewModel.goalProgress,
-                            detailRows: viewModel.goalDetailRows
-                        )
-
-                        PracticePlanPanel(
-                            title: viewModel.practicePlanTitle,
-                            subtitle: viewModel.practicePlanSubtitle,
-                            rows: viewModel.practicePlanRows,
-                            tint: viewModel.focusRecommendationTint
-                        )
-                    }
-
-                    ReminderPlanPanel(
-                        refreshText: viewModel.refreshCadenceText,
-                        remindersEnabled: viewModel.remindersEnabled,
-                        reminderTimeText: viewModel.reminderTimeText,
-                        weeklyReviewText: viewModel.weeklyReviewReminderText,
-                        permissionText: viewModel.reminderPermissionText
+                    GoalPlanPanel(
+                        title: viewModel.goalPlanTitle,
+                        subtitle: viewModel.goalPlanSubtitle,
+                        progress: viewModel.goalProgress,
+                        detailRows: viewModel.goalDetailRows
                     )
-                    .frame(minWidth: 320, idealWidth: 340, maxWidth: 380)
+                    .frame(maxWidth: .infinity)
                 }
 
                 VStack(spacing: 20) {
                     GoalEditorPanel(
                         targetText: $viewModel.goalTargetText,
                         weeklyTargetText: $viewModel.weeklyTargetText,
+                        weeklyEasyTargetText: $viewModel.weeklyEasyTargetText,
+                        weeklyMediumTargetText: $viewModel.weeklyMediumTargetText,
+                        weeklyHardTargetText: $viewModel.weeklyHardTargetText,
                         remindersEnabled: $viewModel.remindersEnabled,
                         reminderTime: $viewModel.reminderTime,
+                        projectedMixText: viewModel.weeklyPracticeMixText,
                         statusText: viewModel.goalStatusMessage,
                         saveAction: viewModel.saveGoalSettings
                     )
@@ -262,7 +279,30 @@ struct ContentView: View {
                         progress: viewModel.goalProgress,
                         detailRows: viewModel.goalDetailRows
                     )
+                }
+            }
 
+            ViewThatFits(in: .horizontal) {
+                HStack(alignment: .top, spacing: 20) {
+                    PracticePlanPanel(
+                        title: viewModel.practicePlanTitle,
+                        subtitle: viewModel.practicePlanSubtitle,
+                        rows: viewModel.practicePlanRows,
+                        tint: viewModel.focusRecommendationTint
+                    )
+                    .frame(maxWidth: .infinity)
+
+                    ReminderPlanPanel(
+                        refreshText: viewModel.refreshCadenceText,
+                        remindersEnabled: viewModel.remindersEnabled,
+                        reminderTimeText: viewModel.reminderTimeText,
+                        weeklyReviewText: viewModel.weeklyReviewReminderText,
+                        permissionText: viewModel.reminderPermissionText
+                    )
+                    .frame(minWidth: 300, idealWidth: 340, maxWidth: 380)
+                }
+
+                VStack(spacing: 20) {
                     PracticePlanPanel(
                         title: viewModel.practicePlanTitle,
                         subtitle: viewModel.practicePlanSubtitle,
@@ -587,9 +627,13 @@ private final class LeetTrackerViewModel: ObservableObject {
     @Published var username = ""
     @Published var goalTargetText = ""
     @Published var weeklyTargetText = ""
+    @Published var weeklyEasyTargetText = ""
+    @Published var weeklyMediumTargetText = ""
+    @Published var weeklyHardTargetText = ""
     @Published var remindersEnabled = false
     @Published var reminderTime = Date()
     @Published private(set) var stats: LeetCodeStats?
+    @Published private(set) var statHistory: [LeetCodeStats] = []
     @Published private(set) var statusMessage = "Enter a LeetCode username to prepare tracking."
     @Published private(set) var goalStatusMessage = "Goal settings are ready."
     @Published private(set) var reminderPermissionText = "Notifications not requested yet."
@@ -657,6 +701,50 @@ private final class LeetTrackerViewModel: ObservableObject {
         }
 
         return "\(stats.username) · \(stats.totalSolved) solved"
+    }
+
+    var goalDashboardSummaryTitle: String {
+        guard stats != nil else {
+            return "Goal"
+        }
+
+        return "\(goalRemainingText) left"
+    }
+
+    var goalDashboardSummaryDetail: String {
+        guard stats != nil else {
+            return "Refresh a profile, then set a target."
+        }
+
+        return "Target \(goalTargetValue) · \(weeklyTargetValue) per week"
+    }
+
+    var analyticsDashboardSummaryTitle: String {
+        difficultyMixText
+    }
+
+    var analyticsDashboardSummaryDetail: String {
+        guard stats != nil else {
+            return "Analytics appear after a refresh."
+        }
+
+        return "\(readinessTitle) · \(focusRecommendationTitle)"
+    }
+
+    var reminderDashboardSummaryTitle: String {
+        remindersEnabled ? reminderTimeText : "Off"
+    }
+
+    var reminderDashboardSummaryDetail: String {
+        remindersEnabled ? "Daily reminder · weekly review" : "No practice reminders scheduled"
+    }
+
+    var widgetDashboardSummaryTitle: String {
+        refreshCadenceText
+    }
+
+    var widgetDashboardSummaryDetail: String {
+        "Auto refresh when macOS allows it"
     }
 
     var difficultyMixText: String {
@@ -760,15 +848,31 @@ private final class LeetTrackerViewModel: ObservableObject {
     }
 
     var weeklyPracticeMixText: String {
-        let easy = max(1, Int((Double(weeklyTargetValue) * 0.20).rounded(.down)))
-        let hard = weeklyTargetValue >= 5 ? 1 : 0
-        let medium = max(0, weeklyTargetValue - easy - hard)
+        let easy = weeklyEasyTargetValue
+        let medium = weeklyMediumTargetValue
+        let hard = weeklyHardTargetValue
 
         if hard > 0 {
             return "\(easy) Easy, \(medium) Medium, \(hard) Hard"
         }
 
         return "\(easy) Easy, \(medium) Medium"
+    }
+
+    var analyticsHeroTitle: String {
+        guard let stats, stats.totalSolved > 0 else {
+            return "Refresh once to draw your practice map"
+        }
+
+        return "\(stats.totalSolved) solved · \(readinessTitle)"
+    }
+
+    var analyticsHeroDetail: String {
+        guard stats != nil else {
+            return "LeetTracker will turn public solved counts and your local goals into readable signals without pretending to know private activity."
+        }
+
+        return "This is a local practice-health view: difficulty balance, target distance, and the next useful move."
     }
 
     var planIntensityText: String {
@@ -1136,6 +1240,7 @@ private final class LeetTrackerViewModel: ObservableObject {
             }
 
             stats = LeetCodeStats(cachedStats: cachedStats)
+            statHistory = snapshot.statHistory.map(LeetCodeStats.init(cachedStats:))
             statusMessage = "Loaded \(cachedStats.username). Updated \(formatted(cachedStats.lastUpdated))."
         }
     }
@@ -1144,11 +1249,15 @@ private final class LeetTrackerViewModel: ObservableObject {
         let currentTotal = stats?.totalSolved ?? 0
         let target = max(currentTotal + 1, parsePositiveInt(goalTargetText, fallback: savedGoalSettings.targetSolved))
         let weeklyTarget = max(1, parsePositiveInt(weeklyTargetText, fallback: savedGoalSettings.weeklyTarget))
+        let difficultyTargets = normalizedDifficultyTargets(fallbackWeeklyTarget: weeklyTarget)
         let components = Calendar.current.dateComponents([.hour, .minute], from: reminderTime)
 
         let settings = SharedGoalSettings(
             targetSolved: target,
             weeklyTarget: weeklyTarget,
+            weeklyEasyTarget: difficultyTargets.easy,
+            weeklyMediumTarget: difficultyTargets.medium,
+            weeklyHardTarget: difficultyTargets.hard,
             remindersEnabled: remindersEnabled,
             reminderHour: components.hour ?? savedGoalSettings.reminderHour,
             reminderMinute: components.minute ?? savedGoalSettings.reminderMinute,
@@ -1190,6 +1299,7 @@ private final class LeetTrackerViewModel: ObservableObject {
 
             sharedStore.saveUsername(freshStats.username)
             sharedStore.saveCachedStats(freshStats.cachedStats)
+            statHistory = sharedStore.statHistory.map(LeetCodeStats.init(cachedStats:))
             statusMessage = "Updated \(freshStats.username). Last checked \(formatted(freshStats.lastUpdated))."
             return true
         } catch let error as LeetCodeProfileError {
@@ -1213,6 +1323,7 @@ private final class LeetTrackerViewModel: ObservableObject {
     private func showCachedStatsAfterFailure(_ error: LeetCodeProfileError) {
         if let cachedStats = sharedStore.cachedStats {
             stats = LeetCodeStats(cachedStats: cachedStats)
+            statHistory = sharedStore.statHistory.map(LeetCodeStats.init(cachedStats:))
 
             if trimmedUsername.isEmpty {
                 username = cachedStats.username
@@ -1242,6 +1353,9 @@ private final class LeetTrackerViewModel: ObservableObject {
         return SharedGoalSettings(
             targetSolved: target,
             weeklyTarget: SharedGoalSettings.default.weeklyTarget,
+            weeklyEasyTarget: SharedGoalSettings.default.weeklyEasyTarget,
+            weeklyMediumTarget: SharedGoalSettings.default.weeklyMediumTarget,
+            weeklyHardTarget: SharedGoalSettings.default.weeklyHardTarget,
             remindersEnabled: SharedGoalSettings.default.remindersEnabled,
             reminderHour: SharedGoalSettings.default.reminderHour,
             reminderMinute: SharedGoalSettings.default.reminderMinute,
@@ -1257,10 +1371,26 @@ private final class LeetTrackerViewModel: ObservableObject {
         max(1, parsePositiveInt(weeklyTargetText, fallback: savedGoalSettings.weeklyTarget))
     }
 
+    private var weeklyEasyTargetValue: Int {
+        max(0, parsePositiveInt(weeklyEasyTargetText, fallback: savedGoalSettings.weeklyEasyTarget ?? suggestedDifficultyTargets(for: weeklyTargetValue).easy))
+    }
+
+    private var weeklyMediumTargetValue: Int {
+        max(0, parsePositiveInt(weeklyMediumTargetText, fallback: savedGoalSettings.weeklyMediumTarget ?? suggestedDifficultyTargets(for: weeklyTargetValue).medium))
+    }
+
+    private var weeklyHardTargetValue: Int {
+        max(0, parsePositiveInt(weeklyHardTargetText, fallback: savedGoalSettings.weeklyHardTarget ?? suggestedDifficultyTargets(for: weeklyTargetValue).hard))
+    }
+
     private func applyGoalSettings(_ settings: SharedGoalSettings, status: String) {
         savedGoalSettings = settings
         goalTargetText = "\(settings.targetSolved)"
         weeklyTargetText = "\(settings.weeklyTarget)"
+        let difficultyTargets = difficultyTargets(from: settings)
+        weeklyEasyTargetText = "\(difficultyTargets.easy)"
+        weeklyMediumTargetText = "\(difficultyTargets.medium)"
+        weeklyHardTargetText = "\(difficultyTargets.hard)"
         remindersEnabled = settings.remindersEnabled
         reminderTime = reminderDate(hour: settings.reminderHour, minute: settings.reminderMinute)
         goalStatusMessage = status
@@ -1292,6 +1422,35 @@ private final class LeetTrackerViewModel: ObservableObject {
     private func parsePositiveInt(_ text: String, fallback: Int) -> Int {
         let digits = text.filter(\.isNumber)
         return Int(digits) ?? fallback
+    }
+
+    private func normalizedDifficultyTargets(fallbackWeeklyTarget: Int) -> (easy: Int, medium: Int, hard: Int) {
+        let fallback = suggestedDifficultyTargets(for: fallbackWeeklyTarget)
+        let easy = max(0, parsePositiveInt(weeklyEasyTargetText, fallback: savedGoalSettings.weeklyEasyTarget ?? fallback.easy))
+        let medium = max(0, parsePositiveInt(weeklyMediumTargetText, fallback: savedGoalSettings.weeklyMediumTarget ?? fallback.medium))
+        let hard = max(0, parsePositiveInt(weeklyHardTargetText, fallback: savedGoalSettings.weeklyHardTarget ?? fallback.hard))
+
+        guard easy + medium + hard > 0 else {
+            return fallback
+        }
+
+        return (easy, medium, hard)
+    }
+
+    private func difficultyTargets(from settings: SharedGoalSettings) -> (easy: Int, medium: Int, hard: Int) {
+        let fallback = suggestedDifficultyTargets(for: settings.weeklyTarget)
+        return (
+            max(0, settings.weeklyEasyTarget ?? fallback.easy),
+            max(0, settings.weeklyMediumTarget ?? fallback.medium),
+            max(0, settings.weeklyHardTarget ?? fallback.hard)
+        )
+    }
+
+    private func suggestedDifficultyTargets(for weeklyTarget: Int) -> (easy: Int, medium: Int, hard: Int) {
+        let easy = max(1, Int((Double(weeklyTarget) * 0.20).rounded(.down)))
+        let hard = weeklyTarget >= 5 ? 1 : 0
+        let medium = max(0, weeklyTarget - easy - hard)
+        return (easy, medium, hard)
     }
 
     private func reminderDate(hour: Int, minute: Int) -> Date {

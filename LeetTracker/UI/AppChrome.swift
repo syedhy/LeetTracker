@@ -51,7 +51,7 @@ struct AppSidebar: View {
                         .fill(AppColor.ink)
                         .frame(width: 8, height: 8)
 
-                    Text("Every 2 min")
+                    Text("Every \(Int(LeetTrackerWidgetConfiguration.refreshInterval / 60)) min")
                         .font(.callout.weight(.medium))
                 }
             }
@@ -132,7 +132,7 @@ struct Panel<Content: View>: View {
                 RoundedRectangle(cornerRadius: 8)
                     .stroke(AppColor.line.opacity(0.32), lineWidth: 1.1)
             }
-            .shadow(color: AppColor.ink.opacity(0.04), radius: 10, y: 6)
+            .shadow(color: AppColor.ink.opacity(0.018), radius: 3, y: 2)
     }
 }
 

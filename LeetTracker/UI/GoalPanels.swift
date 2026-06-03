@@ -3,31 +3,43 @@ import SwiftUI
 struct GoalEditorPanel: View {
     @Binding var targetText: String
     @Binding var weeklyTargetText: String
+    @Binding var weeklyEasyTargetText: String
+    @Binding var weeklyMediumTargetText: String
+    @Binding var weeklyHardTargetText: String
     @Binding var remindersEnabled: Bool
     @Binding var reminderTime: Date
 
+    let projectedMixText: String
     let statusText: String
     let saveAction: () -> Void
 
     var body: some View {
         Panel {
-            VStack(alignment: .leading, spacing: 18) {
+            VStack(alignment: .leading, spacing: 20) {
                 SectionHeader(title: "Set Goal", systemImage: "slider.horizontal.3")
 
-                VStack(alignment: .leading, spacing: 12) {
+                LazyVGrid(
+                    columns: [GridItem(.adaptive(minimum: 150), spacing: 12)],
+                    alignment: .leading,
+                    spacing: 12
+                ) {
                     GoalField(title: "Target solved", text: $targetText, systemImage: "target")
-                    GoalField(title: "Weekly target", text: $weeklyTargetText, systemImage: "calendar")
-
-                    Toggle(isOn: $remindersEnabled) {
-                        Label("Practice reminder", systemImage: "bell.badge")
-                    }
-                    .toggleStyle(.switch)
-
-                    DatePicker("Reminder time", selection: $reminderTime, displayedComponents: .hourAndMinute)
-                        .disabled(!remindersEnabled)
+                    GoalField(title: "Weekly total", text: $weeklyTargetText, systemImage: "calendar")
                 }
 
-                HStack(spacing: 10) {
+                DifficultyGoalGrid(
+                    easyText: $weeklyEasyTargetText,
+                    mediumText: $weeklyMediumTargetText,
+                    hardText: $weeklyHardTargetText,
+                    projectedMixText: projectedMixText
+                )
+
+                ReminderGoalCard(
+                    remindersEnabled: $remindersEnabled,
+                    reminderTime: $reminderTime
+                )
+
+                HStack(alignment: .center, spacing: 10) {
                     Button(action: saveAction) {
                         Label("Save Goal", systemImage: "checkmark.circle.fill")
                     }
@@ -61,11 +73,129 @@ struct GoalField: View {
                 .monospacedDigit()
                 .padding(.horizontal, 12)
                 .frame(height: 40)
-                .background(AppColor.paperWarm.opacity(0.55), in: RoundedRectangle(cornerRadius: 8))
+                .background(AppColor.paperWarm.opacity(0.48), in: RoundedRectangle(cornerRadius: 8))
                 .overlay {
                     RoundedRectangle(cornerRadius: 8)
                         .stroke(AppColor.line.opacity(0.5), lineWidth: 1)
                 }
+        }
+    }
+}
+
+struct DifficultyGoalGrid: View {
+    @Binding var easyText: String
+    @Binding var mediumText: String
+    @Binding var hardText: String
+
+    let projectedMixText: String
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(alignment: .firstTextBaseline) {
+                Label("Weekly difficulty targets", systemImage: "list.bullet.rectangle")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.secondary)
+
+                Spacer()
+
+                Text(projectedMixText)
+                    .font(.caption.weight(.medium))
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.72)
+            }
+
+            LazyVGrid(
+                columns: [GridItem(.adaptive(minimum: 104), spacing: 10)],
+                alignment: .leading,
+                spacing: 10
+            ) {
+                DifficultyGoalField(title: "Easy", text: $easyText, tint: AppColor.easy)
+                DifficultyGoalField(title: "Medium", text: $mediumText, tint: AppColor.medium)
+                DifficultyGoalField(title: "Hard", text: $hardText, tint: AppColor.hard)
+            }
+        }
+        .padding(14)
+        .background(AppColor.paperWarm.opacity(0.42), in: RoundedRectangle(cornerRadius: 8))
+        .overlay {
+            RoundedRectangle(cornerRadius: 8)
+                .stroke(AppColor.line.opacity(0.24), lineWidth: 1)
+        }
+    }
+}
+
+struct DifficultyGoalField: View {
+    let title: String
+    @Binding var text: String
+    let tint: Color
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 7) {
+                Circle()
+                    .fill(tint)
+                    .frame(width: 9, height: 9)
+
+                Text(title)
+                    .font(.caption.weight(.semibold))
+            }
+
+            TextField(title, text: $text)
+                .textFieldStyle(.plain)
+                .font(.title3.weight(.semibold))
+                .monospacedDigit()
+                .padding(.horizontal, 10)
+                .frame(height: 38)
+                .background(AppColor.paper, in: RoundedRectangle(cornerRadius: 8))
+                .overlay {
+                    RoundedRectangle(cornerRadius: 8)
+                        .stroke(tint.opacity(0.5), lineWidth: 1)
+                }
+        }
+    }
+}
+
+struct ReminderGoalCard: View {
+    @Binding var remindersEnabled: Bool
+    @Binding var reminderTime: Date
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(alignment: .center) {
+                Label("Practice reminders", systemImage: "bell.badge")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.secondary)
+
+                Spacer()
+
+                Toggle("", isOn: $remindersEnabled)
+                    .toggleStyle(.switch)
+                    .labelsHidden()
+            }
+
+            HStack(alignment: .center, spacing: 12) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(remindersEnabled ? "Daily focus nudge" : "Reminders paused")
+                        .font(.callout.weight(.semibold))
+
+                    Text(remindersEnabled ? "LeetTracker will also schedule a Sunday review." : "Turn this on when you want a gentle push.")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+
+                Spacer(minLength: 10)
+
+                DatePicker("", selection: $reminderTime, displayedComponents: .hourAndMinute)
+                    .labelsHidden()
+                    .disabled(!remindersEnabled)
+            }
+        }
+        .padding(14)
+        .background(AppColor.paperWarm.opacity(0.42), in: RoundedRectangle(cornerRadius: 8))
+        .overlay {
+            RoundedRectangle(cornerRadius: 8)
+                .stroke(AppColor.line.opacity(0.24), lineWidth: 1)
         }
     }
 }

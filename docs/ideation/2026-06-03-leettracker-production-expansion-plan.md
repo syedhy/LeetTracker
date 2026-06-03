@@ -498,6 +498,20 @@ Defer:
 
 These can be revisited only after the core app is stable and the data access policy is settled.
 
+## Premium Feature Candidates
+
+These are good paid-tier candidates if the app becomes stable enough for production. They should stay privacy-first, local-first where possible, and never depend on private LeetCode credentials or scraped premium content.
+
+- Advanced local history analytics: trend charts, weekly/monthly deltas, streak recovery, and rolling difficulty balance based on locally cached snapshots.
+- Custom widget packs: goal widget, weekly focus widget, difficulty-balance widget, streak widget, and visual theme packs.
+- Structured study plans: interview-prep templates, topic rotation checklists, deadline-based plans, and adaptive weekly targets.
+- Goal presets and automation: auto-suggested milestones, difficulty-specific targets, reminder schedules, and review routines.
+- Exportable progress reports: clean PDF or image summaries for personal accountability or mentor check-ins.
+- Multiple local profiles: compare personal accounts or separate college/interview prep tracks without cloud sync.
+- Polished focus sessions: lightweight timer, session notes, and post-session reflection linked to the weekly plan.
+
+Avoid monetizing anything that implies official LeetCode access, private submission analysis, contest automation, or premium-content extraction.
+
 ## Build Order
 
 Recommended implementation order:

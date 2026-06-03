@@ -42,9 +42,14 @@ struct WidgetContainer<Content: View>: View {
 
     var body: some View {
         content
+            .padding(1)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
             .containerBackground(for: .widget) {
                 LTWidgetColor.cardBackground
+            }
+            .overlay {
+                RoundedRectangle(cornerRadius: LTWidgetRadius.metric)
+                    .stroke(LTWidgetColor.panelStroke, lineWidth: 1)
             }
     }
 }
@@ -135,7 +140,7 @@ struct WidgetBrandMark: View {
     var body: some View {
         Circle()
             .fill(LTWidgetColor.brand)
-        .frame(width: LTWidgetSizing.brandMark, height: LTWidgetSizing.brandMark)
+            .frame(width: LTWidgetSizing.brandMark, height: LTWidgetSizing.brandMark)
     }
 }
 

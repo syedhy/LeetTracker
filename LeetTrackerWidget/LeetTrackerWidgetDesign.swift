@@ -23,23 +23,23 @@ enum LTWidgetTypography {
 enum LTWidgetColor {
     static let cardBackground = LinearGradient(
         colors: [
-            Color(red: 0.07, green: 0.09, blue: 0.12),
-            Color(red: 0.03, green: 0.04, blue: 0.06)
+            Color(red: 0.98, green: 0.975, blue: 0.94),
+            Color(red: 0.92, green: 0.91, blue: 0.86)
         ],
         startPoint: .topLeading,
         endPoint: .bottomTrailing
     )
-    static let panel = Color.white.opacity(0.07)
-    static let panelStroke = Color.white.opacity(0.08)
-    static let primary = Color.white
-    static let secondary = Color.white.opacity(0.70)
-    static let tertiary = Color.white.opacity(0.46)
-    static let brand = Color(red: 0.35, green: 0.76, blue: 1.00)
+    static let panel = Color(red: 0.94, green: 0.93, blue: 0.88).opacity(0.85)
+    static let panelStroke = Color(red: 0.10, green: 0.10, blue: 0.09).opacity(0.28)
+    static let primary = Color(red: 0.08, green: 0.08, blue: 0.075)
+    static let secondary = Color(red: 0.26, green: 0.26, blue: 0.24)
+    static let tertiary = Color(red: 0.42, green: 0.42, blue: 0.39)
+    static let brand = primary
     static let easy = Color(red: 0.30, green: 0.84, blue: 0.44)
     static let medium = Color(red: 1.00, green: 0.62, blue: 0.10)
     static let hard = Color(red: 1.00, green: 0.31, blue: 0.52)
-    static let warning = Color(red: 1.00, green: 0.70, blue: 0.24)
-    static let error = Color(red: 1.00, green: 0.34, blue: 0.44)
+    static let warning = primary
+    static let error = primary
 }
 
 enum LTWidgetSizing {
@@ -48,5 +48,5 @@ enum LTWidgetSizing {
 }
 
 enum LTWidgetRadius {
-    static let metric: CGFloat = 12
+    static let metric: CGFloat = 8
 }

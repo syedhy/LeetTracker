@@ -222,28 +222,28 @@ struct ContentView: View {
                         title: "Progress",
                         detail: "Current solved count, difficulty mix, and last updated time.",
                         systemImage: "checkmark.seal.fill",
-                        tint: AppColor.brand
+                        tint: AppColor.ink
                     )
 
                     WidgetIdeaPanel(
                         title: "Goal Pace",
                         detail: "Milestone progress, remaining problems, and whether you are on track.",
                         systemImage: "speedometer",
-                        tint: AppColor.medium
+                        tint: AppColor.ink
                     )
 
                     WidgetIdeaPanel(
                         title: "Daily Focus",
                         detail: "One small practice target with reminder timing.",
                         systemImage: "calendar.badge.clock",
-                        tint: AppColor.easy
+                        tint: AppColor.ink
                     )
                 }
 
                 VStack(spacing: 20) {
-                    WidgetIdeaPanel(title: "Progress", detail: "Current solved count, difficulty mix, and last updated time.", systemImage: "checkmark.seal.fill", tint: AppColor.brand)
-                    WidgetIdeaPanel(title: "Goal Pace", detail: "Milestone progress, remaining problems, and whether you are on track.", systemImage: "speedometer", tint: AppColor.medium)
-                    WidgetIdeaPanel(title: "Daily Focus", detail: "One small practice target with reminder timing.", systemImage: "calendar.badge.clock", tint: AppColor.easy)
+                    WidgetIdeaPanel(title: "Progress", detail: "Current solved count, difficulty mix, and last updated time.", systemImage: "checkmark.seal.fill", tint: AppColor.ink)
+                    WidgetIdeaPanel(title: "Goal Pace", detail: "Milestone progress, remaining problems, and whether you are on track.", systemImage: "speedometer", tint: AppColor.ink)
+                    WidgetIdeaPanel(title: "Daily Focus", detail: "One small practice target with reminder timing.", systemImage: "calendar.badge.clock", tint: AppColor.ink)
                 }
             }
         }
@@ -286,7 +286,7 @@ struct ContentView: View {
             StatusPill(
                 title: viewModel.isLoading ? "Syncing" : "Ready",
                 systemImage: viewModel.isLoading ? "arrow.triangle.2.circlepath" : "checkmark.circle.fill",
-                tint: viewModel.isLoading ? .orange : .green
+                tint: AppColor.ink
             )
         }
     }
@@ -323,10 +323,10 @@ struct ContentView: View {
                         .font(.body)
                         .padding(.horizontal, 13)
                         .frame(height: 38)
-                        .background(.background.opacity(0.72), in: RoundedRectangle(cornerRadius: 10))
+                        .background(AppColor.paperWarm.opacity(0.55), in: RoundedRectangle(cornerRadius: 8))
                         .overlay {
-                            RoundedRectangle(cornerRadius: 10)
-                                .stroke(.quaternary, lineWidth: 1)
+                            RoundedRectangle(cornerRadius: 8)
+                                .stroke(AppColor.line.opacity(0.5), lineWidth: 1)
                         }
                         .onSubmit(saveUsername)
                 }
@@ -361,8 +361,8 @@ struct ContentView: View {
 
                 HStack(spacing: 12) {
                     InsightCard(title: "Difficulty Mix", value: viewModel.difficultyMixText, tint: AppColor.brand)
-                    InsightCard(title: "Goal Pace", value: viewModel.estimatedWeeksText, tint: AppColor.medium)
-                    InsightCard(title: "Remaining", value: viewModel.goalRemainingText, tint: AppColor.hard)
+                    InsightCard(title: "Goal Pace", value: viewModel.estimatedWeeksText, tint: AppColor.ink)
+                    InsightCard(title: "Remaining", value: viewModel.goalRemainingText, tint: AppColor.ink)
                 }
 
                 Divider()
@@ -406,9 +406,13 @@ struct ContentView: View {
         HStack(alignment: .center, spacing: 14) {
             Image(systemName: systemImage)
                 .font(.title2.weight(.semibold))
-                .foregroundStyle(AppColor.brand)
+                .foregroundStyle(AppColor.ink)
                 .frame(width: 44, height: 44)
-                .background(AppColor.brand.opacity(0.12), in: RoundedRectangle(cornerRadius: 12))
+                .background(AppColor.paper, in: RoundedRectangle(cornerRadius: 8))
+                .overlay {
+                    RoundedRectangle(cornerRadius: 8)
+                        .stroke(AppColor.ink, lineWidth: 1.5)
+                }
 
             VStack(alignment: .leading, spacing: 4) {
                 Text(title)
@@ -482,7 +486,12 @@ struct ContentView: View {
 }
 
 private enum AppColor {
-    static let brand = Color(red: 0.22, green: 0.58, blue: 0.98)
+    static let ink = Color(red: 0.08, green: 0.08, blue: 0.075)
+    static let paper = Color(red: 0.98, green: 0.975, blue: 0.94)
+    static let paperWarm = Color(red: 0.94, green: 0.93, blue: 0.88)
+    static let graphite = Color(red: 0.42, green: 0.42, blue: 0.39)
+    static let line = Color(red: 0.12, green: 0.12, blue: 0.11)
+    static let brand = ink
     static let easy = Color(red: 0.18, green: 0.73, blue: 0.38)
     static let medium = Color(red: 0.95, green: 0.58, blue: 0.08)
     static let hard = Color(red: 0.92, green: 0.25, blue: 0.42)
@@ -536,7 +545,7 @@ private struct AppSidebar: View {
 
                 HStack(spacing: 8) {
                     Circle()
-                        .fill(AppColor.easy)
+                        .fill(AppColor.ink)
                         .frame(width: 8, height: 8)
 
                     Text("Every 2 min")
@@ -545,11 +554,20 @@ private struct AppSidebar: View {
             }
             .padding(12)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(.quaternary.opacity(0.45), in: RoundedRectangle(cornerRadius: 12))
+            .background(AppColor.paper, in: RoundedRectangle(cornerRadius: 8))
+            .overlay {
+                RoundedRectangle(cornerRadius: 8)
+                    .stroke(AppColor.line.opacity(0.45), lineWidth: 1)
+            }
         }
         .padding(20)
         .frame(width: 214)
-        .background(.ultraThinMaterial)
+        .background(AppColor.paperWarm.opacity(0.82))
+        .overlay(alignment: .trailing) {
+            Rectangle()
+                .fill(AppColor.line.opacity(0.2))
+                .frame(width: 1)
+        }
     }
 }
 
@@ -563,13 +581,13 @@ private struct SidebarButtonStyle: ButtonStyle {
             .padding(.horizontal, 12)
             .frame(height: 36)
             .background(
-                isSelected ? AppColor.brand.opacity(configuration.isPressed ? 0.18 : 0.14) : .clear,
-                in: RoundedRectangle(cornerRadius: 10)
+                isSelected ? AppColor.ink.opacity(configuration.isPressed ? 0.12 : 0.08) : .clear,
+                in: RoundedRectangle(cornerRadius: 8)
             )
             .overlay(alignment: .leading) {
                 if isSelected {
-                    RoundedRectangle(cornerRadius: 2)
-                        .fill(AppColor.brand)
+                    Rectangle()
+                        .fill(AppColor.ink)
                         .frame(width: 3, height: 18)
                 }
             }
@@ -578,15 +596,45 @@ private struct SidebarButtonStyle: ButtonStyle {
 
 private struct AppSurfaceBackground: View {
     var body: some View {
-        LinearGradient(
-            colors: [
-                Color(nsColor: .windowBackgroundColor),
-                Color(nsColor: .controlBackgroundColor).opacity(0.72)
-            ],
-            startPoint: .topLeading,
-            endPoint: .bottomTrailing
-        )
+        ZStack {
+            AppColor.paper
+
+            DoodleBackdrop()
+                .stroke(AppColor.line.opacity(0.07), lineWidth: 1.2)
+                .padding(18)
+        }
         .ignoresSafeArea()
+    }
+}
+
+private struct DoodleBackdrop: Shape {
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        let step: CGFloat = 72
+        var x = rect.minX - step
+
+        while x < rect.maxX + step {
+            path.move(to: CGPoint(x: x, y: rect.minY))
+            path.addCurve(
+                to: CGPoint(x: x + 26, y: rect.maxY),
+                control1: CGPoint(x: x + 18, y: rect.minY + rect.height * 0.28),
+                control2: CGPoint(x: x - 16, y: rect.minY + rect.height * 0.72)
+            )
+            x += step
+        }
+
+        var y = rect.minY + 40
+        while y < rect.maxY {
+            path.move(to: CGPoint(x: rect.minX, y: y))
+            path.addCurve(
+                to: CGPoint(x: rect.maxX, y: y + 18),
+                control1: CGPoint(x: rect.minX + rect.width * 0.32, y: y - 12),
+                control2: CGPoint(x: rect.minX + rect.width * 0.68, y: y + 28)
+            )
+            y += step * 1.25
+        }
+
+        return path
     }
 }
 
@@ -594,15 +642,19 @@ private struct AppIconMark: View {
     var body: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 14)
-                .fill(AppColor.brand.gradient)
+                .fill(AppColor.ink)
 
             Image(systemName: "chevron.left.forwardslash.chevron.right")
                 .font(.title3.weight(.bold))
-                .foregroundStyle(.white)
+                .foregroundStyle(AppColor.paper)
         }
         .aspectRatio(1, contentMode: .fit)
         .frame(width: 48, height: 48)
-        .shadow(color: AppColor.brand.opacity(0.28), radius: 16, y: 8)
+        .overlay {
+            RoundedRectangle(cornerRadius: 14)
+                .stroke(AppColor.paper.opacity(0.24), lineWidth: 1)
+        }
+        .shadow(color: AppColor.ink.opacity(0.18), radius: 12, y: 7)
     }
 }
 
@@ -617,7 +669,11 @@ private struct StatusPill: View {
             .foregroundStyle(tint)
             .padding(.horizontal, 12)
             .padding(.vertical, 8)
-            .background(tint.opacity(0.12), in: Capsule())
+            .background(AppColor.paperWarm, in: Capsule())
+            .overlay {
+                Capsule()
+                    .stroke(AppColor.line.opacity(0.4), lineWidth: 1)
+            }
     }
 }
 
@@ -631,11 +687,12 @@ private struct Panel<Content: View>: View {
     var body: some View {
         content
             .padding(20)
-            .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 18))
+            .background(AppColor.paper.opacity(0.94), in: RoundedRectangle(cornerRadius: 8))
             .overlay {
-                RoundedRectangle(cornerRadius: 18)
-                    .stroke(.quaternary, lineWidth: 1)
+                RoundedRectangle(cornerRadius: 8)
+                    .stroke(AppColor.line.opacity(0.42), lineWidth: 1.2)
             }
+            .shadow(color: AppColor.ink.opacity(0.05), radius: 10, y: 6)
     }
 }
 
@@ -661,31 +718,31 @@ private struct TotalSolvedCard: View {
                 VStack(alignment: .leading, spacing: 4) {
                     Text(username)
                         .font(.headline)
-                        .foregroundStyle(.white.opacity(0.72))
+                        .foregroundStyle(AppColor.paper.opacity(0.76))
                         .lineLimit(1)
 
                     Text(lastUpdated)
                         .font(.caption)
-                        .foregroundStyle(.white.opacity(0.48))
+                        .foregroundStyle(AppColor.paper.opacity(0.52))
                 }
 
                 Spacer()
 
                 Image(systemName: "checkmark.seal.fill")
                     .font(.title2)
-                    .foregroundStyle(AppColor.brand)
+                    .foregroundStyle(AppColor.paper)
             }
 
             HStack(alignment: .lastTextBaseline, spacing: 8) {
                 Text(total)
                     .font(.system(size: 58, weight: .semibold, design: .rounded))
-                    .foregroundStyle(.white)
+                    .foregroundStyle(AppColor.paper)
                     .lineLimit(1)
                     .minimumScaleFactor(0.7)
 
                 Text("solved")
                     .font(.title3.weight(.medium))
-                    .foregroundStyle(.white.opacity(0.62))
+                    .foregroundStyle(AppColor.paper.opacity(0.62))
             }
         }
         .padding(20)
@@ -693,14 +750,18 @@ private struct TotalSolvedCard: View {
         .background(
             LinearGradient(
                 colors: [
-                    Color(red: 0.08, green: 0.10, blue: 0.13),
-                    Color(red: 0.04, green: 0.06, blue: 0.08)
+                    AppColor.ink,
+                    Color(red: 0.02, green: 0.02, blue: 0.018)
                 ],
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
             ),
-            in: RoundedRectangle(cornerRadius: 18)
+            in: RoundedRectangle(cornerRadius: 8)
         )
+        .overlay {
+            RoundedRectangle(cornerRadius: 8)
+                .stroke(AppColor.line, lineWidth: 1.2)
+        }
     }
 }
 
@@ -725,10 +786,10 @@ private struct DifficultyCard: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(14)
-        .background(tint.opacity(0.10), in: RoundedRectangle(cornerRadius: 14))
+        .background(AppColor.paperWarm.opacity(0.8), in: RoundedRectangle(cornerRadius: 8))
         .overlay {
-            RoundedRectangle(cornerRadius: 14)
-                .stroke(tint.opacity(0.22), lineWidth: 1)
+            RoundedRectangle(cornerRadius: 8)
+                .stroke(tint.opacity(0.72), lineWidth: 1.4)
         }
     }
 }
@@ -746,7 +807,7 @@ private struct StatusPanel: View {
             } else {
                 Image(systemName: "info.circle.fill")
                     .font(.body)
-                    .foregroundStyle(AppColor.brand)
+                    .foregroundStyle(AppColor.ink)
                     .padding(.top, 2)
             }
 
@@ -757,7 +818,11 @@ private struct StatusPanel: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
         }
         .padding(14)
-        .background(.quaternary.opacity(0.55), in: RoundedRectangle(cornerRadius: 14))
+        .background(AppColor.paperWarm.opacity(0.75), in: RoundedRectangle(cornerRadius: 8))
+        .overlay {
+            RoundedRectangle(cornerRadius: 8)
+                .stroke(AppColor.line.opacity(0.3), lineWidth: 1)
+        }
     }
 }
 
@@ -784,10 +849,10 @@ private struct InsightCard: View {
         }
         .padding(14)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(tint.opacity(0.10), in: RoundedRectangle(cornerRadius: 14))
+        .background(AppColor.paperWarm.opacity(0.72), in: RoundedRectangle(cornerRadius: 8))
         .overlay {
-            RoundedRectangle(cornerRadius: 14)
-                .stroke(tint.opacity(0.18), lineWidth: 1)
+            RoundedRectangle(cornerRadius: 8)
+                .stroke(tint.opacity(0.54), lineWidth: 1.1)
         }
     }
 }
@@ -937,7 +1002,7 @@ private struct AnalyticsScorePanel: View {
                         Circle()
                             .trim(from: 0, to: progress)
                             .stroke(
-                                AppColor.brand.gradient,
+                                AppColor.ink.gradient,
                                 style: StrokeStyle(lineWidth: 12, lineCap: .round)
                             )
                             .rotationEffect(.degrees(-90))
@@ -979,7 +1044,11 @@ private struct FocusRecommendationPanel: View {
                         .font(.title.weight(.semibold))
                         .foregroundStyle(tint)
                         .frame(width: 42, height: 42)
-                        .background(tint.opacity(0.12), in: RoundedRectangle(cornerRadius: 12))
+                        .background(AppColor.paperWarm.opacity(0.8), in: RoundedRectangle(cornerRadius: 8))
+                        .overlay {
+                            RoundedRectangle(cornerRadius: 8)
+                                .stroke(tint.opacity(0.58), lineWidth: 1)
+                        }
 
                     VStack(alignment: .leading, spacing: 6) {
                         Text(title)
@@ -1057,10 +1126,10 @@ private struct GoalField: View {
                 .monospacedDigit()
                 .padding(.horizontal, 12)
                 .frame(height: 40)
-                .background(.background.opacity(0.7), in: RoundedRectangle(cornerRadius: 10))
+                .background(AppColor.paperWarm.opacity(0.55), in: RoundedRectangle(cornerRadius: 8))
                 .overlay {
-                    RoundedRectangle(cornerRadius: 10)
-                        .stroke(.quaternary, lineWidth: 1)
+                    RoundedRectangle(cornerRadius: 8)
+                        .stroke(AppColor.line.opacity(0.5), lineWidth: 1)
                 }
         }
     }
@@ -1169,7 +1238,11 @@ private struct WidgetIdeaPanel: View {
                     .font(.title2.weight(.semibold))
                     .foregroundStyle(tint)
                     .frame(width: 42, height: 42)
-                    .background(tint.opacity(0.12), in: RoundedRectangle(cornerRadius: 12))
+                    .background(AppColor.paperWarm.opacity(0.85), in: RoundedRectangle(cornerRadius: 8))
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(tint.opacity(0.6), lineWidth: 1)
+                    }
 
                 VStack(alignment: .leading, spacing: 6) {
                     Text(title)
@@ -1211,7 +1284,7 @@ private struct PrimaryActionButtonStyle: ButtonStyle {
             .foregroundStyle(.white)
             .padding(.horizontal, 14)
             .frame(height: 36)
-            .background(AppColor.brand.opacity(isEnabled ? (configuration.isPressed ? 0.72 : 1) : 0.42), in: RoundedRectangle(cornerRadius: 10))
+            .background(AppColor.ink.opacity(isEnabled ? (configuration.isPressed ? 0.74 : 1) : 0.42), in: RoundedRectangle(cornerRadius: 8))
     }
 }
 
@@ -1224,7 +1297,11 @@ private struct SecondaryActionButtonStyle: ButtonStyle {
             .foregroundStyle(isEnabled ? .primary : .secondary)
             .padding(.horizontal, 14)
             .frame(height: 36)
-            .background(.quaternary.opacity(configuration.isPressed ? 0.9 : 0.62), in: RoundedRectangle(cornerRadius: 10))
+            .background(AppColor.paperWarm.opacity(configuration.isPressed ? 0.95 : 0.72), in: RoundedRectangle(cornerRadius: 8))
+            .overlay {
+                RoundedRectangle(cornerRadius: 8)
+                    .stroke(AppColor.line.opacity(0.42), lineWidth: 1)
+            }
     }
 }
 

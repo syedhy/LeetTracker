@@ -175,6 +175,43 @@ struct WidgetDifficultyMetric: View {
     }
 }
 
+struct WidgetCompactDifficultyStrip: View {
+    let stats: WidgetStatsSnapshot
+
+    var body: some View {
+        HStack(spacing: LTWidgetSpacing.small) {
+            WidgetCompactDifficultyCount(value: stats.easySolved, tint: LTWidgetColor.easy)
+            WidgetCompactDifficultyCount(value: stats.mediumSolved, tint: LTWidgetColor.medium)
+            WidgetCompactDifficultyCount(value: stats.hardSolved, tint: LTWidgetColor.hard)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+}
+
+struct WidgetCompactDifficultyCount: View {
+    let value: Int
+    let tint: Color
+
+    var body: some View {
+        HStack(spacing: LTWidgetSpacing.compact) {
+            Circle()
+                .fill(tint)
+                .frame(width: LTWidgetSizing.compactDifficultyDot, height: LTWidgetSizing.compactDifficultyDot)
+
+            Text("\(value)")
+                .font(LTWidgetTypography.miniStatNumber)
+                .foregroundStyle(LTWidgetColor.primary)
+                .contentTransition(.numericText())
+                .lineLimit(1)
+                .minimumScaleFactor(0.7)
+        }
+        .padding(.horizontal, LTWidgetSpacing.small)
+        .padding(.vertical, LTWidgetSpacing.compact)
+        .frame(maxWidth: .infinity)
+        .background(tint.opacity(0.20), in: RoundedRectangle(cornerRadius: LTWidgetRadius.metric))
+    }
+}
+
 struct WidgetHeader: View {
     let style: WidgetDifficultySummary.Style
 

@@ -12,7 +12,7 @@ struct SmallWidgetView: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: LTWidgetSpacing.small) {
+        VStack(alignment: .leading, spacing: LTWidgetSpacing.medium) {
             HStack(alignment: .top, spacing: LTWidgetSpacing.medium) {
                 WidgetHeader(style: .compact)
 
@@ -26,27 +26,13 @@ struct SmallWidgetView: View {
                     .minimumScaleFactor(0.72)
             }
 
-            HStack(alignment: .firstTextBaseline) {
-                VStack(alignment: .leading, spacing: LTWidgetSpacing.xSmall) {
-                    Text(username)
-                        .font(LTWidgetTypography.compactUser)
-                        .foregroundStyle(LTWidgetColor.primary)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.74)
+            Text(username)
+                .font(LTWidgetTypography.compactUser)
+                .foregroundStyle(LTWidgetColor.primary)
+                .lineLimit(1)
+                .minimumScaleFactor(0.74)
 
-                    WidgetUpdatedText(date: stats.lastUpdated)
-                }
-
-                Spacer(minLength: LTWidgetSpacing.small)
-
-                Text("solved")
-                    .font(LTWidgetTypography.compactStatLabel)
-                    .foregroundStyle(LTWidgetColor.secondary)
-            }
-
-            WidgetDivider()
-
-            WidgetDifficultySummary(stats: stats, style: .compact)
+            WidgetCompactDifficultyStrip(stats: stats)
 
             Spacer(minLength: 0)
 
@@ -54,8 +40,7 @@ struct SmallWidgetView: View {
                 status
             }
         }
-        .padding(.horizontal, LTWidgetSpacing.medium)
-        .padding(.vertical, LTWidgetSpacing.small)
+        .padding(LTWidgetSpacing.large)
     }
 }
 
@@ -113,7 +98,6 @@ struct MediumWidgetView: View {
                 status
             }
         }
-        .padding(.horizontal, LTWidgetSpacing.mediumWidgetHorizontal)
-        .padding(.vertical, LTWidgetSpacing.mediumWidgetVertical)
+        .padding(LTWidgetSpacing.mediumWidgetPadding)
     }
 }

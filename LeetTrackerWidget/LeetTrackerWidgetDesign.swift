@@ -8,8 +8,7 @@ enum LTWidgetSpacing {
     static let medium: CGFloat = 8
     static let large: CGFloat = 12
     static let xLarge: CGFloat = 16
-    static let mediumWidgetHorizontal: CGFloat = 20
-    static let mediumWidgetVertical: CGFloat = 14
+    static let mediumWidgetPadding: CGFloat = 18
 }
 
 enum LTWidgetTypography {
@@ -21,6 +20,7 @@ enum LTWidgetTypography {
     static let mediumNumber = Font.system(size: 48, weight: .black, design: .rounded)
     static let statNumber = Font.system(size: 20, weight: .bold, design: .rounded)
     static let compactStatNumber = Font.system(size: 17, weight: .bold, design: .rounded)
+    static let miniStatNumber = Font.system(size: 15, weight: .bold, design: .rounded)
     static let label = Font.caption
     static let statLabel = Font.system(size: 14, weight: .medium, design: .default)
     static let compactStatLabel = Font.system(size: 11, weight: .medium, design: .default)

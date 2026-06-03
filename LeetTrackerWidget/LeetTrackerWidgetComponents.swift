@@ -42,19 +42,14 @@ struct WidgetContainer<Content: View>: View {
 
     var body: some View {
         content
-            .padding(LTWidgetSpacing.medium)
+            .padding(0)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
             .containerBackground(for: .widget) {
-                ZStack {
-                    LTWidgetColor.cardBackground
-                    WidgetDoodleBackdrop()
-                        .stroke(LTWidgetColor.primary.opacity(0.045), lineWidth: 1)
-                        .padding(4)
-                }
+                LTWidgetColor.cardBackground
             }
             .overlay {
                 RoundedRectangle(cornerRadius: LTWidgetRadius.metric)
-                    .stroke(LTWidgetColor.primary.opacity(0.14), lineWidth: 1)
+                    .stroke(LTWidgetColor.primary.opacity(0.10), lineWidth: 1)
             }
     }
 }
@@ -89,13 +84,33 @@ struct WidgetDoodleBackdrop: Shape {
 }
 
 struct WidgetDifficultySummary: View {
+    enum Style: Equatable {
+        case compact
+        case spacious
+
+        var spacing: CGFloat {
+            switch self {
+            case .compact:
+                return LTWidgetSpacing.small
+            case .spacious:
+                return LTWidgetSpacing.xLarge
+            }
+        }
+    }
+
     let stats: WidgetStatsSnapshot
+    let style: Style
+
+    init(stats: WidgetStatsSnapshot, style: Style = .spacious) {
+        self.stats = stats
+        self.style = style
+    }
 
     var body: some View {
-        HStack(alignment: .top, spacing: LTWidgetSpacing.medium) {
-            WidgetDifficultyMetric(title: "Easy", value: stats.easySolved, tint: LTWidgetColor.easy)
-            WidgetDifficultyMetric(title: "Medium", value: stats.mediumSolved, tint: LTWidgetColor.medium)
-            WidgetDifficultyMetric(title: "Hard", value: stats.hardSolved, tint: LTWidgetColor.hard)
+        HStack(alignment: .top, spacing: style.spacing) {
+            WidgetDifficultyMetric(title: "Easy", value: stats.easySolved, tint: LTWidgetColor.easy, style: style)
+            WidgetDifficultyMetric(title: "Medium", value: stats.mediumSolved, tint: LTWidgetColor.medium, style: style)
+            WidgetDifficultyMetric(title: "Hard", value: stats.hardSolved, tint: LTWidgetColor.hard, style: style)
         }
     }
 }
@@ -104,27 +119,51 @@ struct WidgetDifficultyMetric: View {
     let title: String
     let value: Int
     let tint: Color
+    let style: WidgetDifficultySummary.Style
+
+    private var dotSize: CGFloat {
+        style == .compact ? LTWidgetSizing.compactDifficultyDot : LTWidgetSizing.difficultyDot
+    }
+
+    private var labelFont: Font {
+        style == .compact ? LTWidgetTypography.compactStatLabel : LTWidgetTypography.statLabel
+    }
+
+    private var valueFont: Font {
+        style == .compact ? LTWidgetTypography.compactStatNumber : LTWidgetTypography.statNumber
+    }
+
+    private var badgeSize: CGSize {
+        switch style {
+        case .compact:
+            return CGSize(width: 36, height: 32)
+        case .spacious:
+            return CGSize(width: 52, height: 44)
+        }
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: LTWidgetSpacing.small) {
             HStack(spacing: LTWidgetSpacing.compact) {
                 Circle()
                     .fill(tint)
-                    .frame(width: LTWidgetSizing.difficultyDot, height: LTWidgetSizing.difficultyDot)
+                    .frame(width: dotSize, height: dotSize)
 
                 Text(title)
-                    .font(LTWidgetTypography.statLabel)
-                    .foregroundStyle(LTWidgetColor.secondary)
+                    .font(labelFont)
+                    .foregroundStyle(LTWidgetColor.primary)
                     .lineLimit(1)
-                    .minimumScaleFactor(0.78)
+                    .minimumScaleFactor(0.7)
             }
 
             Text("\(value)")
-                .font(LTWidgetTypography.statNumber)
+                .font(valueFont)
                 .contentTransition(.numericText())
                 .foregroundStyle(LTWidgetColor.primary)
                 .lineLimit(1)
                 .minimumScaleFactor(0.72)
+                .frame(width: badgeSize.width, height: badgeSize.height)
+                .background(tint.opacity(0.28), in: RoundedRectangle(cornerRadius: 9))
         }
         .padding(.vertical, LTWidgetSpacing.xSmall)
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -132,58 +171,79 @@ struct WidgetDifficultyMetric: View {
 }
 
 struct WidgetHeader: View {
-    let showMark: Bool
+    let style: WidgetDifficultySummary.Style
 
-    init(showMark: Bool = false) {
-        self.showMark = showMark
+    init(style: WidgetDifficultySummary.Style = .spacious) {
+        self.style = style
     }
 
-    @ViewBuilder
     var body: some View {
-        if showMark {
-            HStack(alignment: .center) {
-                WidgetBrandMark()
+        HStack(alignment: .center, spacing: style == .compact ? LTWidgetSpacing.small : LTWidgetSpacing.medium) {
+            WidgetBrandMark(style: style)
 
-                brandText
-
-                Spacer(minLength: LTWidgetSpacing.medium)
-            }
-        } else {
-            HStack(alignment: .center, spacing: LTWidgetSpacing.small) {
-                WidgetBrandMark()
-                brandText
-            }
+            Text("LeetTracker")
+                .font(style == .compact ? LTWidgetTypography.compactTitle : LTWidgetTypography.title)
+                .foregroundStyle(LTWidgetColor.brand)
+                .lineLimit(1)
         }
-    }
-
-    private var brandText: some View {
-        Text("LeetTracker")
-            .font(LTWidgetTypography.title)
-            .foregroundStyle(LTWidgetColor.brand)
-            .lineLimit(1)
     }
 }
 
 struct WidgetBrandMark: View {
+    let style: WidgetDifficultySummary.Style
+
+    private var markSize: CGFloat {
+        style == .compact ? LTWidgetSizing.compactBrandMark : LTWidgetSizing.brandMark
+    }
+
     var body: some View {
-        Image(systemName: "chevron.left.forwardslash.chevron.right")
-            .font(.system(size: 13, weight: .heavy))
-            .foregroundStyle(LTWidgetColor.primary)
-            .frame(width: LTWidgetSizing.brandMark, height: LTWidgetSizing.brandMark)
-            .overlay(alignment: .bottom) {
-                HStack(spacing: 2) {
-                    Circle()
-                        .fill(LTWidgetColor.easy)
-                    Circle()
-                        .fill(LTWidgetColor.medium)
-                    Circle()
-                        .fill(LTWidgetColor.hard)
-                }
-                .frame(width: 14, height: 3)
-                .offset(y: 3)
+        VStack(spacing: style == .compact ? 1 : 3) {
+            WidgetCodeMarkShape()
+                .fill(LTWidgetColor.primary)
+                .frame(width: markSize, height: markSize * 0.70)
+
+            HStack(spacing: style == .compact ? 2 : 3) {
+                Circle()
+                    .fill(LTWidgetColor.easy)
+                Circle()
+                    .fill(LTWidgetColor.medium)
+                Circle()
+                    .fill(LTWidgetColor.hard)
             }
-        .frame(width: LTWidgetSizing.brandMark, height: LTWidgetSizing.brandMark)
-        .rotationEffect(.degrees(-4))
+            .frame(width: markSize * 0.52, height: style == .compact ? 3 : 5)
+        }
+        .frame(width: markSize, height: markSize)
+    }
+}
+
+struct WidgetCodeMarkShape: Shape {
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        let lineWidth = rect.height * 0.25
+        let leftX = rect.minX + rect.width * 0.29
+        let rightX = rect.minX + rect.width * 0.71
+        let midY = rect.midY
+        let chevronHeight = rect.height * 0.30
+        let chevronWidth = rect.width * 0.17
+
+        var left = Path()
+        left.move(to: CGPoint(x: leftX, y: midY - chevronHeight))
+        left.addLine(to: CGPoint(x: leftX - chevronWidth, y: midY))
+        left.addLine(to: CGPoint(x: leftX, y: midY + chevronHeight))
+        path.addPath(left.strokedPath(StrokeStyle(lineWidth: lineWidth, lineCap: .round, lineJoin: .round)))
+
+        var slash = Path()
+        slash.move(to: CGPoint(x: rect.midX + rect.width * 0.07, y: rect.minY + rect.height * 0.12))
+        slash.addLine(to: CGPoint(x: rect.midX - rect.width * 0.07, y: rect.maxY - rect.height * 0.12))
+        path.addPath(slash.strokedPath(StrokeStyle(lineWidth: lineWidth, lineCap: .round, lineJoin: .round)))
+
+        var right = Path()
+        right.move(to: CGPoint(x: rightX, y: midY - chevronHeight))
+        right.addLine(to: CGPoint(x: rightX + chevronWidth, y: midY))
+        right.addLine(to: CGPoint(x: rightX, y: midY + chevronHeight))
+        path.addPath(right.strokedPath(StrokeStyle(lineWidth: lineWidth, lineCap: .round, lineJoin: .round)))
+
+        return path
     }
 }
 
@@ -245,7 +305,7 @@ struct WidgetEmptyStateView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: LTWidgetSpacing.large) {
-            WidgetHeader(showMark: true)
+            WidgetHeader()
 
             Spacer()
 
@@ -262,6 +322,7 @@ struct WidgetEmptyStateView: View {
                     .fixedSize(horizontal: false, vertical: true)
             }
         }
+        .padding(LTWidgetSpacing.xLarge)
     }
 }
 
@@ -271,7 +332,7 @@ struct WidgetErrorStateView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: LTWidgetSpacing.large) {
-            WidgetHeader(showMark: true)
+            WidgetHeader()
 
             Spacer()
 
@@ -290,13 +351,14 @@ struct WidgetErrorStateView: View {
                     .fixedSize(horizontal: false, vertical: true)
             }
         }
+        .padding(LTWidgetSpacing.xLarge)
     }
 }
 
 struct WidgetLoadingStateView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: LTWidgetSpacing.large) {
-            WidgetHeader(showMark: true)
+            WidgetHeader()
 
             Spacer()
 
@@ -320,5 +382,6 @@ struct WidgetLoadingStateView: View {
                 }
             }
         }
+        .padding(LTWidgetSpacing.xLarge)
     }
 }

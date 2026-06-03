@@ -4,19 +4,23 @@ enum LTWidgetSpacing {
     static let xSmall: CGFloat = 2
     static let compact: CGFloat = 4
     static let small: CGFloat = 6
-    static let medium: CGFloat = 8
-    static let large: CGFloat = 12
-    static let xLarge: CGFloat = 16
+    static let medium: CGFloat = 10
+    static let large: CGFloat = 14
+    static let xLarge: CGFloat = 20
 }
 
 enum LTWidgetTypography {
-    static let title = Font.caption.weight(.bold)
-    static let user = Font.subheadline.weight(.semibold)
-    static let primaryNumber = Font.system(size: 52, weight: .bold, design: .rounded)
-    static let mediumNumber = Font.system(size: 58, weight: .bold, design: .rounded)
-    static let statNumber = Font.system(size: 18, weight: .semibold, design: .rounded)
+    static let title = Font.system(size: 17, weight: .bold, design: .default)
+    static let compactTitle = Font.caption.weight(.bold)
+    static let user = Font.title3.weight(.semibold)
+    static let compactUser = Font.subheadline.weight(.semibold)
+    static let primaryNumber = Font.system(size: 50, weight: .black, design: .rounded)
+    static let mediumNumber = Font.system(size: 72, weight: .black, design: .rounded)
+    static let statNumber = Font.system(size: 30, weight: .bold, design: .rounded)
+    static let compactStatNumber = Font.system(size: 20, weight: .bold, design: .rounded)
     static let label = Font.caption
-    static let statLabel = Font.caption.weight(.medium)
+    static let statLabel = Font.callout.weight(.medium)
+    static let compactStatLabel = Font.caption.weight(.medium)
     static let stateTitle = Font.headline.weight(.semibold)
 }
 
@@ -24,7 +28,7 @@ enum LTWidgetColor {
     static let cardBackground = LinearGradient(
         colors: [
             Color(red: 0.992, green: 0.992, blue: 0.976),
-            Color(red: 0.960, green: 0.960, blue: 0.936)
+            Color(red: 0.974, green: 0.974, blue: 0.954)
         ],
         startPoint: .topLeading,
         endPoint: .bottomTrailing
@@ -43,8 +47,10 @@ enum LTWidgetColor {
 }
 
 enum LTWidgetSizing {
-    static let difficultyDot: CGFloat = 7
-    static let brandMark: CGFloat = 17
+    static let difficultyDot: CGFloat = 9
+    static let compactDifficultyDot: CGFloat = 7
+    static let brandMark: CGFloat = 34
+    static let compactBrandMark: CGFloat = 18
 }
 
 enum LTWidgetRadius {

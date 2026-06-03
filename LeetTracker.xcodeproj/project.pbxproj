@@ -24,6 +24,11 @@
 		111111111111111111111015 /* LeetTrackerWidgetComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 111111111111111111112015 /* LeetTrackerWidgetComponents.swift */; };
 		111111111111111111111017 /* LeetTrackerWidgetLayouts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 111111111111111111112017 /* LeetTrackerWidgetLayouts.swift */; };
 		111111111111111111111018 /* BackgroundRefreshRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 111111111111111111112018 /* BackgroundRefreshRunner.swift */; };
+		111111111111111111111019 /* AppTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 111111111111111111112019 /* AppTheme.swift */; };
+		111111111111111111111020 /* AppChrome.swift in Sources */ = {isa = PBXBuildFile; fileRef = 111111111111111111112020 /* AppChrome.swift */; };
+		111111111111111111111021 /* DashboardPanels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 111111111111111111112021 /* DashboardPanels.swift */; };
+		111111111111111111111022 /* AnalyticsPanels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 111111111111111111112022 /* AnalyticsPanels.swift */; };
+		111111111111111111111023 /* GoalPanels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 111111111111111111112023 /* GoalPanels.swift */; };
 		1BCFE48B2FCF8B3400138000 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1BCFE48A2FCF8B3400138000 /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
@@ -68,6 +73,11 @@
 		111111111111111111112015 /* LeetTrackerWidgetComponents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LeetTrackerWidgetComponents.swift; sourceTree = "<group>"; };
 		111111111111111111112017 /* LeetTrackerWidgetLayouts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LeetTrackerWidgetLayouts.swift; sourceTree = "<group>"; };
 		111111111111111111112018 /* BackgroundRefreshRunner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackgroundRefreshRunner.swift; sourceTree = "<group>"; };
+		111111111111111111112019 /* AppTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTheme.swift; sourceTree = "<group>"; };
+		111111111111111111112020 /* AppChrome.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppChrome.swift; sourceTree = "<group>"; };
+		111111111111111111112021 /* DashboardPanels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardPanels.swift; sourceTree = "<group>"; };
+		111111111111111111112022 /* AnalyticsPanels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsPanels.swift; sourceTree = "<group>"; };
+		111111111111111111112023 /* GoalPanels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalPanels.swift; sourceTree = "<group>"; };
 		111111111111111111113001 /* LeetTracker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LeetTracker.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		111111111111111111113002 /* LeetTrackerWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = LeetTrackerWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		1BCFE48A2FCF8B3400138000 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -145,6 +155,11 @@
 		111111111111111111118006 /* UI */ = {
 			isa = PBXGroup;
 			children = (
+				111111111111111111112019 /* AppTheme.swift */,
+				111111111111111111112020 /* AppChrome.swift */,
+				111111111111111111112021 /* DashboardPanels.swift */,
+				111111111111111111112022 /* AnalyticsPanels.swift */,
+				111111111111111111112023 /* GoalPanels.swift */,
 			);
 			path = UI;
 			sourceTree = "<group>";
@@ -298,6 +313,11 @@
 				111111111111111111111001 /* LeetTrackerApp.swift in Sources */,
 				111111111111111111111018 /* BackgroundRefreshRunner.swift in Sources */,
 				111111111111111111111002 /* ContentView.swift in Sources */,
+				111111111111111111111019 /* AppTheme.swift in Sources */,
+				111111111111111111111020 /* AppChrome.swift in Sources */,
+				111111111111111111111021 /* DashboardPanels.swift in Sources */,
+				111111111111111111111022 /* AnalyticsPanels.swift in Sources */,
+				111111111111111111111023 /* GoalPanels.swift in Sources */,
 				111111111111111111111006 /* SharedLeetTrackerStore.swift in Sources */,
 				111111111111111111111008 /* LeetCodeClient.swift in Sources */,
 				111111111111111111111009 /* LeetCodeStats.swift in Sources */,

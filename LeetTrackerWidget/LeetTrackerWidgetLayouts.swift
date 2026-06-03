@@ -56,7 +56,7 @@ struct MediumWidgetView: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: LTWidgetSpacing.medium) {
+        VStack(alignment: .leading, spacing: LTWidgetSpacing.large) {
             HStack(alignment: .top, spacing: LTWidgetSpacing.large) {
                 VStack(alignment: .leading, spacing: LTWidgetSpacing.medium) {
                     WidgetHeader(style: .spacious)
@@ -87,8 +87,6 @@ struct MediumWidgetView: View {
                         .foregroundStyle(LTWidgetColor.secondary)
                 }
             }
-
-            WidgetDivider()
 
             WidgetDifficultySummary(stats: stats, style: .spacious)
 

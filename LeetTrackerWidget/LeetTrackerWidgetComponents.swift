@@ -103,12 +103,35 @@ struct WidgetDifficultySummary: View {
     }
 
     var body: some View {
-        HStack(alignment: .top, spacing: style.spacing) {
-            WidgetDifficultyMetric(title: "Easy", value: stats.easySolved, tint: LTWidgetColor.easy, style: style)
-            WidgetDifficultyMetric(title: "Medium", value: stats.mediumSolved, tint: LTWidgetColor.medium, style: style)
-            WidgetDifficultyMetric(title: "Hard", value: stats.hardSolved, tint: LTWidgetColor.hard, style: style)
+        if style == .compact {
+            HStack(alignment: .top, spacing: style.spacing) {
+                WidgetDifficultyMetric(title: "Easy", value: stats.easySolved, tint: LTWidgetColor.easy, style: style)
+                WidgetDifficultyMetric(title: "Medium", value: stats.mediumSolved, tint: LTWidgetColor.medium, style: style)
+                WidgetDifficultyMetric(title: "Hard", value: stats.hardSolved, tint: LTWidgetColor.hard, style: style)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+        } else {
+            HStack(alignment: .top, spacing: 0) {
+                WidgetDifficultyMetric(
+                    title: "Easy",
+                    value: stats.easySolved,
+                    tint: LTWidgetColor.easy,
+                    style: style,
+                    metricAlignment: .leading,
+                    frameAlignment: .leading
+                )
+                WidgetDifficultyMetric(title: "Medium", value: stats.mediumSolved, tint: LTWidgetColor.medium, style: style)
+                WidgetDifficultyMetric(
+                    title: "Hard",
+                    value: stats.hardSolved,
+                    tint: LTWidgetColor.hard,
+                    style: style,
+                    metricAlignment: .trailing,
+                    frameAlignment: .trailing
+                )
+            }
+            .frame(maxWidth: .infinity)
         }
-        .frame(maxWidth: .infinity, alignment: style == .compact ? .leading : .center)
     }
 }
 
@@ -117,6 +140,24 @@ struct WidgetDifficultyMetric: View {
     let value: Int
     let tint: Color
     let style: WidgetDifficultySummary.Style
+    let metricAlignmentOverride: HorizontalAlignment?
+    let frameAlignmentOverride: Alignment?
+
+    init(
+        title: String,
+        value: Int,
+        tint: Color,
+        style: WidgetDifficultySummary.Style,
+        metricAlignment: HorizontalAlignment? = nil,
+        frameAlignment: Alignment? = nil
+    ) {
+        self.title = title
+        self.value = value
+        self.tint = tint
+        self.style = style
+        self.metricAlignmentOverride = metricAlignment
+        self.frameAlignmentOverride = frameAlignment
+    }
 
     private var dotSize: CGFloat {
         style == .compact ? LTWidgetSizing.compactDifficultyDot : LTWidgetSizing.difficultyDot
@@ -140,11 +181,19 @@ struct WidgetDifficultyMetric: View {
     }
 
     private var metricAlignment: HorizontalAlignment {
-        style == .compact ? .leading : .center
+        if let metricAlignmentOverride {
+            return metricAlignmentOverride
+        }
+
+        return style == .compact ? HorizontalAlignment.leading : HorizontalAlignment.center
     }
 
     private var frameAlignment: Alignment {
-        style == .compact ? .leading : .center
+        if let frameAlignmentOverride {
+            return frameAlignmentOverride
+        }
+
+        return style == .compact ? Alignment.leading : Alignment.center
     }
 
     var body: some View {

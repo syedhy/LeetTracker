@@ -97,8 +97,8 @@ final class ReminderScheduler {
         weeklyMix: String
     ) async throws {
         let content = UNMutableNotificationContent()
-        content.title = "LeetTracker practice"
-        content.body = "A small session for \(username): \(weeklyMix)."
+        content.title = "Small step, real progress"
+        content.body = "\(username), keep momentum warm with one focused session: \(weeklyMix)."
         content.sound = .default
 
         var dateComponents = DateComponents()
@@ -116,8 +116,8 @@ final class ReminderScheduler {
 
     private func scheduleWeeklyReview(settings: SharedGoalSettings) async throws {
         let content = UNMutableNotificationContent()
-        content.title = "LeetTracker weekly review"
-        content.body = "Check your goal pace and set the next small practice block."
+        content.title = "Reset your LeetCode week"
+        content.body = "Check your pace, celebrate what moved, and pick the next small win."
         content.sound = .default
 
         var dateComponents = DateComponents()

@@ -106,6 +106,52 @@ struct GoalPlanPanel: View {
     }
 }
 
+struct PracticePlanPanel: View {
+    let title: String
+    let subtitle: String
+    let rows: [(String, String)]
+    let tint: Color
+
+    var body: some View {
+        Panel {
+            VStack(alignment: .leading, spacing: 18) {
+                SectionHeader(title: "Practice Plan", systemImage: "calendar.badge.checkmark")
+
+                HStack(alignment: .top, spacing: 14) {
+                    Image(systemName: "list.clipboard.fill")
+                        .font(.title2.weight(.semibold))
+                        .foregroundStyle(tint)
+                        .frame(width: 42, height: 42)
+                        .background(AppColor.paperWarm.opacity(0.85), in: RoundedRectangle(cornerRadius: 8))
+                        .overlay {
+                            RoundedRectangle(cornerRadius: 8)
+                                .stroke(tint.opacity(0.52), lineWidth: 1)
+                        }
+
+                    VStack(alignment: .leading, spacing: 5) {
+                        Text(title)
+                            .font(.title3.weight(.semibold))
+                            .fixedSize(horizontal: false, vertical: true)
+
+                        Text(subtitle)
+                            .font(.callout)
+                            .foregroundStyle(.secondary)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                }
+
+                Divider()
+
+                VStack(alignment: .leading, spacing: 10) {
+                    ForEach(rows, id: \.0) { row in
+                        DetailRow(title: row.0, value: row.1)
+                    }
+                }
+            }
+        }
+    }
+}
+
 struct ReminderPlanPanel: View {
     let refreshText: String
     let remindersEnabled: Bool

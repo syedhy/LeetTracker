@@ -164,14 +164,23 @@ struct ContentView: View {
                         statusText: viewModel.goalStatusMessage,
                         saveAction: viewModel.saveGoalSettings
                     )
-                    .frame(width: 360)
+                    .frame(width: 340)
 
-                    GoalPlanPanel(
-                        title: viewModel.goalPlanTitle,
-                        subtitle: viewModel.goalPlanSubtitle,
-                        progress: viewModel.goalProgress,
-                        detailRows: viewModel.goalDetailRows
-                    )
+                    VStack(spacing: 20) {
+                        GoalPlanPanel(
+                            title: viewModel.goalPlanTitle,
+                            subtitle: viewModel.goalPlanSubtitle,
+                            progress: viewModel.goalProgress,
+                            detailRows: viewModel.goalDetailRows
+                        )
+
+                        PracticePlanPanel(
+                            title: viewModel.practicePlanTitle,
+                            subtitle: viewModel.practicePlanSubtitle,
+                            rows: viewModel.practicePlanRows,
+                            tint: viewModel.focusRecommendationTint
+                        )
+                    }
 
                     ReminderPlanPanel(
                         refreshText: viewModel.refreshCadenceText,
@@ -196,6 +205,13 @@ struct ContentView: View {
                         subtitle: viewModel.goalPlanSubtitle,
                         progress: viewModel.goalProgress,
                         detailRows: viewModel.goalDetailRows
+                    )
+
+                    PracticePlanPanel(
+                        title: viewModel.practicePlanTitle,
+                        subtitle: viewModel.practicePlanSubtitle,
+                        rows: viewModel.practicePlanRows,
+                        tint: viewModel.focusRecommendationTint
                     )
 
                     ReminderPlanPanel(
@@ -382,12 +398,22 @@ struct ContentView: View {
         ViewThatFits(in: .horizontal) {
             HStack(alignment: .top, spacing: 20) {
                 DifficultyBreakdownPanel(stats: viewModel.statsSnapshot)
-                GoalPlanPanel(
-                    title: viewModel.goalPlanTitle,
-                    subtitle: viewModel.goalPlanSubtitle,
-                    progress: viewModel.goalProgress,
-                    detailRows: viewModel.goalDetailRows
-                )
+
+                VStack(spacing: 20) {
+                    GoalPlanPanel(
+                        title: viewModel.goalPlanTitle,
+                        subtitle: viewModel.goalPlanSubtitle,
+                        progress: viewModel.goalProgress,
+                        detailRows: viewModel.goalDetailRows
+                    )
+
+                    PracticePlanPanel(
+                        title: viewModel.practicePlanTitle,
+                        subtitle: viewModel.practicePlanSubtitle,
+                        rows: viewModel.practicePlanRows,
+                        tint: viewModel.focusRecommendationTint
+                    )
+                }
             }
 
             VStack(spacing: 20) {
@@ -397,6 +423,12 @@ struct ContentView: View {
                     subtitle: viewModel.goalPlanSubtitle,
                     progress: viewModel.goalProgress,
                     detailRows: viewModel.goalDetailRows
+                )
+                PracticePlanPanel(
+                    title: viewModel.practicePlanTitle,
+                    subtitle: viewModel.practicePlanSubtitle,
+                    rows: viewModel.practicePlanRows,
+                    tint: viewModel.focusRecommendationTint
                 )
             }
         }
@@ -619,6 +651,58 @@ private final class LeetTrackerViewModel: ObservableObject {
         return weeks == 1 ? "1 week" : "\(weeks) weeks"
     }
 
+    var estimatedCompletionDateText: String {
+        guard let totalSolved = stats?.totalSolved else {
+            return "--"
+        }
+
+        let remaining = max(0, goalTargetValue - totalSolved)
+
+        guard remaining > 0 else {
+            return "Reached"
+        }
+
+        let weeks = Int(ceil(Double(remaining) / Double(max(1, weeklyTargetValue))))
+        let days = max(1, weeks * 7)
+        let completionDate = Calendar.current.date(byAdding: .day, value: days, to: Date()) ?? Date()
+        return DateFormatter.localizedString(from: completionDate, dateStyle: .medium, timeStyle: .none)
+    }
+
+    var dailyPaceText: String {
+        if weeklyTargetValue >= 7 {
+            let perDay = Double(weeklyTargetValue) / 7
+            return String(format: "%.1f per day", perDay)
+        }
+
+        let spacing = Int(ceil(7.0 / Double(max(1, weeklyTargetValue))))
+        return spacing <= 1 ? "1 per day" : "1 every \(spacing) days"
+    }
+
+    var weeklyPracticeMixText: String {
+        let easy = max(1, Int((Double(weeklyTargetValue) * 0.20).rounded(.down)))
+        let hard = weeklyTargetValue >= 5 ? 1 : 0
+        let medium = max(0, weeklyTargetValue - easy - hard)
+
+        if hard > 0 {
+            return "\(easy) Easy, \(medium) Medium, \(hard) Hard"
+        }
+
+        return "\(easy) Easy, \(medium) Medium"
+    }
+
+    var planIntensityText: String {
+        switch weeklyTargetValue {
+        case 1...3:
+            return "Light"
+        case 4...7:
+            return "Steady"
+        case 8...14:
+            return "Focused"
+        default:
+            return "Aggressive"
+        }
+    }
+
     var cacheStatusText: String {
         guard let lastUpdated = stats?.lastUpdated else {
             return "Empty"
@@ -641,7 +725,37 @@ private final class LeetTrackerViewModel: ObservableObject {
             ("Target", goalTargetDisplayText),
             ("Remaining", goalRemainingText),
             ("Weekly pace", "\(weeklyTargetValue) problems"),
-            ("ETA", estimatedWeeksText)
+            ("ETA", estimatedWeeksText),
+            ("Finish by", estimatedCompletionDateText)
+        ]
+    }
+
+    var practicePlanTitle: String {
+        guard stats != nil else {
+            return "Load a profile first"
+        }
+
+        return "\(weeklyTargetValue) problem\(weeklyTargetValue == 1 ? "" : "s") this week"
+    }
+
+    var practicePlanSubtitle: String {
+        guard let stats, stats.totalSolved > 0 else {
+            return "After your first refresh, the plan will turn your goal into a weekly practice target."
+        }
+
+        if max(0, goalTargetValue - stats.totalSolved) == 0 {
+            return "Your active target is complete. Set the next milestone to keep momentum visible."
+        }
+
+        return "\(dailyPaceText). \(focusRecommendationDetail)"
+    }
+
+    var practicePlanRows: [(String, String)] {
+        [
+            ("Daily pace", dailyPaceText),
+            ("Weekly mix", weeklyPracticeMixText),
+            ("Finish date", estimatedCompletionDateText),
+            ("Intensity", planIntensityText)
         ]
     }
 

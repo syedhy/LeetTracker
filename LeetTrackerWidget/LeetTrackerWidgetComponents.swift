@@ -47,10 +47,6 @@ struct WidgetContainer<Content: View>: View {
             .containerBackground(for: .widget) {
                 LTWidgetColor.cardBackground
             }
-            .overlay {
-                RoundedRectangle(cornerRadius: LTWidgetRadius.metric)
-                    .stroke(LTWidgetColor.primary.opacity(0.10), lineWidth: 1)
-            }
     }
 }
 
@@ -136,9 +132,9 @@ struct WidgetDifficultyMetric: View {
     private var badgeSize: CGSize {
         switch style {
         case .compact:
-            return CGSize(width: 36, height: 32)
+            return CGSize(width: 31, height: 25)
         case .spacious:
-            return CGSize(width: 52, height: 44)
+            return CGSize(width: 39, height: 28)
         }
     }
 
@@ -153,7 +149,7 @@ struct WidgetDifficultyMetric: View {
                     .font(labelFont)
                     .foregroundStyle(LTWidgetColor.primary)
                     .lineLimit(1)
-                    .minimumScaleFactor(0.7)
+                    .minimumScaleFactor(0.58)
             }
 
             Text("\(value)")
@@ -163,7 +159,7 @@ struct WidgetDifficultyMetric: View {
                 .lineLimit(1)
                 .minimumScaleFactor(0.72)
                 .frame(width: badgeSize.width, height: badgeSize.height)
-                .background(tint.opacity(0.28), in: RoundedRectangle(cornerRadius: 9))
+                .background(tint.opacity(0.24), in: RoundedRectangle(cornerRadius: 8))
         }
         .padding(.vertical, LTWidgetSpacing.xSmall)
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -185,6 +181,7 @@ struct WidgetHeader: View {
                 .font(style == .compact ? LTWidgetTypography.compactTitle : LTWidgetTypography.title)
                 .foregroundStyle(LTWidgetColor.brand)
                 .lineLimit(1)
+                .minimumScaleFactor(0.65)
         }
     }
 }

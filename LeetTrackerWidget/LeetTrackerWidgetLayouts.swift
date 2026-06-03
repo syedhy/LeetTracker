@@ -12,7 +12,7 @@ struct SmallWidgetView: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: LTWidgetSpacing.medium) {
+        VStack(alignment: .leading, spacing: LTWidgetSpacing.small) {
             HStack(alignment: .top, spacing: LTWidgetSpacing.medium) {
                 WidgetHeader(style: .compact)
 
@@ -54,7 +54,8 @@ struct SmallWidgetView: View {
                 status
             }
         }
-        .padding(LTWidgetSpacing.large)
+        .padding(.horizontal, LTWidgetSpacing.medium)
+        .padding(.vertical, LTWidgetSpacing.small)
     }
 }
 
@@ -70,9 +71,9 @@ struct MediumWidgetView: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: LTWidgetSpacing.xLarge) {
-            HStack(alignment: .top, spacing: LTWidgetSpacing.xLarge) {
-                VStack(alignment: .leading, spacing: LTWidgetSpacing.large) {
+        VStack(alignment: .leading, spacing: LTWidgetSpacing.medium) {
+            HStack(alignment: .top, spacing: LTWidgetSpacing.large) {
+                VStack(alignment: .leading, spacing: LTWidgetSpacing.medium) {
                     WidgetHeader(style: .spacious)
 
                     VStack(alignment: .leading, spacing: LTWidgetSpacing.compact) {
@@ -88,7 +89,7 @@ struct MediumWidgetView: View {
 
                 Spacer(minLength: LTWidgetSpacing.medium)
 
-                VStack(alignment: .trailing, spacing: LTWidgetSpacing.medium) {
+                VStack(alignment: .trailing, spacing: LTWidgetSpacing.compact) {
                     Text("\(stats.totalSolved)")
                         .font(LTWidgetTypography.mediumNumber)
                         .foregroundStyle(LTWidgetColor.primary)
@@ -110,6 +111,7 @@ struct MediumWidgetView: View {
                 status
             }
         }
-        .padding(LTWidgetSpacing.xLarge)
+        .padding(.horizontal, LTWidgetSpacing.xLarge)
+        .padding(.vertical, LTWidgetSpacing.large)
     }
 }

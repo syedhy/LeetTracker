@@ -4,31 +4,31 @@ enum LTWidgetSpacing {
     static let xSmall: CGFloat = 2
     static let compact: CGFloat = 4
     static let small: CGFloat = 6
-    static let medium: CGFloat = 10
-    static let large: CGFloat = 14
-    static let xLarge: CGFloat = 20
+    static let medium: CGFloat = 8
+    static let large: CGFloat = 12
+    static let xLarge: CGFloat = 16
 }
 
 enum LTWidgetTypography {
-    static let title = Font.system(size: 17, weight: .bold, design: .default)
-    static let compactTitle = Font.caption.weight(.bold)
-    static let user = Font.title3.weight(.semibold)
-    static let compactUser = Font.subheadline.weight(.semibold)
-    static let primaryNumber = Font.system(size: 50, weight: .black, design: .rounded)
-    static let mediumNumber = Font.system(size: 72, weight: .black, design: .rounded)
-    static let statNumber = Font.system(size: 30, weight: .bold, design: .rounded)
-    static let compactStatNumber = Font.system(size: 20, weight: .bold, design: .rounded)
+    static let title = Font.system(size: 14, weight: .bold, design: .default)
+    static let compactTitle = Font.system(size: 10, weight: .bold, design: .default)
+    static let user = Font.system(size: 16, weight: .semibold, design: .default)
+    static let compactUser = Font.system(size: 13, weight: .semibold, design: .default)
+    static let primaryNumber = Font.system(size: 40, weight: .black, design: .rounded)
+    static let mediumNumber = Font.system(size: 48, weight: .black, design: .rounded)
+    static let statNumber = Font.system(size: 20, weight: .bold, design: .rounded)
+    static let compactStatNumber = Font.system(size: 17, weight: .bold, design: .rounded)
     static let label = Font.caption
-    static let statLabel = Font.callout.weight(.medium)
-    static let compactStatLabel = Font.caption.weight(.medium)
+    static let statLabel = Font.system(size: 14, weight: .medium, design: .default)
+    static let compactStatLabel = Font.system(size: 11, weight: .medium, design: .default)
     static let stateTitle = Font.headline.weight(.semibold)
 }
 
 enum LTWidgetColor {
     static let cardBackground = LinearGradient(
         colors: [
-            Color(red: 0.992, green: 0.992, blue: 0.976),
-            Color(red: 0.974, green: 0.974, blue: 0.954)
+            Color(red: 0.998, green: 0.998, blue: 0.990),
+            Color(red: 0.990, green: 0.990, blue: 0.978)
         ],
         startPoint: .topLeading,
         endPoint: .bottomTrailing
@@ -49,8 +49,8 @@ enum LTWidgetColor {
 enum LTWidgetSizing {
     static let difficultyDot: CGFloat = 9
     static let compactDifficultyDot: CGFloat = 7
-    static let brandMark: CGFloat = 34
-    static let compactBrandMark: CGFloat = 18
+    static let brandMark: CGFloat = 22
+    static let compactBrandMark: CGFloat = 15
 }
 
 enum LTWidgetRadius {

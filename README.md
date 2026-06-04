@@ -13,11 +13,12 @@ This app is still in active development. The widget, goal settings, reminders, d
 When a release is published:
 
 1. Open the repository's **Releases** page.
-2. Download the latest `LeetTracker.app.zip`.
+2. Download the latest `LeetTracker-macOS.zip`.
 3. Unzip it.
 4. Move `LeetTracker.app` to `/Applications`.
 5. Open the app once, enter your LeetCode username, and press **Refresh**.
 6. Add the LeetTracker widget from macOS **Edit Widgets**.
+7. Double-click **Install Background Refresh.command** if you want the widget to refresh while the app window is closed.
 
 If macOS warns that the app was downloaded from the internet, open **System Settings > Privacy & Security** and allow LeetTracker.
 
@@ -52,6 +53,14 @@ To install the built app into `/Applications`, build a Release version and copy 
 xcodebuild -scheme LeetTracker -configuration Release -derivedDataPath build CODE_SIGN_STYLE=Automatic build
 ditto --rsrc --extattr build/Build/Products/Release/LeetTracker.app /Applications/LeetTracker.app
 ```
+
+To create the same zip format used for GitHub releases:
+
+```zsh
+scripts/package-release.sh
+```
+
+The packaged zip is written to `dist/LeetTracker-macOS.zip`.
 
 ## Widget Setup
 
@@ -103,9 +112,11 @@ LeetTracker uses public LeetCode profile information only. It does not scrape pr
 ## Roadmap
 
 - Publish packaged GitHub releases for one-click downloads
+- Publish a Homebrew Cask as the recommended installation path
+- Move background refresh setup into the app settings screen
+- Add signing and notarization notes for public macOS distribution
 - Add clearer onboarding for first-time users
 - Improve analytics with more useful goal and difficulty visualizations
 - Add more widget types
 - Make reminder and goal planning more flexible
 - Add a polished release checklist and troubleshooting section
-

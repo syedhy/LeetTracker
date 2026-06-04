@@ -6,6 +6,7 @@ enum AppSection: String, CaseIterable, Identifiable {
     case dashboard = "Dashboard"
     case analytics = "Analytics"
     case goals = "Goals"
+    case planner = "Planner"
     case widgets = "Widgets"
     case settings = "Settings"
 
@@ -19,6 +20,8 @@ enum AppSection: String, CaseIterable, Identifiable {
             return "chart.xyaxis.line"
         case .goals:
             return "target"
+        case .planner:
+            return "calendar.badge.checkmark"
         case .widgets:
             return "square.grid.2x2"
         case .settings:
@@ -63,6 +66,8 @@ struct ContentView: View {
             analyticsPage
         case .goals:
             goalsPage
+        case .planner:
+            plannerPage
         case .widgets:
             widgetsPage
         case .settings:
@@ -81,6 +86,8 @@ struct ContentView: View {
                 analyticsDetail: viewModel.analyticsDashboardSummaryDetail,
                 reminderTitle: viewModel.reminderDashboardSummaryTitle,
                 reminderDetail: viewModel.reminderDashboardSummaryDetail,
+                plannerTitle: viewModel.plannerDashboardSummaryTitle,
+                plannerDetail: viewModel.plannerDashboardSummaryDetail,
                 widgetTitle: viewModel.widgetDashboardSummaryTitle,
                 widgetDetail: viewModel.widgetDashboardSummaryDetail
             )
@@ -364,6 +371,70 @@ struct ContentView: View {
         .frame(maxWidth: 1320, alignment: .leading)
     }
 
+    private var plannerPage: some View {
+        VStack(alignment: .leading, spacing: 24) {
+            pageHeader(
+                title: "Planner",
+                subtitle: "Turn the saved goal into a week you can actually finish.",
+                systemImage: "calendar.badge.checkmark"
+            )
+
+            PlannerOverviewPanel(
+                weekTitle: viewModel.plannerWeekTitle,
+                completedCount: viewModel.plannerCompletedCount,
+                sessionCount: viewModel.plannerSessions.count,
+                nextSessionText: viewModel.plannerNextSessionText,
+                progress: viewModel.plannerProgress,
+                resetAction: viewModel.resetPlannerWeek
+            )
+
+            WeeklyPlannerBoard(
+                sessions: viewModel.plannerSessions,
+                completedIDs: viewModel.completedPlannerSessionIDs,
+                toggleAction: viewModel.togglePlannerSession
+            )
+
+            ViewThatFits(in: .horizontal) {
+                HStack(alignment: .top, spacing: 20) {
+                    PlannerGuidePanel(
+                        mixText: viewModel.plannerMixText,
+                        targetText: viewModel.plannerGoalDistanceText,
+                        paceText: viewModel.plannerPaceText,
+                        reminderText: viewModel.plannerReminderTimeText
+                    )
+                    .frame(maxWidth: .infinity)
+
+                    ReminderPlanPanel(
+                        refreshText: viewModel.refreshCadenceText,
+                        remindersEnabled: viewModel.plannerRemindersEnabled,
+                        reminderTimeText: viewModel.plannerReminderTimeText,
+                        weeklyReviewText: viewModel.plannerWeeklyReviewText,
+                        permissionText: viewModel.reminderPermissionText
+                    )
+                    .frame(minWidth: 300, idealWidth: 340, maxWidth: 380)
+                }
+
+                VStack(spacing: 20) {
+                    PlannerGuidePanel(
+                        mixText: viewModel.plannerMixText,
+                        targetText: viewModel.plannerGoalDistanceText,
+                        paceText: viewModel.plannerPaceText,
+                        reminderText: viewModel.plannerReminderTimeText
+                    )
+
+                    ReminderPlanPanel(
+                        refreshText: viewModel.refreshCadenceText,
+                        remindersEnabled: viewModel.plannerRemindersEnabled,
+                        reminderTimeText: viewModel.plannerReminderTimeText,
+                        weeklyReviewText: viewModel.plannerWeeklyReviewText,
+                        permissionText: viewModel.reminderPermissionText
+                    )
+                }
+            }
+        }
+        .frame(maxWidth: 1320, alignment: .leading)
+    }
+
     private var settingsPage: some View {
         VStack(alignment: .leading, spacing: 24) {
             pageHeader(
@@ -635,22 +706,26 @@ private final class LeetTrackerViewModel: ObservableObject {
     @Published private(set) var statusMessage = "Enter a LeetCode username to prepare tracking."
     @Published private(set) var goalStatusMessage = "Goal settings are ready."
     @Published private(set) var reminderPermissionText = "Notifications not requested yet."
+    @Published private(set) var completedPlannerSessionIDs: Set<String> = []
     @Published private(set) var isLoading = false
 
     private let client: LeetCodeClient
     private let sharedStore: SharedLeetTrackerStore
     private let reminderScheduler: ReminderScheduler
+    private let plannerDefaults: UserDefaults
     private var savedGoalSettings = SharedGoalSettings.default
     private var hasSavedGoalSettings = false
 
     init(
         client: LeetCodeClient = LeetCodeClient(),
         sharedStore: SharedLeetTrackerStore = SharedLeetTrackerStore(),
-        reminderScheduler: ReminderScheduler = ReminderScheduler()
+        reminderScheduler: ReminderScheduler = ReminderScheduler(),
+        plannerDefaults: UserDefaults = .standard
     ) {
         self.client = client
         self.sharedStore = sharedStore
         self.reminderScheduler = reminderScheduler
+        self.plannerDefaults = plannerDefaults
     }
 
     var trimmedUsername: String {
@@ -735,6 +810,18 @@ private final class LeetTrackerViewModel: ObservableObject {
 
     var reminderDashboardSummaryDetail: String {
         remindersEnabled ? "Daily reminder · weekly review" : "No practice reminders scheduled"
+    }
+
+    var plannerDashboardSummaryTitle: String {
+        "\(plannerCompletedCount)/\(plannerSessions.count) sessions"
+    }
+
+    var plannerDashboardSummaryDetail: String {
+        guard let nextSession = plannerSessions.first(where: { !completedPlannerSessionIDs.contains($0.id) }) else {
+            return plannerSessions.isEmpty ? "Set a weekly mix to generate the board" : "Weekly board complete"
+        }
+
+        return "Next \(nextSession.dayText) · \(nextSession.difficulty.rawValue)"
     }
 
     var widgetDashboardSummaryTitle: String {
@@ -855,6 +942,76 @@ private final class LeetTrackerViewModel: ObservableObject {
         }
 
         return "\(easy) Easy, \(medium) Medium"
+    }
+
+    var plannerSessions: [PlannerSession] {
+        let targets = difficultyTargets(from: savedGoalSettings)
+        return WeeklyPlannerFactory.makeSessions(
+            easy: targets.easy,
+            medium: targets.medium,
+            hard: targets.hard
+        )
+    }
+
+    var plannerMixText: String {
+        let targets = difficultyTargets(from: savedGoalSettings)
+        return difficultyMixText(easy: targets.easy, medium: targets.medium, hard: targets.hard)
+    }
+
+    var plannerPaceText: String {
+        paceText(for: savedGoalSettings.weeklyTarget)
+    }
+
+    var plannerRemindersEnabled: Bool {
+        savedGoalSettings.remindersEnabled
+    }
+
+    var plannerReminderTimeText: String {
+        guard savedGoalSettings.remindersEnabled else {
+            return "Off"
+        }
+
+        let date = reminderDate(hour: savedGoalSettings.reminderHour, minute: savedGoalSettings.reminderMinute)
+        return formattedTime(date)
+    }
+
+    var plannerWeeklyReviewText: String {
+        savedGoalSettings.remindersEnabled ? "Sundays at \(plannerReminderTimeText)" : "Off"
+    }
+
+    var plannerGoalDistanceText: String {
+        guard let totalSolved = stats?.totalSolved else {
+            return "Refresh profile"
+        }
+
+        let remaining = max(0, savedGoalSettings.targetSolved - totalSolved)
+        return remaining == 0 ? "Goal reached" : "\(remaining) problems left"
+    }
+
+    var plannerWeekTitle: String {
+        WeeklyPlannerFactory.weekTitle()
+    }
+
+    var plannerCompletedCount: Int {
+        plannerSessions.filter { completedPlannerSessionIDs.contains($0.id) }.count
+    }
+
+    var plannerProgress: Double {
+        guard !plannerSessions.isEmpty else {
+            return 0
+        }
+
+        return Double(plannerCompletedCount) / Double(plannerSessions.count)
+    }
+
+    var plannerNextSessionText: String {
+        guard let nextSession = plannerSessions.first(where: { !completedPlannerSessionIDs.contains($0.id) }) else {
+            return plannerSessions.isEmpty
+                ? "Set weekly difficulty targets in Goals to generate your practice board."
+                : "This week's board is complete. Review the goal before planning the next week."
+        }
+
+        return "Next: \(nextSession.dayText) · \(nextSession.difficulty.sessionTitle) · \(nextSession.difficulty.rawValue)"
     }
 
     var analyticsHeroTitle: String {
@@ -1208,10 +1365,7 @@ private final class LeetTrackerViewModel: ObservableObject {
     }
 
     var reminderTimeText: String {
-        let formatter = DateFormatter()
-        formatter.timeStyle = .short
-        formatter.dateStyle = .none
-        return formatter.string(from: reminderTime)
+        formattedTime(reminderTime)
     }
 
     var weeklyReviewReminderText: String {
@@ -1226,6 +1380,7 @@ private final class LeetTrackerViewModel: ObservableObject {
             status: snapshot.hasGoalSettings ? "Goal loaded." : "Suggested a starting goal."
         )
         syncReminderPermissionStatus()
+        loadPlannerCompletion()
 
         if let savedUsername = snapshot.username {
             username = savedUsername
@@ -1265,6 +1420,22 @@ private final class LeetTrackerViewModel: ObservableObject {
         hasSavedGoalSettings = true
         applyGoalSettings(settings, status: "Saved goal for \(target) solved.")
         updateReminderSchedule(settings, statusPrefix: "Saved goal for \(target) solved.")
+        removePlannerCompletionsNotInCurrentPlan()
+    }
+
+    func togglePlannerSession(_ id: String) {
+        if completedPlannerSessionIDs.contains(id) {
+            completedPlannerSessionIDs.remove(id)
+        } else {
+            completedPlannerSessionIDs.insert(id)
+        }
+
+        savePlannerCompletion()
+    }
+
+    func resetPlannerWeek() {
+        completedPlannerSessionIDs.removeAll()
+        savePlannerCompletion()
     }
 
     func refreshStats() async -> Bool {
@@ -1448,6 +1619,24 @@ private final class LeetTrackerViewModel: ObservableObject {
         return (easy, medium, hard)
     }
 
+    private func difficultyMixText(easy: Int, medium: Int, hard: Int) -> String {
+        if hard > 0 {
+            return "\(easy) Easy, \(medium) Medium, \(hard) Hard"
+        }
+
+        return "\(easy) Easy, \(medium) Medium"
+    }
+
+    private func paceText(for weeklyTarget: Int) -> String {
+        if weeklyTarget >= 7 {
+            let perDay = Double(weeklyTarget) / 7
+            return String(format: "%.1f per day", perDay)
+        }
+
+        let spacing = Int(ceil(7.0 / Double(max(1, weeklyTarget))))
+        return spacing <= 1 ? "1 per day" : "1 every \(spacing) days"
+    }
+
     private func reminderDate(hour: Int, minute: Int) -> Date {
         Calendar.current.date(
             bySettingHour: min(23, max(0, hour)),
@@ -1459,5 +1648,38 @@ private final class LeetTrackerViewModel: ObservableObject {
 
     private func formatted(_ date: Date) -> String {
         DateFormatter.localizedString(from: date, dateStyle: .medium, timeStyle: .short)
+    }
+
+    private func formattedTime(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.timeStyle = .short
+        formatter.dateStyle = .none
+        return formatter.string(from: date)
+    }
+
+    private var plannerCompletionKey: String {
+        "com.hyder.LeetTracker.planner.completed.\(WeeklyPlannerFactory.weekIdentifier())"
+    }
+
+    private func loadPlannerCompletion() {
+        let savedIDs = plannerDefaults.stringArray(forKey: plannerCompletionKey) ?? []
+        completedPlannerSessionIDs = Set(savedIDs)
+        removePlannerCompletionsNotInCurrentPlan()
+    }
+
+    private func savePlannerCompletion() {
+        plannerDefaults.set(Array(completedPlannerSessionIDs).sorted(), forKey: plannerCompletionKey)
+    }
+
+    private func removePlannerCompletionsNotInCurrentPlan() {
+        let validIDs = Set(plannerSessions.map(\.id))
+        let filteredIDs = completedPlannerSessionIDs.intersection(validIDs)
+
+        guard filteredIDs != completedPlannerSessionIDs else {
+            return
+        }
+
+        completedPlannerSessionIDs = filteredIDs
+        savePlannerCompletion()
     }
 }

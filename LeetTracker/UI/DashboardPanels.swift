@@ -7,6 +7,8 @@ struct DashboardCommandCenterPanel: View {
     let analyticsDetail: String
     let reminderTitle: String
     let reminderDetail: String
+    let plannerTitle: String
+    let plannerDetail: String
     let widgetTitle: String
     let widgetDetail: String
 
@@ -42,6 +44,14 @@ struct DashboardCommandCenterPanel: View {
                         )
 
                         DashboardSignalTile(
+                            title: "Planner",
+                            value: plannerTitle,
+                            detail: plannerDetail,
+                            systemImage: "calendar.badge.checkmark",
+                            tint: AppColor.ink
+                        )
+
+                        DashboardSignalTile(
                             title: "Widget",
                             value: widgetTitle,
                             detail: widgetDetail,
@@ -54,6 +64,7 @@ struct DashboardCommandCenterPanel: View {
                         DashboardSignalTile(title: "Target", value: goalTitle, detail: goalDetail, systemImage: "target", tint: AppColor.ink)
                         DashboardSignalTile(title: "Analytics", value: analyticsTitle, detail: analyticsDetail, systemImage: "chart.xyaxis.line", tint: AppColor.ink)
                         DashboardSignalTile(title: "Reminders", value: reminderTitle, detail: reminderDetail, systemImage: "bell.badge", tint: AppColor.medium)
+                        DashboardSignalTile(title: "Planner", value: plannerTitle, detail: plannerDetail, systemImage: "calendar.badge.checkmark", tint: AppColor.ink)
                         DashboardSignalTile(title: "Widget", value: widgetTitle, detail: widgetDetail, systemImage: "square.grid.2x2", tint: AppColor.ink)
                     }
                 }

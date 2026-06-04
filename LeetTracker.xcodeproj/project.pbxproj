@@ -31,6 +31,7 @@
 		111111111111111111111023 /* GoalPanels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 111111111111111111112023 /* GoalPanels.swift */; };
 		111111111111111111111024 /* ReminderScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 111111111111111111112024 /* ReminderScheduler.swift */; };
 		111111111111111111111025 /* AnalyticsInsightPanels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 111111111111111111112025 /* AnalyticsInsightPanels.swift */; };
+		111111111111111111111026 /* PlannerPanels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 111111111111111111112026 /* PlannerPanels.swift */; };
 		1BCFE48B2FCF8B3400138000 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1BCFE48A2FCF8B3400138000 /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
@@ -82,6 +83,7 @@
 		111111111111111111112023 /* GoalPanels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalPanels.swift; sourceTree = "<group>"; };
 		111111111111111111112024 /* ReminderScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReminderScheduler.swift; sourceTree = "<group>"; };
 		111111111111111111112025 /* AnalyticsInsightPanels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsInsightPanels.swift; sourceTree = "<group>"; };
+		111111111111111111112026 /* PlannerPanels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlannerPanels.swift; sourceTree = "<group>"; };
 		111111111111111111113001 /* LeetTracker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LeetTracker.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		111111111111111111113002 /* LeetTrackerWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = LeetTrackerWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		1BCFE48A2FCF8B3400138000 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -166,6 +168,7 @@
 				111111111111111111112022 /* AnalyticsPanels.swift */,
 				111111111111111111112025 /* AnalyticsInsightPanels.swift */,
 				111111111111111111112023 /* GoalPanels.swift */,
+				111111111111111111112026 /* PlannerPanels.swift */,
 			);
 			path = UI;
 			sourceTree = "<group>";
@@ -326,6 +329,7 @@
 				111111111111111111111022 /* AnalyticsPanels.swift in Sources */,
 				111111111111111111111025 /* AnalyticsInsightPanels.swift in Sources */,
 				111111111111111111111023 /* GoalPanels.swift in Sources */,
+				111111111111111111111026 /* PlannerPanels.swift in Sources */,
 				111111111111111111111006 /* SharedLeetTrackerStore.swift in Sources */,
 				111111111111111111111008 /* LeetCodeClient.swift in Sources */,
 				111111111111111111111009 /* LeetCodeStats.swift in Sources */,

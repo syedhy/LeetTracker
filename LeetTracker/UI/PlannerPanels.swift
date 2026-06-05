@@ -285,10 +285,10 @@ struct PlannerSessionCard: View {
             .frame(maxWidth: .infinity, minHeight: 164, alignment: .topLeading)
             .background(
                 isCompleted ? AppColor.paperWarm.opacity(0.38) : AppColor.paperWarm.opacity(0.68),
-                in: RoundedRectangle(cornerRadius: 8)
+                in: RoundedRectangle(cornerRadius: 15)
             )
             .overlay {
-                RoundedRectangle(cornerRadius: 8)
+                RoundedRectangle(cornerRadius: 15)
                     .stroke(isCompleted ? AppColor.line.opacity(0.16) : AppColor.line.opacity(0.3), lineWidth: 1)
             }
             .animation(.easeOut(duration: 0.16), value: isCompleted)

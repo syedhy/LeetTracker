@@ -15,19 +15,19 @@ struct AnalyticsHeroPanel: View {
     var body: some View {
         Panel {
             VStack(alignment: .leading, spacing: 20) {
-                SectionHeader(title: "Practice Map", systemImage: "chart.line.uptrend.xyaxis")
+                SectionHeader(title: "Practice Compass", systemImage: "scope")
 
                 ViewThatFits(in: .horizontal) {
                     HStack(alignment: .center, spacing: 24) {
-                        heroGraph
-                            .frame(minWidth: 360, idealWidth: 520, maxWidth: .infinity)
+                        compassSummary
+                            .frame(minWidth: 360, idealWidth: 560, maxWidth: .infinity)
 
                         heroCopy
                             .frame(minWidth: 300, idealWidth: 380, maxWidth: 440)
                     }
 
                     VStack(alignment: .leading, spacing: 20) {
-                        heroGraph
+                        compassSummary
                         heroCopy
                     }
                 }
@@ -35,45 +35,23 @@ struct AnalyticsHeroPanel: View {
         }
     }
 
-    private var heroGraph: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            HStack(alignment: .top, spacing: 18) {
-                VStack(alignment: .leading, spacing: 4) {
-                    HStack(alignment: .lastTextBaseline, spacing: 8) {
-                        Text(stats.map { "\($0.totalSolved)" } ?? "--")
-                            .font(.system(size: 52, weight: .semibold, design: .rounded))
-                            .monospacedDigit()
-
-                        Text("solved")
-                            .font(.title3.weight(.medium))
-                            .foregroundStyle(.secondary)
-                    }
-
-                    Text("Goal runway")
-                        .font(.caption.weight(.semibold))
-                        .foregroundStyle(.secondary)
+    private var compassSummary: some View {
+        VStack(alignment: .leading, spacing: 18) {
+            ViewThatFits(in: .horizontal) {
+                HStack(spacing: 12) {
+                    AnalyticsCompassMetric(title: "Solved", value: stats.map { "\($0.totalSolved)" } ?? "--", detail: "Public profile")
+                    AnalyticsCompassMetric(title: "Health", value: "\(score)", detail: "Local signal")
+                    AnalyticsCompassMetric(title: "Remaining", value: remainingText, detail: "To target")
                 }
 
-                Spacer()
-
-                VStack(alignment: .trailing, spacing: 4) {
-                    Text("\(score)")
-                        .font(.system(size: 34, weight: .semibold, design: .rounded))
-                        .monospacedDigit()
-
-                    Text("practice health")
-                        .font(.caption.weight(.semibold))
-                        .foregroundStyle(.secondary)
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: 140), spacing: 12)], spacing: 12) {
+                    AnalyticsCompassMetric(title: "Solved", value: stats.map { "\($0.totalSolved)" } ?? "--", detail: "Public profile")
+                    AnalyticsCompassMetric(title: "Health", value: "\(score)", detail: "Local signal")
+                    AnalyticsCompassMetric(title: "Remaining", value: remainingText, detail: "To target")
                 }
             }
 
-            GoalRunwayLineGraph(
-                stats: stats,
-                targetSolved: targetSolved,
-                weeklyTarget: weeklyTarget,
-                rows: rows
-            )
-                .frame(height: 210)
+            DifficultyMixCards(rows: rows)
 
             HStack(spacing: 10) {
                 AnalyticsHeroBadge(title: "Target", value: "\(targetSolved)")
@@ -134,6 +112,46 @@ struct AnalyticsHeroPanel: View {
             return AppColor.ink
         }
     }
+
+    private var remainingText: String {
+        guard let total = stats?.totalSolved else {
+            return "--"
+        }
+
+        return "\(max(0, targetSolved - total))"
+    }
+}
+
+struct AnalyticsCompassMetric: View {
+    let title: String
+    let value: String
+    let detail: String
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(title)
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(.secondary)
+
+            Text(value)
+                .font(.system(size: 42, weight: .black, design: .rounded))
+                .monospacedDigit()
+                .lineLimit(1)
+                .minimumScaleFactor(0.7)
+
+            Text(detail)
+                .font(.caption.weight(.medium))
+                .foregroundStyle(.secondary)
+                .lineLimit(1)
+        }
+        .padding(16)
+        .frame(maxWidth: .infinity, minHeight: 126, alignment: .leading)
+        .background(AppColor.paperWarm.opacity(0.62), in: RoundedRectangle(cornerRadius: 16))
+        .overlay {
+            RoundedRectangle(cornerRadius: 16)
+                .stroke(AppColor.line.opacity(0.18), lineWidth: 1.1)
+        }
+    }
 }
 
 struct AnalyticsHeroBadge: View {
@@ -155,10 +173,10 @@ struct AnalyticsHeroBadge: View {
         .padding(.horizontal, 12)
         .padding(.vertical, 10)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(AppColor.paperWarm.opacity(0.62), in: RoundedRectangle(cornerRadius: 8))
+        .background(AppColor.paperWarm.opacity(0.72), in: RoundedRectangle(cornerRadius: 13))
         .overlay {
-            RoundedRectangle(cornerRadius: 8)
-                .stroke(AppColor.line.opacity(0.22), lineWidth: 1)
+            RoundedRectangle(cornerRadius: 13)
+                .stroke(AppColor.line.opacity(0.16), lineWidth: 1)
         }
     }
 }

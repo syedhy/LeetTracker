@@ -2,9 +2,10 @@ import SwiftUI
 
 struct AppSidebar: View {
     @Binding var selectedSection: AppSection
+    @Binding var isSidebarVisible: Bool
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 18) {
+        VStack(alignment: .leading, spacing: 20) {
             HStack(spacing: 12) {
                 AppIconMark()
                     .frame(width: 38, height: 38)
@@ -17,25 +18,27 @@ struct AppSidebar: View {
                         .font(.caption)
                         .foregroundStyle(.secondary)
                 }
+
+                Spacer()
+
+                Button {
+                    withAnimation(.snappy(duration: 0.18)) {
+                        isSidebarVisible = false
+                    }
+                } label: {
+                    Image(systemName: "sidebar.left")
+                }
+                .buttonStyle(DoodleIconButtonStyle(size: 34))
+                .help("Hide sidebar")
             }
             .padding(.bottom, 8)
 
             VStack(spacing: 6) {
                 ForEach(AppSection.allCases) { section in
-                    Button {
-                        selectedSection = section
-                    } label: {
-                        HStack(spacing: 10) {
-                            Image(systemName: section.systemImage)
-                                .frame(width: 18)
-
-                            Text(section.rawValue)
-                                .lineLimit(1)
-
-                            Spacer()
-                        }
-                    }
-                    .buttonStyle(SidebarButtonStyle(isSelected: selectedSection == section))
+                    SidebarSectionButton(
+                        section: section,
+                        selectedSection: $selectedSection
+                    )
                 }
             }
 
@@ -57,19 +60,75 @@ struct AppSidebar: View {
             }
             .padding(12)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(AppColor.paper, in: RoundedRectangle(cornerRadius: 8))
+            .background(AppColor.paper, in: RoundedRectangle(cornerRadius: 10))
             .overlay {
-                RoundedRectangle(cornerRadius: 8)
-                    .stroke(AppColor.line.opacity(0.32), lineWidth: 1)
+                RoundedRectangle(cornerRadius: 10)
+                    .stroke(AppColor.line.opacity(0.42), lineWidth: 1.4)
             }
         }
-        .padding(20)
-        .frame(width: 214)
-        .background(AppColor.paperWarm.opacity(0.82))
+        .padding(22)
+        .frame(width: 236)
+        .background(AppColor.paperWarm.opacity(0.88))
         .overlay(alignment: .trailing) {
             Rectangle()
-                .fill(AppColor.line.opacity(0.16))
-                .frame(width: 1)
+                .fill(AppColor.line.opacity(0.18))
+                .frame(width: 1.4)
+        }
+    }
+}
+
+struct SidebarSectionButton: View {
+    let section: AppSection
+    @Binding var selectedSection: AppSection
+    @State private var isHovered = false
+
+    private var isSelected: Bool {
+        selectedSection == section
+    }
+
+    var body: some View {
+        Button {
+            withAnimation(.snappy(duration: 0.16)) {
+                selectedSection = section
+            }
+        } label: {
+            HStack(spacing: 10) {
+                Image(systemName: section.systemImage)
+                    .frame(width: 18)
+
+                Text(section.rawValue)
+                    .lineLimit(1)
+
+                Spacer()
+            }
+            .padding(.horizontal, 12)
+            .frame(maxWidth: .infinity, minHeight: 40, alignment: .leading)
+            .contentShape(RoundedRectangle(cornerRadius: 10))
+            .background(
+                AppColor.ink.opacity(isSelected ? 0.1 : (isHovered ? 0.085 : 0)),
+                in: RoundedRectangle(cornerRadius: 10)
+            )
+            .overlay(alignment: .leading) {
+                if isSelected {
+                    RoundedRectangle(cornerRadius: 2)
+                        .fill(AppColor.ink)
+                        .frame(width: 4, height: 22)
+                }
+            }
+            .overlay {
+                if isHovered, !isSelected {
+                    RoundedRectangle(cornerRadius: 10)
+                        .stroke(AppColor.line.opacity(0.3), lineWidth: 1.15)
+                }
+            }
+        }
+        .buttonStyle(.plain)
+        .font(.callout.weight(isSelected ? .semibold : .regular))
+        .foregroundStyle(isSelected ? .primary : .secondary)
+        .onHover { hovering in
+            withAnimation(.snappy(duration: 0.12)) {
+                isHovered = hovering
+            }
         }
     }
 }
@@ -82,18 +141,32 @@ struct SidebarButtonStyle: ButtonStyle {
             .font(.callout.weight(isSelected ? .semibold : .regular))
             .foregroundStyle(isSelected ? .primary : .secondary)
             .padding(.horizontal, 12)
-            .frame(height: 36)
+            .frame(height: 40)
             .background(
-                isSelected ? AppColor.ink.opacity(configuration.isPressed ? 0.12 : 0.08) : .clear,
-                in: RoundedRectangle(cornerRadius: 8)
+                isSelected ? AppColor.ink.opacity(configuration.isPressed ? 0.13 : 0.08) : .clear,
+                in: RoundedRectangle(cornerRadius: 10)
             )
             .overlay(alignment: .leading) {
                 if isSelected {
-                    Rectangle()
+                    RoundedRectangle(cornerRadius: 2)
                         .fill(AppColor.ink)
-                        .frame(width: 3, height: 18)
+                        .frame(width: 4, height: 22)
                 }
             }
+            .scaleEffect(configuration.isPressed ? 0.985 : 1)
+            .animation(.snappy(duration: 0.12), value: configuration.isPressed)
+    }
+}
+
+struct FloatingSidebarToggle: View {
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            Image(systemName: "sidebar.left")
+        }
+        .buttonStyle(DoodleIconButtonStyle(size: 42))
+        .help("Show sidebar")
     }
 }
 
@@ -125,14 +198,24 @@ struct Panel<Content: View>: View {
 
     var body: some View {
         content
-            .padding(20)
+            .padding(24)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(AppColor.paper.opacity(0.94), in: RoundedRectangle(cornerRadius: 8))
+            .background(
+                LinearGradient(
+                    colors: [
+                        AppColor.paper.opacity(0.985),
+                        AppColor.paperWarm.opacity(0.92)
+                    ],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                ),
+                in: RoundedRectangle(cornerRadius: 18)
+            )
             .overlay {
-                RoundedRectangle(cornerRadius: 8)
-                    .stroke(AppColor.line.opacity(0.32), lineWidth: 1.1)
+                RoundedRectangle(cornerRadius: 18)
+                    .stroke(AppColor.line.opacity(0.28), lineWidth: 1.15)
             }
-            .shadow(color: AppColor.ink.opacity(0.018), radius: 3, y: 2)
+            .shadow(color: AppColor.ink.opacity(0.018), radius: 2, x: 1, y: 2)
     }
 }
 
@@ -194,8 +277,10 @@ struct PrimaryActionButtonStyle: ButtonStyle {
             .font(.callout.weight(.semibold))
             .foregroundStyle(.white)
             .padding(.horizontal, 14)
-            .frame(height: 36)
-            .background(AppColor.ink.opacity(isEnabled ? (configuration.isPressed ? 0.74 : 1) : 0.42), in: RoundedRectangle(cornerRadius: 8))
+            .frame(height: 38)
+            .background(AppColor.ink.opacity(isEnabled ? (configuration.isPressed ? 0.74 : 1) : 0.42), in: RoundedRectangle(cornerRadius: 10))
+            .scaleEffect(configuration.isPressed ? 0.98 : 1)
+            .animation(.snappy(duration: 0.12), value: configuration.isPressed)
     }
 }
 
@@ -207,11 +292,73 @@ struct SecondaryActionButtonStyle: ButtonStyle {
             .font(.callout.weight(.semibold))
             .foregroundStyle(isEnabled ? .primary : .secondary)
             .padding(.horizontal, 14)
-            .frame(height: 36)
-            .background(AppColor.paperWarm.opacity(configuration.isPressed ? 0.95 : 0.72), in: RoundedRectangle(cornerRadius: 8))
+            .frame(height: 38)
+            .background(AppColor.paperWarm.opacity(configuration.isPressed ? 0.95 : 0.72), in: RoundedRectangle(cornerRadius: 10))
             .overlay {
-                RoundedRectangle(cornerRadius: 8)
-                    .stroke(AppColor.line.opacity(0.36), lineWidth: 1)
+                RoundedRectangle(cornerRadius: 10)
+                    .stroke(AppColor.line.opacity(0.46), lineWidth: 1.2)
             }
+            .scaleEffect(configuration.isPressed ? 0.98 : 1)
+            .animation(.snappy(duration: 0.12), value: configuration.isPressed)
+    }
+}
+
+struct DoodleIconButtonStyle: ButtonStyle {
+    let size: CGFloat
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .font(.body.weight(.semibold))
+            .foregroundStyle(AppColor.ink)
+            .frame(width: size, height: size)
+            .background(AppColor.paper, in: Circle())
+            .overlay {
+                Circle()
+                    .stroke(AppColor.ink.opacity(0.78), lineWidth: 1.6)
+            }
+            .shadow(color: AppColor.ink.opacity(0.07), radius: 3, x: 2, y: 2)
+            .scaleEffect(configuration.isPressed ? 0.94 : 1)
+            .animation(.snappy(duration: 0.12), value: configuration.isPressed)
+    }
+}
+
+struct PracticeModePicker: View {
+    @Binding var selectedMode: PracticeMode
+
+    var body: some View {
+        HStack(spacing: 8) {
+            ForEach(PracticeMode.allCases) { mode in
+                Button {
+                    withAnimation(.snappy(duration: 0.16)) {
+                        selectedMode = mode
+                    }
+                } label: {
+                    Label(mode.rawValue, systemImage: mode.systemImage)
+                        .frame(minWidth: 112)
+                }
+                .buttonStyle(PracticeModeButtonStyle(isSelected: selectedMode == mode))
+            }
+
+            Spacer(minLength: 0)
+        }
+    }
+}
+
+struct PracticeModeButtonStyle: ButtonStyle {
+    let isSelected: Bool
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .font(.callout.weight(.semibold))
+            .foregroundStyle(isSelected ? AppColor.paper : AppColor.ink)
+            .padding(.horizontal, 14)
+            .frame(height: 42)
+            .background(isSelected ? AppColor.ink : AppColor.paper, in: RoundedRectangle(cornerRadius: 10))
+            .overlay {
+                RoundedRectangle(cornerRadius: 10)
+                    .stroke(AppColor.ink.opacity(isSelected ? 1 : 0.5), lineWidth: 1.5)
+            }
+            .scaleEffect(configuration.isPressed ? 0.98 : 1)
+            .animation(.snappy(duration: 0.12), value: configuration.isPressed)
     }
 }

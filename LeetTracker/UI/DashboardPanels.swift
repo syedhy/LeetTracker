@@ -1,5 +1,190 @@
 import SwiftUI
 
+struct DashboardHeroBoard: View {
+    let total: String
+    let username: String
+    let lastUpdated: String
+    let focusTitle: String
+    let focusDetail: String
+
+    var body: some View {
+        Panel {
+            ViewThatFits(in: .horizontal) {
+                HStack(alignment: .center, spacing: 28) {
+                    heroCopy
+                        .frame(minWidth: 340, idealWidth: 520, maxWidth: .infinity, alignment: .leading)
+
+                    scoreSheet
+                        .frame(minWidth: 300, idealWidth: 380, maxWidth: 460)
+                }
+
+                VStack(alignment: .leading, spacing: 22) {
+                    heroCopy
+                    scoreSheet
+                }
+            }
+        }
+        .frame(minHeight: 408)
+    }
+
+    private var heroCopy: some View {
+        VStack(alignment: .leading, spacing: 22) {
+            HStack(alignment: .center, spacing: 22) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Practice")
+                        .font(.system(size: 52, weight: .black, design: .rounded))
+                        .lineLimit(1)
+
+                    Text("Lab")
+                        .font(.system(size: 52, weight: .black, design: .rounded))
+                        .lineLimit(1)
+                }
+
+                PracticePulseSketch()
+                    .frame(width: 176, height: 134)
+                    .padding(.leading, 4)
+            }
+
+            HStack(spacing: 10) {
+                Text(username)
+                    .font(.title3.weight(.semibold))
+                    .lineLimit(1)
+
+                Circle()
+                    .fill(AppColor.ink.opacity(0.42))
+                    .frame(width: 5, height: 5)
+
+                Text(lastUpdated)
+                    .font(.callout.weight(.medium))
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.82)
+            }
+        }
+    }
+
+    private var scoreSheet: some View {
+        VStack(alignment: .leading, spacing: 18) {
+            HStack(alignment: .firstTextBaseline) {
+                Text(total)
+                    .font(.system(size: 78, weight: .black, design: .rounded))
+                    .monospacedDigit()
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.65)
+
+                Text("solved")
+                    .font(.title2.weight(.semibold))
+                    .foregroundStyle(.secondary)
+
+                Spacer()
+            }
+
+            HStack(alignment: .top, spacing: 12) {
+                Image(systemName: "arrow.up.right.circle.fill")
+                    .font(.title2.weight(.semibold))
+                    .foregroundStyle(focusTint)
+                    .frame(width: 42, height: 42)
+                    .background(AppColor.paper, in: Circle())
+                    .overlay {
+                        Circle()
+                            .stroke(focusTint.opacity(0.6), lineWidth: 1.6)
+                    }
+
+                VStack(alignment: .leading, spacing: 5) {
+                    Text(focusTitle)
+                        .font(.headline.weight(.semibold))
+                        .fixedSize(horizontal: false, vertical: true)
+
+                    Text(focusDetail)
+                        .font(.callout)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(3)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+        }
+        .padding(20)
+        .background(AppColor.paperWarm.opacity(0.54), in: RoundedRectangle(cornerRadius: 12))
+        .overlay {
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(AppColor.line.opacity(0.28), lineWidth: 1.2)
+        }
+    }
+
+    private var focusTint: Color {
+        switch focusTitle {
+        case "Add one Hard":
+            return AppColor.hard
+        case "Lean into Medium":
+            return AppColor.medium
+        case "Finish the goal":
+            return AppColor.easy
+        default:
+            return AppColor.ink
+        }
+    }
+}
+
+struct PracticePulseSketch: View {
+    var body: some View {
+        ZStack {
+            PracticeArc()
+                .stroke(
+                    AppColor.ink,
+                    style: StrokeStyle(lineWidth: 5, lineCap: .round, lineJoin: .round)
+                )
+                .frame(width: 142, height: 92)
+                .rotationEffect(.degrees(-4))
+                .offset(y: 8)
+
+            AppIconMark()
+                .frame(width: 72, height: 72)
+                .scaleEffect(1.08)
+                .offset(x: -44, y: -12)
+
+            PracticeNode(tint: AppColor.easy, systemImage: "checkmark")
+                .offset(x: 46, y: -32)
+
+            PracticeNode(tint: AppColor.medium, systemImage: "arrow.up.right")
+                .offset(x: 64, y: 22)
+
+            PracticeNode(tint: AppColor.hard, systemImage: "flame")
+                .offset(x: -8, y: 46)
+        }
+    }
+}
+
+struct PracticeNode: View {
+    let tint: Color
+    let systemImage: String
+
+    var body: some View {
+        Image(systemName: systemImage)
+            .font(.system(size: 17, weight: .black, design: .rounded))
+            .foregroundStyle(AppColor.ink)
+            .frame(width: 42, height: 42)
+            .background(tint.opacity(0.88), in: Circle())
+            .overlay {
+                Circle()
+                    .stroke(AppColor.ink, lineWidth: 2.8)
+            }
+            .shadow(color: AppColor.ink.opacity(0.12), radius: 0, x: 4, y: 4)
+    }
+}
+
+struct PracticeArc: Shape {
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        path.move(to: CGPoint(x: rect.minX + rect.width * 0.12, y: rect.midY))
+        path.addCurve(
+            to: CGPoint(x: rect.maxX - rect.width * 0.08, y: rect.midY + rect.height * 0.03),
+            control1: CGPoint(x: rect.minX + rect.width * 0.34, y: rect.minY + rect.height * 0.04),
+            control2: CGPoint(x: rect.minX + rect.width * 0.64, y: rect.maxY - rect.height * 0.08)
+        )
+        return path
+    }
+}
+
 struct DashboardCommandCenterPanel: View {
     let goalTitle: String
     let goalDetail: String
@@ -15,10 +200,19 @@ struct DashboardCommandCenterPanel: View {
     var body: some View {
         Panel {
             VStack(alignment: .leading, spacing: 16) {
-                SectionHeader(title: "Command Center", systemImage: "sparkle.magnifyingglass")
+                HStack(alignment: .firstTextBaseline) {
+                    SectionHeader(title: "Quick Reads", systemImage: "sparkle.magnifyingglass")
+
+                    Spacer()
+
+                    Text("scan before practice")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(.secondary)
+                        .textCase(.uppercase)
+                }
 
                 ViewThatFits(in: .horizontal) {
-                    HStack(spacing: 12) {
+                    HStack(spacing: 10) {
                         DashboardSignalTile(
                             title: "Target",
                             value: goalTitle,
@@ -60,7 +254,7 @@ struct DashboardCommandCenterPanel: View {
                         )
                     }
 
-                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 210), spacing: 12)], spacing: 12) {
+                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 190), spacing: 10)], spacing: 10) {
                         DashboardSignalTile(title: "Target", value: goalTitle, detail: goalDetail, systemImage: "target", tint: AppColor.ink)
                         DashboardSignalTile(title: "Analytics", value: analyticsTitle, detail: analyticsDetail, systemImage: "chart.xyaxis.line", tint: AppColor.ink)
                         DashboardSignalTile(title: "Reminders", value: reminderTitle, detail: reminderDetail, systemImage: "bell.badge", tint: AppColor.medium)
@@ -85,12 +279,12 @@ struct DashboardSignalTile: View {
             HStack(spacing: 8) {
                 Image(systemName: systemImage)
                     .font(.callout.weight(.semibold))
-                    .foregroundStyle(tint)
-                    .frame(width: 24, height: 24)
-                    .background(AppColor.paper, in: RoundedRectangle(cornerRadius: 6))
+                    .foregroundStyle(AppColor.ink)
+                    .frame(width: 28, height: 28)
+                    .background(AppColor.paper, in: Circle())
                     .overlay {
-                        RoundedRectangle(cornerRadius: 6)
-                            .stroke(tint.opacity(0.34), lineWidth: 1)
+                        Circle()
+                            .stroke(tint.opacity(0.58), lineWidth: 1.4)
                     }
 
                 Text(title)
@@ -112,11 +306,11 @@ struct DashboardSignalTile: View {
                 .fixedSize(horizontal: false, vertical: true)
         }
         .padding(14)
-        .frame(maxWidth: .infinity, minHeight: 116, alignment: .leading)
-        .background(AppColor.paperWarm.opacity(0.56), in: RoundedRectangle(cornerRadius: 8))
+        .frame(maxWidth: .infinity, minHeight: 102, alignment: .leading)
+        .background(tint.opacity(tint == AppColor.ink ? 0.035 : 0.09), in: RoundedRectangle(cornerRadius: 14))
         .overlay {
-            RoundedRectangle(cornerRadius: 8)
-                .stroke(AppColor.line.opacity(0.22), lineWidth: 1)
+            RoundedRectangle(cornerRadius: 14)
+                .stroke(tint.opacity(tint == AppColor.ink ? 0.2 : 0.44), lineWidth: 1.1)
         }
     }
 }
@@ -131,7 +325,7 @@ struct TotalSolvedCard: View {
             HStack(alignment: .top) {
                 VStack(alignment: .leading, spacing: 4) {
                     Text(username)
-                        .font(.headline)
+                        .font(.title3.weight(.semibold))
                         .foregroundStyle(AppColor.paper.opacity(0.76))
                         .lineLimit(1)
 
@@ -142,9 +336,12 @@ struct TotalSolvedCard: View {
 
                 Spacer()
 
-                Image(systemName: "checkmark.seal.fill")
-                    .font(.title2)
-                    .foregroundStyle(AppColor.paper)
+                VStack(spacing: 5) {
+                    Circle().fill(AppColor.easy)
+                    Circle().fill(AppColor.medium)
+                    Circle().fill(AppColor.hard)
+                }
+                .frame(width: 8, height: 30)
             }
 
             HStack(alignment: .lastTextBaseline, spacing: 8) {
@@ -170,10 +367,10 @@ struct TotalSolvedCard: View {
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
             ),
-            in: RoundedRectangle(cornerRadius: 8)
+            in: RoundedRectangle(cornerRadius: 12)
         )
         .overlay {
-            RoundedRectangle(cornerRadius: 8)
+            RoundedRectangle(cornerRadius: 12)
                 .stroke(AppColor.line, lineWidth: 1.2)
         }
     }
@@ -200,9 +397,9 @@ struct DifficultyCard: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(14)
-        .background(AppColor.paperWarm.opacity(0.8), in: RoundedRectangle(cornerRadius: 8))
+        .background(AppColor.paperWarm.opacity(0.8), in: RoundedRectangle(cornerRadius: 10))
         .overlay {
-            RoundedRectangle(cornerRadius: 8)
+            RoundedRectangle(cornerRadius: 10)
                 .stroke(tint.opacity(0.64), lineWidth: 1.2)
         }
     }
@@ -232,9 +429,9 @@ struct StatusPanel: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
         }
         .padding(14)
-        .background(AppColor.paperWarm.opacity(0.75), in: RoundedRectangle(cornerRadius: 8))
+        .background(AppColor.paperWarm.opacity(0.75), in: RoundedRectangle(cornerRadius: 10))
         .overlay {
-            RoundedRectangle(cornerRadius: 8)
+            RoundedRectangle(cornerRadius: 10)
                 .stroke(AppColor.line.opacity(0.3), lineWidth: 1)
         }
     }

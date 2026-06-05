@@ -5,5 +5,7 @@ import SwiftUI
 struct LeetTrackerWidgetBundle: WidgetBundle {
     var body: some Widget {
         LeetTrackerWidget()
+        LeetTrackerMotivationWidget()
+        LeetTrackerGoalPaceWidget()
     }
 }

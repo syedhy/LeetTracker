@@ -331,7 +331,7 @@ struct ContentView: View {
         VStack(alignment: .leading, spacing: 24) {
             pageHeader(
                 title: "Widgets",
-                subtitle: "The desktop should show useful progress without opening the app.",
+                subtitle: "Three desktop cards for progress, motivation, and goal pace.",
                 systemImage: "square.grid.2x2"
             )
 

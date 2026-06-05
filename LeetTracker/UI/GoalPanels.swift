@@ -15,23 +15,40 @@ struct GoalEditorPanel: View {
 
     var body: some View {
         Panel {
-            VStack(alignment: .leading, spacing: 20) {
+            VStack(alignment: .leading, spacing: 18) {
                 SectionHeader(title: "Set Goal", systemImage: "slider.horizontal.3")
 
-                LazyVGrid(
-                    columns: [GridItem(.adaptive(minimum: 150), spacing: 12)],
-                    alignment: .leading,
-                    spacing: 12
-                ) {
+                HStack(alignment: .bottom, spacing: 12) {
                     GoalField(title: "Target solved", text: $targetText, systemImage: "target")
-                    GoalField(title: "Weekly total", text: $weeklyTargetText, systemImage: "calendar")
+                        .frame(maxWidth: .infinity)
+
+                    VStack(alignment: .leading, spacing: 6) {
+                        Label("Weekly pace", systemImage: "calendar")
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(.secondary)
+
+                        Text(weeklyDifficultyTotalText)
+                            .font(.title3.weight(.semibold))
+                            .monospacedDigit()
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.72)
+                            .padding(.horizontal, 12)
+                            .frame(maxWidth: .infinity, minHeight: 40, alignment: .leading)
+                            .background(AppColor.paperWarm.opacity(0.58), in: RoundedRectangle(cornerRadius: 13))
+                            .overlay {
+                                RoundedRectangle(cornerRadius: 13)
+                                    .stroke(AppColor.line.opacity(0.28), lineWidth: 1)
+                            }
+                    }
+                    .frame(maxWidth: .infinity)
                 }
 
                 DifficultyGoalGrid(
                     easyText: $weeklyEasyTargetText,
                     mediumText: $weeklyMediumTargetText,
                     hardText: $weeklyHardTargetText,
-                    projectedMixText: projectedMixText
+                    projectedMixText: projectedMixText,
+                    totalText: weeklyDifficultyTotalText
                 )
 
                 ReminderGoalCard(
@@ -41,19 +58,34 @@ struct GoalEditorPanel: View {
 
                 HStack(alignment: .center, spacing: 10) {
                     Button(action: saveAction) {
-                        Label("Save Goal", systemImage: "checkmark.circle.fill")
+                        Label("Save", systemImage: "checkmark.circle.fill")
                     }
                     .buttonStyle(PrimaryActionButtonStyle())
 
                     Text(statusText)
                         .font(.caption)
                         .foregroundStyle(.secondary)
-                        .lineLimit(2)
+                        .lineLimit(1)
                         .minimumScaleFactor(0.8)
                 }
             }
         }
     }
+
+    private var weeklyDifficultyTotalText: String {
+        let total = [
+            Int(weeklyEasyTargetText.filter(\.isNumber)) ?? 0,
+            Int(weeklyMediumTargetText.filter(\.isNumber)) ?? 0,
+            Int(weeklyHardTargetText.filter(\.isNumber)) ?? 0
+        ].reduce(0, +)
+
+        guard total > 0 else {
+            return "Set a weekly mix"
+        }
+
+        return "\(total)/week"
+    }
+
 }
 
 struct GoalField: View {
@@ -88,6 +120,7 @@ struct DifficultyGoalGrid: View {
     @Binding var hardText: String
 
     let projectedMixText: String
+    let totalText: String
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -98,22 +131,35 @@ struct DifficultyGoalGrid: View {
 
                 Spacer()
 
-                Text(projectedMixText)
+                Text(totalText)
                     .font(.caption.weight(.medium))
                     .foregroundStyle(.secondary)
                     .lineLimit(1)
                     .minimumScaleFactor(0.72)
             }
 
-            LazyVGrid(
-                columns: [GridItem(.adaptive(minimum: 104), spacing: 10)],
-                alignment: .leading,
-                spacing: 10
-            ) {
-                DifficultyGoalField(title: "Easy", text: $easyText, tint: AppColor.easy)
-                DifficultyGoalField(title: "Medium", text: $mediumText, tint: AppColor.medium)
-                DifficultyGoalField(title: "Hard", text: $hardText, tint: AppColor.hard)
+            ViewThatFits(in: .horizontal) {
+                HStack(alignment: .top, spacing: 10) {
+                    DifficultyGoalField(title: "Easy", text: $easyText, tint: AppColor.easy)
+                    DifficultyGoalField(title: "Medium", text: $mediumText, tint: AppColor.medium)
+                    DifficultyGoalField(title: "Hard", text: $hardText, tint: AppColor.hard)
+                }
+
+                LazyVGrid(
+                    columns: [GridItem(.adaptive(minimum: 128), spacing: 10)],
+                    alignment: .leading,
+                    spacing: 10
+                ) {
+                    DifficultyGoalField(title: "Easy", text: $easyText, tint: AppColor.easy)
+                    DifficultyGoalField(title: "Medium", text: $mediumText, tint: AppColor.medium)
+                    DifficultyGoalField(title: "Hard", text: $hardText, tint: AppColor.hard)
+                }
             }
+
+            Text(projectedMixText)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .fixedSize(horizontal: false, vertical: true)
         }
         .padding(14)
         .background(AppColor.paperWarm.opacity(0.48), in: RoundedRectangle(cornerRadius: 15))
@@ -138,6 +184,8 @@ struct DifficultyGoalField: View {
 
                 Text(title)
                     .font(.caption.weight(.semibold))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.72)
             }
 
             TextField(title, text: $text)
@@ -151,6 +199,81 @@ struct DifficultyGoalField: View {
                     RoundedRectangle(cornerRadius: 13)
                         .stroke(tint.opacity(0.42), lineWidth: 1)
                 }
+        }
+        .frame(minWidth: 0, maxWidth: .infinity)
+    }
+}
+
+struct GoalWeekPreviewPanel: View {
+    let title: String
+    let subtitle: String
+    let rows: [(String, String)]
+    let nextSession: String
+    let reminderText: String
+
+    var body: some View {
+        Panel {
+            VStack(alignment: .leading, spacing: 16) {
+                SectionHeader(title: "This Week", systemImage: "calendar.badge.checkmark")
+
+                HStack(alignment: .center, spacing: 14) {
+                    Image(systemName: "arrow.up.right.circle.fill")
+                        .font(.title2.weight(.semibold))
+                        .foregroundStyle(AppColor.medium)
+                        .frame(width: 42, height: 42)
+                        .background(AppColor.paperWarm.opacity(0.85), in: Circle())
+
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(title)
+                            .font(.title3.weight(.semibold))
+
+                        Text(subtitle)
+                            .font(.callout)
+                            .foregroundStyle(.secondary)
+                            .lineLimit(2)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                }
+
+                HStack(alignment: .top, spacing: 10) {
+                    GoalWeekMiniTile(title: "Next", value: nextSession, tint: AppColor.ink)
+                    GoalWeekMiniTile(title: "Reminder", value: reminderText, tint: AppColor.medium)
+
+                    ForEach(rows.prefix(2), id: \.0) { row in
+                        GoalWeekMiniTile(title: row.0, value: row.1, tint: AppColor.ink)
+                    }
+                }
+            }
+        }
+    }
+}
+
+struct GoalWeekMiniTile: View {
+    let title: String
+    let value: String
+    let tint: Color
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Circle()
+                .fill(tint)
+                .frame(width: 8, height: 8)
+
+            Text(title)
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(.secondary)
+
+            Text(value)
+                .font(.callout.weight(.semibold))
+                .lineLimit(2)
+                .minimumScaleFactor(0.72)
+        }
+        .padding(12)
+        .frame(maxWidth: .infinity, minHeight: 86, alignment: .topLeading)
+        .background(AppColor.paperWarm.opacity(0.54), in: RoundedRectangle(cornerRadius: 14))
+        .overlay {
+            RoundedRectangle(cornerRadius: 14)
+                .stroke(AppColor.line.opacity(0.16), lineWidth: 1)
         }
     }
 }
@@ -175,10 +298,10 @@ struct ReminderGoalCard: View {
 
             HStack(alignment: .center, spacing: 12) {
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(remindersEnabled ? "Daily focus nudge" : "Reminders paused")
+                    Text(remindersEnabled ? "Daily nudge" : "Reminders off")
                         .font(.callout.weight(.semibold))
 
-                    Text(remindersEnabled ? "LeetTracker will also schedule a Sunday review." : "Turn this on when you want a gentle push.")
+                    Text(remindersEnabled ? "One reminder plus a Sunday reset." : "Turn on when you want a small pullback.")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
@@ -186,9 +309,15 @@ struct ReminderGoalCard: View {
 
                 Spacer(minLength: 10)
 
-                DatePicker("", selection: $reminderTime, displayedComponents: .hourAndMinute)
-                    .labelsHidden()
-                    .disabled(!remindersEnabled)
+                VStack(alignment: .trailing, spacing: 5) {
+                    Text("Nudge time")
+                        .font(.caption2.weight(.semibold))
+                        .foregroundStyle(.secondary)
+
+                    DatePicker("", selection: $reminderTime, displayedComponents: .hourAndMinute)
+                        .labelsHidden()
+                        .disabled(!remindersEnabled)
+                }
             }
         }
         .padding(14)

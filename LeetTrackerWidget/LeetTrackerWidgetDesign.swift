@@ -10,21 +10,21 @@ enum LTWidgetSpacing {
     static let xLarge: CGFloat = 16
     static let xxLarge: CGFloat = 20
     static let smallPadding: CGFloat = 16
-    static let mediumPadding: CGFloat = 20
+    static let mediumPadding: CGFloat = 18
 }
 
 enum LTWidgetTypography {
     static let eyebrow = Font.system(size: 10, weight: .black, design: .rounded)
     static let compactTitle = Font.system(size: 13, weight: .black, design: .rounded)
     static let title = Font.system(size: 16, weight: .black, design: .rounded)
-    static let display = Font.system(size: 44, weight: .black, design: .rounded)
-    static let mediumDisplay = Font.system(size: 56, weight: .black, design: .rounded)
+    static let display = Font.system(size: 40, weight: .black, design: .rounded)
+    static let mediumDisplay = Font.system(size: 50, weight: .black, design: .rounded)
     static let user = Font.system(size: 18, weight: .black, design: .rounded)
     static let compactUser = Font.system(size: 15, weight: .black, design: .rounded)
     static let headline = Font.system(size: 18, weight: .black, design: .rounded)
     static let compactHeadline = Font.system(size: 16, weight: .black, design: .rounded)
-    static let metricNumber = Font.system(size: 24, weight: .black, design: .rounded)
-    static let compactMetricNumber = Font.system(size: 16, weight: .black, design: .rounded)
+    static let metricNumber = Font.system(size: 22, weight: .black, design: .rounded)
+    static let compactMetricNumber = Font.system(size: 15, weight: .black, design: .rounded)
     static let label = Font.system(size: 12, weight: .semibold, design: .rounded)
     static let compactLabel = Font.system(size: 10, weight: .semibold, design: .rounded)
     static let body = Font.system(size: 13, weight: .medium, design: .rounded)

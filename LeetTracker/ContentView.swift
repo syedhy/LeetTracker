@@ -1421,7 +1421,7 @@ private final class LeetTrackerViewModel: ObservableObject {
         }
 
         isLoading = true
-        statusMessage = "Fetching stats for \(normalizedUsername)..."
+        statusMessage = "Fetching stats for \(normalizedUsername)"
 
         defer {
             isLoading = false

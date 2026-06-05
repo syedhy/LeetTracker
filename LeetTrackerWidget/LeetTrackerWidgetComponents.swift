@@ -240,11 +240,13 @@ struct WidgetHeader: View {
         HStack(spacing: LTWidgetSpacing.small) {
             WidgetBrandMark(isCompact: isCompact)
 
-            Text(title)
-                .font(isCompact ? LTWidgetTypography.compactTitle : LTWidgetTypography.title)
-                .foregroundStyle(LTWidgetColor.brand)
-                .lineLimit(1)
-                .minimumScaleFactor(0.62)
+            if !isCompact {
+                Text(title)
+                    .font(LTWidgetTypography.title)
+                    .foregroundStyle(LTWidgetColor.brand)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.72)
+            }
         }
     }
 }
@@ -267,24 +269,47 @@ struct WidgetDifficultySummary: View {
         switch style {
         case .compact:
             HStack(spacing: LTWidgetSpacing.small) {
-                WidgetDifficultyChip(title: nil, value: stats.easySolved, tint: LTWidgetColor.easy, isCompact: true)
-                WidgetDifficultyChip(title: nil, value: stats.mediumSolved, tint: LTWidgetColor.medium, isCompact: true)
-                WidgetDifficultyChip(title: nil, value: stats.hardSolved, tint: LTWidgetColor.hard, isCompact: true)
+                WidgetDifficultyMini(value: stats.easySolved, tint: LTWidgetColor.easy)
+                WidgetDifficultyMini(value: stats.mediumSolved, tint: LTWidgetColor.medium)
+                WidgetDifficultyMini(value: stats.hardSolved, tint: LTWidgetColor.hard)
             }
         case .spacious:
             HStack(spacing: LTWidgetSpacing.medium) {
-                WidgetDifficultyCard(title: "Easy", value: stats.easySolved, percent: stats.percentText(for: stats.easySolved), tint: LTWidgetColor.easy)
-                WidgetDifficultyCard(title: "Medium", value: stats.mediumSolved, percent: stats.percentText(for: stats.mediumSolved), tint: LTWidgetColor.medium)
-                WidgetDifficultyCard(title: "Hard", value: stats.hardSolved, percent: stats.percentText(for: stats.hardSolved), tint: LTWidgetColor.hard)
+                WidgetDifficultyCard(title: "Easy", value: stats.easySolved, tint: LTWidgetColor.easy)
+                WidgetDifficultyCard(title: "Medium", value: stats.mediumSolved, tint: LTWidgetColor.medium)
+                WidgetDifficultyCard(title: "Hard", value: stats.hardSolved, tint: LTWidgetColor.hard)
             }
         }
+    }
+}
+
+struct WidgetDifficultyMini: View {
+    let value: Int
+    let tint: Color
+
+    var body: some View {
+        HStack(spacing: LTWidgetSpacing.compact) {
+            Circle()
+                .fill(tint)
+                .frame(width: LTWidgetSizing.tinyDot, height: LTWidgetSizing.tinyDot)
+
+            Text("\(value)")
+                .font(LTWidgetTypography.compactMetricNumber)
+                .foregroundStyle(LTWidgetColor.primary)
+                .contentTransition(.numericText())
+                .lineLimit(1)
+                .minimumScaleFactor(0.75)
+        }
+        .padding(.horizontal, LTWidgetSpacing.small)
+        .padding(.vertical, 5)
+        .frame(maxWidth: .infinity, minHeight: 27)
+        .background(tint.opacity(0.18), in: RoundedRectangle(cornerRadius: LTWidgetRadius.badge))
     }
 }
 
 struct WidgetDifficultyCard: View {
     let title: String
     let value: Int
-    let percent: String
     let tint: Color
 
     var body: some View {
@@ -298,13 +323,6 @@ struct WidgetDifficultyCard: View {
                     .font(LTWidgetTypography.label)
                     .foregroundStyle(LTWidgetColor.primary)
                     .lineLimit(1)
-
-                Spacer(minLength: 0)
-
-                Text(percent)
-                    .font(LTWidgetTypography.compactLabel)
-                    .foregroundStyle(LTWidgetColor.tertiary)
-                    .lineLimit(1)
             }
 
             Text("\(value)")
@@ -315,16 +333,9 @@ struct WidgetDifficultyCard: View {
                 .minimumScaleFactor(0.72)
         }
         .padding(.horizontal, LTWidgetSpacing.medium)
-        .padding(.vertical, LTWidgetSpacing.small)
-        .frame(maxWidth: .infinity, minHeight: 62, alignment: .leading)
+        .padding(.vertical, LTWidgetSpacing.medium)
+        .frame(maxWidth: .infinity, minHeight: 54, alignment: .leading)
         .background(tint.opacity(0.12), in: RoundedRectangle(cornerRadius: LTWidgetRadius.miniPanel))
-        .overlay(alignment: .bottomLeading) {
-            RoundedRectangle(cornerRadius: 3)
-                .fill(tint)
-                .frame(height: 4)
-                .padding(.horizontal, LTWidgetSpacing.medium)
-                .padding(.bottom, 1)
-        }
         .overlay {
             RoundedRectangle(cornerRadius: LTWidgetRadius.miniPanel)
                 .stroke(tint.opacity(0.44), lineWidth: 1.1)

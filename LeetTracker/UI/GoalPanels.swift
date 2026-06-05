@@ -493,12 +493,12 @@ struct WidgetIdeaPanel: View {
 
                     Spacer()
 
-                    Text(title == "Progress" ? "Live" : "Planned")
+                    Text("Live")
                         .font(.caption.weight(.semibold))
-                        .foregroundStyle(title == "Progress" ? AppColor.paper : AppColor.ink)
+                        .foregroundStyle(AppColor.paper)
                         .padding(.horizontal, 9)
                         .padding(.vertical, 5)
-                        .background(title == "Progress" ? AppColor.ink : AppColor.paperWarm, in: Capsule())
+                        .background(AppColor.ink, in: Capsule())
                         .overlay {
                             Capsule()
                                 .stroke(AppColor.line.opacity(0.28), lineWidth: 1)

@@ -4,9 +4,7 @@ import WidgetKit
 
 enum AppSection: String, CaseIterable, Identifiable {
     case dashboard = "Dashboard"
-    case analytics = "Analytics"
-    case goals = "Goals"
-    case planner = "Planner"
+    case practice = "Practice"
     case widgets = "Widgets"
     case settings = "Settings"
 
@@ -16,11 +14,7 @@ enum AppSection: String, CaseIterable, Identifiable {
         switch self {
         case .dashboard:
             return "rectangle.3.group"
-        case .analytics:
-            return "chart.xyaxis.line"
-        case .goals:
-            return "target"
-        case .planner:
+        case .practice:
             return "calendar.badge.checkmark"
         case .widgets:
             return "square.grid.2x2"
@@ -30,31 +24,78 @@ enum AppSection: String, CaseIterable, Identifiable {
     }
 }
 
+enum PracticeMode: String, CaseIterable, Identifiable {
+    case plan = "Plan"
+    case analytics = "Analytics"
+    case goals = "Goals"
+
+    var id: String { rawValue }
+
+    var systemImage: String {
+        switch self {
+        case .plan:
+            return "calendar.badge.checkmark"
+        case .analytics:
+            return "chart.xyaxis.line"
+        case .goals:
+            return "target"
+        }
+    }
+}
+
 struct ContentView: View {
     @StateObject private var viewModel = LeetTrackerViewModel()
     @State private var selectedSection = AppSection.dashboard
+    @State private var selectedPracticeMode = PracticeMode.plan
+    @State private var isSidebarVisible = true
 
     var body: some View {
-        ZStack {
+        ZStack(alignment: .topLeading) {
             AppSurfaceBackground()
 
             HStack(spacing: 0) {
-                AppSidebar(selectedSection: $selectedSection)
+                if isSidebarVisible {
+                    AppSidebar(
+                        selectedSection: $selectedSection,
+                        isSidebarVisible: $isSidebarVisible
+                    )
+                    .transition(.move(edge: .leading).combined(with: .opacity))
 
-                Divider()
-
-                ScrollView {
-                    selectedContent
-                        .padding(28)
-                        .frame(maxWidth: .infinity, alignment: .topLeading)
-                        .sectionEntrance(trigger: selectedSection.rawValue)
+                    Divider()
                 }
+
+                mainWorkspace
+            }
+
+            if !isSidebarVisible {
+                FloatingSidebarToggle {
+                    withAnimation(.snappy(duration: 0.18)) {
+                        isSidebarVisible = true
+                    }
+                }
+                .padding(18)
+                .transition(.scale.combined(with: .opacity))
             }
         }
+        .animation(.snappy(duration: 0.18), value: isSidebarVisible)
         .frame(minWidth: 780, idealWidth: 1120, minHeight: 620)
         .onAppear {
             viewModel.loadSavedState()
         }
+    }
+
+    private var mainWorkspace: some View {
+        ScrollView(.vertical) {
+            VStack(alignment: .leading, spacing: 26) {
+                selectedContent
+                    .sectionEntrance(trigger: "\(selectedSection.rawValue)-\(selectedPracticeMode.rawValue)")
+            }
+            .padding(.leading, isSidebarVisible ? 30 : 82)
+            .padding(.trailing, 30)
+            .padding(.vertical, 30)
+            .frame(maxWidth: .infinity, alignment: .topLeading)
+        }
+        .scrollIndicators(.visible)
     }
 
     @ViewBuilder
@@ -62,12 +103,8 @@ struct ContentView: View {
         switch selectedSection {
         case .dashboard:
             dashboard
-        case .analytics:
-            analyticsPage
-        case .goals:
-            goalsPage
-        case .planner:
-            plannerPage
+        case .practice:
+            practicePage
         case .widgets:
             widgetsPage
         case .settings:
@@ -78,6 +115,8 @@ struct ContentView: View {
     private var dashboard: some View {
         VStack(alignment: .leading, spacing: 24) {
             header
+
+            dashboardSnapshotSection
 
             DashboardCommandCenterPanel(
                 goalTitle: viewModel.goalDashboardSummaryTitle,
@@ -92,10 +131,29 @@ struct ContentView: View {
                 widgetDetail: viewModel.widgetDashboardSummaryDetail
             )
 
+            WeeklyPlannerBoard(
+                sessions: viewModel.plannerSessions,
+                completedIDs: viewModel.completedPlannerSessionIDs,
+                toggleAction: viewModel.togglePlannerSession
+            )
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private var dashboardSnapshotSection: some View {
+        VStack(alignment: .leading, spacing: 18) {
+            SectionHeader(title: "Today’s Snapshot", systemImage: "chart.bar.xaxis")
+
             ViewThatFits(in: .horizontal) {
                 HStack(alignment: .top, spacing: 20) {
-                    statsSection
-                        .frame(maxWidth: .infinity)
+                    DashboardHeroBoard(
+                        total: viewModel.totalSolvedText,
+                        username: viewModel.displayUsername,
+                        lastUpdated: viewModel.lastUpdatedText,
+                        focusTitle: viewModel.focusRecommendationTitle,
+                        focusDetail: viewModel.focusRecommendationDetail
+                    )
+                    .frame(maxWidth: .infinity)
 
                     VStack(spacing: 20) {
                         goalSection
@@ -105,25 +163,44 @@ struct ContentView: View {
                 }
 
                 VStack(spacing: 20) {
-                    statsSection
+                    DashboardHeroBoard(
+                        total: viewModel.totalSolvedText,
+                        username: viewModel.displayUsername,
+                        lastUpdated: viewModel.lastUpdatedText,
+                        focusTitle: viewModel.focusRecommendationTitle,
+                        focusDetail: viewModel.focusRecommendationDetail
+                    )
                     goalSection
                     dataHealthSection
                 }
             }
-
-            planningSnapshot
         }
-        .frame(maxWidth: 1320, alignment: .leading)
     }
 
-    private var analyticsPage: some View {
+    private var practicePage: some View {
         VStack(alignment: .leading, spacing: 24) {
             pageHeader(
-                title: "Analytics",
-                subtitle: "Local practice signals from public solved counts.",
-                systemImage: "chart.line.uptrend.xyaxis"
+                title: "Practice",
+                subtitle: "Plan the week, read the signals, and tune the goal from one place.",
+                systemImage: selectedPracticeMode.systemImage
             )
 
+            PracticeModePicker(selectedMode: $selectedPracticeMode)
+
+            switch selectedPracticeMode {
+            case .plan:
+                plannerContent
+            case .analytics:
+                analyticsContent
+            case .goals:
+                goalsContent
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private var analyticsContent: some View {
+        VStack(alignment: .leading, spacing: 24) {
             AnalyticsHeroPanel(
                 stats: viewModel.statsSnapshot,
                 rows: viewModel.difficultyDistributionRows,
@@ -139,107 +216,58 @@ struct ContentView: View {
 
             ViewThatFits(in: .horizontal) {
                 HStack(alignment: .top, spacing: 20) {
-                    AnalyticsScorePanel(
-                        score: viewModel.readinessScore,
-                        title: viewModel.readinessTitle,
-                        detail: viewModel.readinessDetail
+                    ProgressSignalsPanel(signals: viewModel.progressSignals)
+                        .frame(maxWidth: .infinity)
+
+                    DifficultyBalancePanel(
+                        stats: viewModel.statsSnapshot,
+                        rows: viewModel.difficultyDistributionRows,
+                        balanceText: viewModel.balanceNarrative
+                    )
+                    .frame(maxWidth: .infinity)
+                }
+
+                VStack(spacing: 20) {
+                    ProgressSignalsPanel(signals: viewModel.progressSignals)
+
+                    DifficultyBalancePanel(
+                        stats: viewModel.statsSnapshot,
+                        rows: viewModel.difficultyDistributionRows,
+                        balanceText: viewModel.balanceNarrative
+                    )
+                }
+            }
+
+            ViewThatFits(in: .horizontal) {
+                HStack(alignment: .top, spacing: 20) {
+                    GoalProjectionPanel(
+                        currentSolved: viewModel.currentSolvedValue,
+                        targetSolved: viewModel.goalTargetNumber,
+                        weeklyTarget: viewModel.weeklyTargetNumber,
+                        completionText: viewModel.estimatedCompletionDateText
                     )
                     .frame(maxWidth: .infinity)
 
-                    ProgressSignalsPanel(signals: viewModel.progressSignals)
+                    AnalyticsNarrativePanel(summary: viewModel.analyticsSummary)
                         .frame(maxWidth: .infinity)
                 }
 
                 VStack(spacing: 20) {
-                    AnalyticsScorePanel(
-                        score: viewModel.readinessScore,
-                        title: viewModel.readinessTitle,
-                        detail: viewModel.readinessDetail
-                    )
-
-                    ProgressSignalsPanel(signals: viewModel.progressSignals)
-                }
-            }
-
-            ViewThatFits(in: .horizontal) {
-                HStack(alignment: .top, spacing: 20) {
-                    DifficultyBalancePanel(
-                        stats: viewModel.statsSnapshot,
-                        rows: viewModel.difficultyDistributionRows,
-                        balanceText: viewModel.balanceNarrative
-                    )
-                    .frame(maxWidth: .infinity)
-
                     GoalProjectionPanel(
                         currentSolved: viewModel.currentSolvedValue,
                         targetSolved: viewModel.goalTargetNumber,
                         weeklyTarget: viewModel.weeklyTargetNumber,
                         completionText: viewModel.estimatedCompletionDateText
                     )
-                    .frame(maxWidth: .infinity)
-                }
 
-                VStack(spacing: 20) {
-                    DifficultyBalancePanel(
-                        stats: viewModel.statsSnapshot,
-                        rows: viewModel.difficultyDistributionRows,
-                        balanceText: viewModel.balanceNarrative
-                    )
-
-                    GoalProjectionPanel(
-                        currentSolved: viewModel.currentSolvedValue,
-                        targetSolved: viewModel.goalTargetNumber,
-                        weeklyTarget: viewModel.weeklyTargetNumber,
-                        completionText: viewModel.estimatedCompletionDateText
-                    )
+                    AnalyticsNarrativePanel(summary: viewModel.analyticsSummary)
                 }
             }
-
-            ViewThatFits(in: .horizontal) {
-                HStack(alignment: .top, spacing: 20) {
-                    MilestonePanel(
-                        title: viewModel.milestoneTitle,
-                        subtitle: viewModel.milestoneSubtitle,
-                        rows: viewModel.milestoneRows
-                    )
-                    .frame(maxWidth: .infinity)
-
-                    FocusRecommendationPanel(
-                        title: viewModel.focusRecommendationTitle,
-                        detail: viewModel.focusRecommendationDetail,
-                        tint: viewModel.focusRecommendationTint
-                    )
-                    .frame(maxWidth: .infinity)
-                }
-
-                VStack(spacing: 20) {
-                    MilestonePanel(
-                        title: viewModel.milestoneTitle,
-                        subtitle: viewModel.milestoneSubtitle,
-                        rows: viewModel.milestoneRows
-                    )
-
-                    FocusRecommendationPanel(
-                        title: viewModel.focusRecommendationTitle,
-                        detail: viewModel.focusRecommendationDetail,
-                        tint: viewModel.focusRecommendationTint
-                    )
-                }
-            }
-
-            AnalyticsNarrativePanel(summary: viewModel.analyticsSummary)
         }
-        .frame(maxWidth: 1320, alignment: .leading)
     }
 
-    private var goalsPage: some View {
+    private var goalsContent: some View {
         VStack(alignment: .leading, spacing: 24) {
-            pageHeader(
-                title: "Goals",
-                subtitle: "Plan the next step without making the app noisy.",
-                systemImage: "target"
-            )
-
             ViewThatFits(in: .horizontal) {
                 HStack(alignment: .top, spacing: 20) {
                     GoalEditorPanel(
@@ -326,7 +354,6 @@ struct ContentView: View {
                 }
             }
         }
-        .frame(maxWidth: 1320, alignment: .leading)
     }
 
     private var widgetsPage: some View {
@@ -339,46 +366,23 @@ struct ContentView: View {
 
             ViewThatFits(in: .horizontal) {
                 HStack(alignment: .top, spacing: 20) {
-                    WidgetIdeaPanel(
-                        title: "Progress",
-                        detail: "Current solved count, difficulty mix, and last updated time.",
-                        systemImage: "checkmark.seal.fill",
-                        tint: AppColor.ink
-                    )
-
-                    WidgetIdeaPanel(
-                        title: "Goal Pace",
-                        detail: "Milestone progress, remaining problems, and whether you are on track.",
-                        systemImage: "speedometer",
-                        tint: AppColor.ink
-                    )
-
-                    WidgetIdeaPanel(
-                        title: "Daily Focus",
-                        detail: "One small practice target with reminder timing.",
-                        systemImage: "calendar.badge.clock",
-                        tint: AppColor.ink
-                    )
+                    WidgetIdeaPanel(title: "Progress", detail: "Current solved count, difficulty mix, and last updated time.", systemImage: "checkmark.seal.fill", tint: AppColor.ink)
+                    WidgetIdeaPanel(title: "Motivation", detail: "A daily nudge that turns the next small practice block into a visible desktop prompt.", systemImage: "quote.bubble.fill", tint: AppColor.medium)
+                    WidgetIdeaPanel(title: "Goal Pace", detail: "Milestone progress, remaining problems, and whether the weekly target is still on track.", systemImage: "speedometer", tint: AppColor.ink)
                 }
 
                 VStack(spacing: 20) {
                     WidgetIdeaPanel(title: "Progress", detail: "Current solved count, difficulty mix, and last updated time.", systemImage: "checkmark.seal.fill", tint: AppColor.ink)
-                    WidgetIdeaPanel(title: "Goal Pace", detail: "Milestone progress, remaining problems, and whether you are on track.", systemImage: "speedometer", tint: AppColor.ink)
-                    WidgetIdeaPanel(title: "Daily Focus", detail: "One small practice target with reminder timing.", systemImage: "calendar.badge.clock", tint: AppColor.ink)
+                    WidgetIdeaPanel(title: "Motivation", detail: "A daily nudge that turns the next small practice block into a visible desktop prompt.", systemImage: "quote.bubble.fill", tint: AppColor.medium)
+                    WidgetIdeaPanel(title: "Goal Pace", detail: "Milestone progress, remaining problems, and whether the weekly target is still on track.", systemImage: "speedometer", tint: AppColor.ink)
                 }
             }
         }
-        .frame(maxWidth: 1320, alignment: .leading)
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
-    private var plannerPage: some View {
+    private var plannerContent: some View {
         VStack(alignment: .leading, spacing: 24) {
-            pageHeader(
-                title: "Planner",
-                subtitle: "Turn the saved goal into a week you can actually finish.",
-                systemImage: "calendar.badge.checkmark"
-            )
-
             PlannerOverviewPanel(
                 weekTitle: viewModel.plannerWeekTitle,
                 completedCount: viewModel.plannerCompletedCount,
@@ -432,7 +436,7 @@ struct ContentView: View {
                 }
             }
         }
-        .frame(maxWidth: 1320, alignment: .leading)
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     private var settingsPage: some View {
@@ -446,7 +450,7 @@ struct ContentView: View {
             setupSection
             dataHealthSection
         }
-        .frame(maxWidth: 1320, alignment: .leading)
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     private var header: some View {
@@ -480,19 +484,15 @@ struct ContentView: View {
 
     private var statsSection: some View {
         VStack(alignment: .leading, spacing: 18) {
-            SectionHeader(title: "Dashboard", systemImage: "chart.bar.xaxis")
+            SectionHeader(title: "Today’s Snapshot", systemImage: "chart.bar.xaxis")
 
-            TotalSolvedCard(
+            DashboardHeroBoard(
                 total: viewModel.totalSolvedText,
                 username: viewModel.displayUsername,
-                lastUpdated: viewModel.lastUpdatedText
+                lastUpdated: viewModel.lastUpdatedText,
+                focusTitle: viewModel.focusRecommendationTitle,
+                focusDetail: viewModel.focusRecommendationDetail
             )
-
-            HStack(spacing: 12) {
-                DifficultyCard(title: "Easy", value: viewModel.easySolvedText, tint: AppColor.easy)
-                DifficultyCard(title: "Medium", value: viewModel.mediumSolvedText, tint: AppColor.medium)
-                DifficultyCard(title: "Hard", value: viewModel.hardSolvedText, tint: AppColor.hard)
-            }
         }
     }
 

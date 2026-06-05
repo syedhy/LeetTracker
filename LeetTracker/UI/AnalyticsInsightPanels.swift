@@ -64,13 +64,7 @@ struct DifficultyBalancePanel: View {
                 SectionHeader(title: "Balance", systemImage: "chart.bar.xaxis")
 
                 if stats?.totalSolved ?? 0 > 0 {
-                    DifficultyStackedBar(rows: rows)
-
-                    VStack(spacing: 12) {
-                        ForEach(rows) { row in
-                            DifficultyDistributionDetail(row: row)
-                        }
-                    }
+                    DifficultyMixCards(rows: rows)
 
                     Text(balanceText)
                         .font(.callout)
@@ -83,6 +77,84 @@ struct DifficultyBalancePanel: View {
                     )
                 }
             }
+        }
+    }
+}
+
+struct DifficultyMixCards: View {
+    let rows: [DifficultyDistributionRow]
+
+    var body: some View {
+        ViewThatFits(in: .horizontal) {
+            HStack(spacing: 12) {
+                ForEach(rows) { row in
+                    DifficultyMixCard(row: row)
+                }
+            }
+
+            LazyVGrid(columns: [GridItem(.adaptive(minimum: 126), spacing: 12)], spacing: 12) {
+                ForEach(rows) { row in
+                    DifficultyMixCard(row: row)
+                }
+            }
+        }
+    }
+}
+
+struct DifficultyMixCard: View {
+    let row: DifficultyDistributionRow
+
+    private var practiceLabel: String {
+        switch row.title {
+        case "Easy":
+            return "warmups"
+        case "Medium":
+            return "core reps"
+        case "Hard":
+            return "deep work"
+        default:
+            return "solved"
+        }
+    }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(alignment: .firstTextBaseline, spacing: 8) {
+                Circle()
+                    .fill(row.tint)
+                    .frame(width: 11, height: 11)
+
+                Text(row.title)
+                    .font(.callout.weight(.semibold))
+                    .lineLimit(1)
+
+                Spacer(minLength: 8)
+
+                Text("\(row.percentage)%")
+                    .font(.caption.weight(.semibold).monospacedDigit())
+                    .foregroundStyle(.secondary)
+            }
+
+            HStack(alignment: .lastTextBaseline, spacing: 8) {
+                Text("\(row.value)")
+                    .font(.system(size: 38, weight: .black, design: .rounded))
+                    .monospacedDigit()
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.72)
+
+                Text(practiceLabel)
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.secondary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.76)
+            }
+        }
+        .padding(15)
+        .frame(maxWidth: .infinity, minHeight: 118, alignment: .leading)
+        .background(row.tint.opacity(0.1), in: RoundedRectangle(cornerRadius: 18))
+        .overlay {
+            RoundedRectangle(cornerRadius: 18)
+                .stroke(row.tint.opacity(0.46), lineWidth: 1.15)
         }
     }
 }

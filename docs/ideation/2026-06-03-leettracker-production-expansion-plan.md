@@ -343,6 +343,8 @@ Current widgets:
 
 New widget ideas:
 
+- Motivation widget: a short daily practice nudge generated from the user's saved goals, weekly mix, and next useful move.
+- Goal Pace widget: target progress, remaining problems, weekly pace, and whether the user is still on track.
 - Goal progress widget.
 - Weekly pace widget.
 - Daily focus widget.

@@ -73,10 +73,10 @@ struct GoalField: View {
                 .monospacedDigit()
                 .padding(.horizontal, 12)
                 .frame(height: 40)
-                .background(AppColor.paperWarm.opacity(0.48), in: RoundedRectangle(cornerRadius: 8))
+                .background(AppColor.paperWarm.opacity(0.58), in: RoundedRectangle(cornerRadius: 13))
                 .overlay {
-                    RoundedRectangle(cornerRadius: 8)
-                        .stroke(AppColor.line.opacity(0.5), lineWidth: 1)
+                    RoundedRectangle(cornerRadius: 13)
+                        .stroke(AppColor.line.opacity(0.28), lineWidth: 1)
                 }
         }
     }
@@ -116,10 +116,10 @@ struct DifficultyGoalGrid: View {
             }
         }
         .padding(14)
-        .background(AppColor.paperWarm.opacity(0.42), in: RoundedRectangle(cornerRadius: 8))
+        .background(AppColor.paperWarm.opacity(0.48), in: RoundedRectangle(cornerRadius: 15))
         .overlay {
-            RoundedRectangle(cornerRadius: 8)
-                .stroke(AppColor.line.opacity(0.24), lineWidth: 1)
+            RoundedRectangle(cornerRadius: 15)
+                .stroke(AppColor.line.opacity(0.16), lineWidth: 1)
         }
     }
 }
@@ -146,10 +146,10 @@ struct DifficultyGoalField: View {
                 .monospacedDigit()
                 .padding(.horizontal, 10)
                 .frame(height: 38)
-                .background(AppColor.paper, in: RoundedRectangle(cornerRadius: 8))
+                .background(AppColor.paper, in: RoundedRectangle(cornerRadius: 13))
                 .overlay {
-                    RoundedRectangle(cornerRadius: 8)
-                        .stroke(tint.opacity(0.5), lineWidth: 1)
+                    RoundedRectangle(cornerRadius: 13)
+                        .stroke(tint.opacity(0.42), lineWidth: 1)
                 }
         }
     }
@@ -192,10 +192,10 @@ struct ReminderGoalCard: View {
             }
         }
         .padding(14)
-        .background(AppColor.paperWarm.opacity(0.42), in: RoundedRectangle(cornerRadius: 8))
+        .background(AppColor.paperWarm.opacity(0.48), in: RoundedRectangle(cornerRadius: 15))
         .overlay {
-            RoundedRectangle(cornerRadius: 8)
-                .stroke(AppColor.line.opacity(0.24), lineWidth: 1)
+            RoundedRectangle(cornerRadius: 15)
+                .stroke(AppColor.line.opacity(0.16), lineWidth: 1)
         }
     }
 }
@@ -350,26 +350,45 @@ struct WidgetIdeaPanel: View {
 
     var body: some View {
         Panel {
-            VStack(alignment: .leading, spacing: 16) {
-                Image(systemName: systemImage)
-                    .font(.title2.weight(.semibold))
-                    .foregroundStyle(tint)
-                    .frame(width: 42, height: 42)
-                    .background(AppColor.paperWarm.opacity(0.85), in: RoundedRectangle(cornerRadius: 8))
-                    .overlay {
-                        RoundedRectangle(cornerRadius: 8)
-                            .stroke(tint.opacity(0.52), lineWidth: 1)
-                    }
+            VStack(alignment: .leading, spacing: 18) {
+                HStack(alignment: .top) {
+                    Image(systemName: systemImage)
+                        .font(.title2.weight(.semibold))
+                        .foregroundStyle(AppColor.ink)
+                        .frame(width: 48, height: 48)
+                        .background(AppColor.paperWarm.opacity(0.85), in: Circle())
+                        .overlay {
+                            Circle()
+                                .stroke(tint.opacity(0.62), lineWidth: 1.6)
+                        }
+
+                    Spacer()
+
+                    Text(title == "Progress" ? "Live" : "Planned")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(title == "Progress" ? AppColor.paper : AppColor.ink)
+                        .padding(.horizontal, 9)
+                        .padding(.vertical, 5)
+                        .background(title == "Progress" ? AppColor.ink : AppColor.paperWarm, in: Capsule())
+                        .overlay {
+                            Capsule()
+                                .stroke(AppColor.line.opacity(0.28), lineWidth: 1)
+                        }
+                }
 
                 VStack(alignment: .leading, spacing: 6) {
                     Text(title)
-                        .font(.title3.weight(.semibold))
+                        .font(.title2.weight(.semibold))
 
                     Text(detail)
                         .font(.callout)
                         .foregroundStyle(.secondary)
                         .fixedSize(horizontal: false, vertical: true)
                 }
+
+                Capsule()
+                    .fill(tint.opacity(0.82))
+                    .frame(height: 7)
             }
         }
     }

@@ -23,8 +23,8 @@ struct DashboardHeroBoard: View {
                     scoreSheet
                 }
             }
+            .frame(minHeight: 278, alignment: .center)
         }
-        .frame(minHeight: 408)
     }
 
     private var heroCopy: some View {

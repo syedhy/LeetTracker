@@ -116,25 +116,7 @@ struct ContentView: View {
         VStack(alignment: .leading, spacing: 24) {
             header
 
-            ViewThatFits(in: .horizontal) {
-                HStack(alignment: .top, spacing: 20) {
-                    statsSection
-                        .frame(maxWidth: .infinity)
-
-                    VStack(spacing: 20) {
-                        goalSection
-                        dataHealthSection
-                    }
-                    .frame(minWidth: 300, idealWidth: 340, maxWidth: 380)
-                    .padding(.top, 43)
-                }
-
-                VStack(spacing: 20) {
-                    statsSection
-                    goalSection
-                    dataHealthSection
-                }
-            }
+            dashboardSnapshotSection
 
             DashboardCommandCenterPanel(
                 goalTitle: viewModel.goalDashboardSummaryTitle,
@@ -156,6 +138,43 @@ struct ContentView: View {
             )
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private var dashboardSnapshotSection: some View {
+        VStack(alignment: .leading, spacing: 18) {
+            SectionHeader(title: "Today’s Snapshot", systemImage: "chart.bar.xaxis")
+
+            ViewThatFits(in: .horizontal) {
+                HStack(alignment: .top, spacing: 20) {
+                    DashboardHeroBoard(
+                        total: viewModel.totalSolvedText,
+                        username: viewModel.displayUsername,
+                        lastUpdated: viewModel.lastUpdatedText,
+                        focusTitle: viewModel.focusRecommendationTitle,
+                        focusDetail: viewModel.focusRecommendationDetail
+                    )
+                    .frame(maxWidth: .infinity)
+
+                    VStack(spacing: 20) {
+                        goalSection
+                        dataHealthSection
+                    }
+                    .frame(minWidth: 300, idealWidth: 340, maxWidth: 380)
+                }
+
+                VStack(spacing: 20) {
+                    DashboardHeroBoard(
+                        total: viewModel.totalSolvedText,
+                        username: viewModel.displayUsername,
+                        lastUpdated: viewModel.lastUpdatedText,
+                        focusTitle: viewModel.focusRecommendationTitle,
+                        focusDetail: viewModel.focusRecommendationDetail
+                    )
+                    goalSection
+                    dataHealthSection
+                }
+            }
+        }
     }
 
     private var practicePage: some View {

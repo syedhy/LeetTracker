@@ -270,90 +270,61 @@ struct ContentView: View {
         VStack(alignment: .leading, spacing: 24) {
             ViewThatFits(in: .horizontal) {
                 HStack(alignment: .top, spacing: 20) {
-                    GoalEditorPanel(
-                        targetText: $viewModel.goalTargetText,
-                        weeklyTargetText: $viewModel.weeklyTargetText,
-                        weeklyEasyTargetText: $viewModel.weeklyEasyTargetText,
-                        weeklyMediumTargetText: $viewModel.weeklyMediumTargetText,
-                        weeklyHardTargetText: $viewModel.weeklyHardTargetText,
-                        remindersEnabled: $viewModel.remindersEnabled,
-                        reminderTime: $viewModel.reminderTime,
-                        projectedMixText: viewModel.weeklyPracticeMixText,
-                        statusText: viewModel.goalStatusMessage,
-                        saveAction: viewModel.saveGoalSettings
-                    )
-                    .frame(minWidth: 340, idealWidth: 390, maxWidth: 430)
+                    goalEditorPanel
+                        .frame(minWidth: 360, idealWidth: 430, maxWidth: 500)
 
-                    GoalPlanPanel(
-                        title: viewModel.goalPlanTitle,
-                        subtitle: viewModel.goalPlanSubtitle,
-                        progress: viewModel.goalProgress,
-                        detailRows: viewModel.goalDetailRows
-                    )
-                    .frame(maxWidth: .infinity)
+                    VStack(spacing: 20) {
+                        goalPlanPanel
+
+                        GoalWeekPreviewPanel(
+                            title: viewModel.practicePlanTitle,
+                            subtitle: viewModel.practicePlanSubtitle,
+                            rows: viewModel.practicePlanRows,
+                            nextSession: viewModel.plannerNextSessionText,
+                            reminderText: viewModel.remindersEnabled ? viewModel.reminderTimeText : "Off"
+                        )
+                    }
+                    .frame(minWidth: 460, maxWidth: .infinity)
+                    .layoutPriority(1)
                 }
 
                 VStack(spacing: 20) {
-                    GoalEditorPanel(
-                        targetText: $viewModel.goalTargetText,
-                        weeklyTargetText: $viewModel.weeklyTargetText,
-                        weeklyEasyTargetText: $viewModel.weeklyEasyTargetText,
-                        weeklyMediumTargetText: $viewModel.weeklyMediumTargetText,
-                        weeklyHardTargetText: $viewModel.weeklyHardTargetText,
-                        remindersEnabled: $viewModel.remindersEnabled,
-                        reminderTime: $viewModel.reminderTime,
-                        projectedMixText: viewModel.weeklyPracticeMixText,
-                        statusText: viewModel.goalStatusMessage,
-                        saveAction: viewModel.saveGoalSettings
-                    )
-
-                    GoalPlanPanel(
-                        title: viewModel.goalPlanTitle,
-                        subtitle: viewModel.goalPlanSubtitle,
-                        progress: viewModel.goalProgress,
-                        detailRows: viewModel.goalDetailRows
-                    )
-                }
-            }
-
-            ViewThatFits(in: .horizontal) {
-                HStack(alignment: .top, spacing: 20) {
-                    PracticePlanPanel(
+                    goalEditorPanel
+                    goalPlanPanel
+                    GoalWeekPreviewPanel(
                         title: viewModel.practicePlanTitle,
                         subtitle: viewModel.practicePlanSubtitle,
                         rows: viewModel.practicePlanRows,
-                        tint: viewModel.focusRecommendationTint
-                    )
-                    .frame(maxWidth: .infinity)
-
-                    ReminderPlanPanel(
-                        refreshText: viewModel.refreshCadenceText,
-                        remindersEnabled: viewModel.remindersEnabled,
-                        reminderTimeText: viewModel.reminderTimeText,
-                        weeklyReviewText: viewModel.weeklyReviewReminderText,
-                        permissionText: viewModel.reminderPermissionText
-                    )
-                    .frame(minWidth: 300, idealWidth: 340, maxWidth: 380)
-                }
-
-                VStack(spacing: 20) {
-                    PracticePlanPanel(
-                        title: viewModel.practicePlanTitle,
-                        subtitle: viewModel.practicePlanSubtitle,
-                        rows: viewModel.practicePlanRows,
-                        tint: viewModel.focusRecommendationTint
-                    )
-
-                    ReminderPlanPanel(
-                        refreshText: viewModel.refreshCadenceText,
-                        remindersEnabled: viewModel.remindersEnabled,
-                        reminderTimeText: viewModel.reminderTimeText,
-                        weeklyReviewText: viewModel.weeklyReviewReminderText,
-                        permissionText: viewModel.reminderPermissionText
+                        nextSession: viewModel.plannerNextSessionText,
+                        reminderText: viewModel.remindersEnabled ? viewModel.reminderTimeText : "Off"
                     )
                 }
             }
         }
+    }
+
+    private var goalEditorPanel: some View {
+        GoalEditorPanel(
+            targetText: $viewModel.goalTargetText,
+            weeklyTargetText: $viewModel.weeklyTargetText,
+            weeklyEasyTargetText: $viewModel.weeklyEasyTargetText,
+            weeklyMediumTargetText: $viewModel.weeklyMediumTargetText,
+            weeklyHardTargetText: $viewModel.weeklyHardTargetText,
+            remindersEnabled: $viewModel.remindersEnabled,
+            reminderTime: $viewModel.reminderTime,
+            projectedMixText: viewModel.weeklyPracticeMixText,
+            statusText: viewModel.goalStatusMessage,
+            saveAction: viewModel.saveGoalSettings
+        )
+    }
+
+    private var goalPlanPanel: some View {
+        GoalPlanPanel(
+            title: viewModel.goalPlanTitle,
+            subtitle: viewModel.goalPlanSubtitle,
+            progress: viewModel.goalProgress,
+            detailRows: viewModel.goalDetailRows
+        )
     }
 
     private var widgetsPage: some View {
@@ -789,7 +760,7 @@ private final class LeetTrackerViewModel: ObservableObject {
             return "Refresh a profile, then set a target."
         }
 
-        return "Target \(goalTargetValue) · \(weeklyTargetValue) per week"
+        return "Target \(goalTargetValue) · \(weeklyPracticeMixText) · \(estimatedWeeksText)"
     }
 
     var analyticsDashboardSummaryTitle: String {
@@ -809,7 +780,9 @@ private final class LeetTrackerViewModel: ObservableObject {
     }
 
     var reminderDashboardSummaryDetail: String {
-        remindersEnabled ? "Daily reminder · weekly review" : "No practice reminders scheduled"
+        remindersEnabled
+            ? "Daily nudge plus Sunday review"
+            : "Turn on nudges when you want the app to pull you back in"
     }
 
     var plannerDashboardSummaryTitle: String {
@@ -821,7 +794,7 @@ private final class LeetTrackerViewModel: ObservableObject {
             return plannerSessions.isEmpty ? "Set a weekly mix to generate the board" : "Weekly board complete"
         }
 
-        return "Next \(nextSession.dayText) · \(nextSession.difficulty.rawValue)"
+        return "Next \(nextSession.dayText) · \(nextSession.difficulty.sessionTitle)"
     }
 
     var widgetDashboardSummaryTitle: String {
@@ -1208,8 +1181,7 @@ private final class LeetTrackerViewModel: ObservableObject {
         [
             ("Target", goalTargetDisplayText),
             ("Remaining", goalRemainingText),
-            ("Weekly pace", "\(weeklyTargetValue) problems"),
-            ("ETA", estimatedWeeksText),
+            ("Weekly mix", weeklyPracticeMixText),
             ("Finish by", estimatedCompletionDateText)
         ]
     }
@@ -1400,8 +1372,9 @@ private final class LeetTrackerViewModel: ObservableObject {
     func saveGoalSettings() {
         let currentTotal = stats?.totalSolved ?? 0
         let target = max(currentTotal + 1, parsePositiveInt(goalTargetText, fallback: savedGoalSettings.targetSolved))
-        let weeklyTarget = max(1, parsePositiveInt(weeklyTargetText, fallback: savedGoalSettings.weeklyTarget))
-        let difficultyTargets = normalizedDifficultyTargets(fallbackWeeklyTarget: weeklyTarget)
+        let requestedWeeklyTarget = max(1, parsePositiveInt(weeklyTargetText, fallback: savedGoalSettings.weeklyTarget))
+        let difficultyTargets = normalizedDifficultyTargets(fallbackWeeklyTarget: requestedWeeklyTarget)
+        let weeklyTarget = max(1, difficultyTargets.easy + difficultyTargets.medium + difficultyTargets.hard)
         let components = Calendar.current.dateComponents([.hour, .minute], from: reminderTime)
 
         let settings = SharedGoalSettings(
@@ -1418,8 +1391,9 @@ private final class LeetTrackerViewModel: ObservableObject {
 
         sharedStore.saveGoalSettings(settings)
         hasSavedGoalSettings = true
-        applyGoalSettings(settings, status: "Saved goal for \(target) solved.")
-        updateReminderSchedule(settings, statusPrefix: "Saved goal for \(target) solved.")
+        let statusPrefix = "Saved \(weeklyTarget)/week toward \(target) solved."
+        applyGoalSettings(settings, status: statusPrefix)
+        updateReminderSchedule(settings, statusPrefix: statusPrefix)
         removePlannerCompletionsNotInCurrentPlan()
     }
 

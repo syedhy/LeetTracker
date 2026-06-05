@@ -97,8 +97,8 @@ final class ReminderScheduler {
         weeklyMix: String
     ) async throws {
         let content = UNMutableNotificationContent()
-        content.title = "One clean problem moves the week"
-        content.body = "\(username), make today's session small and finishable. Aim for \(weeklyMix)."
+        content.title = "One clean solve is enough to move"
+        content.body = "\(username), keep it light: open one problem, finish the thought, and let \(weeklyMix) guide the week."
         content.sound = .default
 
         var dateComponents = DateComponents()
@@ -116,8 +116,8 @@ final class ReminderScheduler {
 
     private func scheduleWeeklyReview(settings: SharedGoalSettings) async throws {
         let content = UNMutableNotificationContent()
-        content.title = "Close the week with a win"
-        content.body = "Review what moved, adjust the mix, and choose the next problem before momentum fades."
+        content.title = "Reset the board before Monday"
+        content.body = "Look at the week, keep what worked, adjust the mix, and choose the next small target."
         content.sound = .default
 
         var dateComponents = DateComponents()

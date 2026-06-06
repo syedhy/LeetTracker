@@ -41,8 +41,8 @@ struct DashboardHeroBoard: View {
                 }
 
                 PracticePulseSketch()
-                    .frame(width: 176, height: 134)
-                    .padding(.leading, 4)
+                    .frame(width: 168, height: 128)
+                    .padding(.leading, 2)
             }
 
             HStack(spacing: 10) {
@@ -128,59 +128,77 @@ struct DashboardHeroBoard: View {
 struct PracticePulseSketch: View {
     var body: some View {
         ZStack {
-            PracticeArc()
+            PracticeConnector()
                 .stroke(
-                    AppColor.ink,
-                    style: StrokeStyle(lineWidth: 5, lineCap: .round, lineJoin: .round)
+                    AppColor.ink.opacity(0.88),
+                    style: StrokeStyle(lineWidth: 4.4, lineCap: .round, lineJoin: .round)
                 )
-                .frame(width: 142, height: 92)
-                .rotationEffect(.degrees(-4))
-                .offset(y: 8)
+                .frame(width: 140, height: 96)
+                .offset(x: 12, y: 10)
 
-            AppIconMark()
-                .frame(width: 72, height: 72)
-                .scaleEffect(1.08)
-                .offset(x: -44, y: -12)
+            AppIconMark(size: 58, cornerRadius: 14)
+                .rotationEffect(.degrees(-2))
+                .offset(x: -38, y: -4)
 
-            PracticeNode(tint: AppColor.easy, systemImage: "checkmark")
-                .offset(x: 46, y: -32)
+            PracticeNode(size: 38, tint: AppColor.easy, systemImage: "checkmark")
+                .offset(x: 42, y: -36)
 
-            PracticeNode(tint: AppColor.medium, systemImage: "arrow.up.right")
-                .offset(x: 64, y: 22)
+            PracticeNode(size: 38, tint: AppColor.medium, systemImage: "arrow.up.right")
+                .offset(x: 64, y: 16)
 
-            PracticeNode(tint: AppColor.hard, systemImage: "flame")
-                .offset(x: -8, y: 46)
+            PracticeNode(size: 38, tint: AppColor.hard, systemImage: "flame.fill")
+                .offset(x: -12, y: 42)
         }
+        .frame(width: 168, height: 128)
     }
 }
 
 struct PracticeNode: View {
+    let size: CGFloat
     let tint: Color
     let systemImage: String
 
     var body: some View {
         Image(systemName: systemImage)
-            .font(.system(size: 17, weight: .black, design: .rounded))
+            .font(.system(size: size * 0.42, weight: .black, design: .rounded))
             .foregroundStyle(AppColor.ink)
-            .frame(width: 42, height: 42)
+            .frame(width: size, height: size)
             .background(tint.opacity(0.88), in: Circle())
             .overlay {
                 Circle()
-                    .stroke(AppColor.ink, lineWidth: 2.8)
+                    .stroke(AppColor.ink, lineWidth: 2.6)
             }
             .shadow(color: AppColor.ink.opacity(0.12), radius: 0, x: 4, y: 4)
     }
 }
 
-struct PracticeArc: Shape {
+struct PracticeConnector: Shape {
     func path(in rect: CGRect) -> Path {
         var path = Path()
-        path.move(to: CGPoint(x: rect.minX + rect.width * 0.12, y: rect.midY))
+
+        let hub = CGPoint(x: rect.minX + rect.width * 0.34, y: rect.minY + rect.height * 0.44)
+
+        path.move(to: hub)
         path.addCurve(
-            to: CGPoint(x: rect.maxX - rect.width * 0.08, y: rect.midY + rect.height * 0.03),
-            control1: CGPoint(x: rect.minX + rect.width * 0.34, y: rect.minY + rect.height * 0.04),
-            control2: CGPoint(x: rect.minX + rect.width * 0.64, y: rect.maxY - rect.height * 0.08)
+            to: CGPoint(x: rect.minX + rect.width * 0.72, y: rect.minY + rect.height * 0.16),
+            control1: CGPoint(x: rect.minX + rect.width * 0.46, y: rect.minY + rect.height * 0.30),
+            control2: CGPoint(x: rect.minX + rect.width * 0.56, y: rect.minY + rect.height * 0.18)
         )
+
+        path.move(to: hub)
+        path.addCurve(
+            to: CGPoint(x: rect.minX + rect.width * 0.86, y: rect.minY + rect.height * 0.58),
+            control1: CGPoint(x: rect.minX + rect.width * 0.52, y: rect.minY + rect.height * 0.54),
+            control2: CGPoint(x: rect.minX + rect.width * 0.68, y: rect.minY + rect.height * 0.52)
+        )
+
+        path.move(to: hub)
+        path.addCurve(
+            to: CGPoint(x: rect.minX + rect.width * 0.38, y: rect.minY + rect.height * 0.86),
+            control1: CGPoint(x: rect.minX + rect.width * 0.20, y: rect.minY + rect.height * 0.56),
+            control2: CGPoint(x: rect.minX + rect.width * 0.24, y: rect.minY + rect.height * 0.78)
+        )
+
         return path
     }
 }

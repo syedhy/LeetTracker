@@ -82,59 +82,26 @@ extension View {
 }
 
 struct AppIconMark: View {
-    var body: some View {
-        VStack(spacing: 5) {
-            CodeMarkShape()
-                .fill(AppColor.ink)
-                .frame(width: 34, height: 26)
+    let size: CGFloat
+    let cornerRadius: CGFloat
 
-            HStack(spacing: 4) {
-                Circle()
-                    .fill(AppColor.easy)
-                Circle()
-                    .fill(AppColor.medium)
-                Circle()
-                    .fill(AppColor.hard)
-            }
-            .frame(width: 24, height: 5)
-        }
-        .padding(9)
-        .background(AppColor.paper, in: RoundedRectangle(cornerRadius: 14))
-        .overlay {
-            RoundedRectangle(cornerRadius: 14)
-                .stroke(AppColor.line.opacity(0.12), lineWidth: 1)
-        }
-        .shadow(color: AppColor.ink.opacity(0.08), radius: 10, y: 6)
+    init(size: CGFloat = 52, cornerRadius: CGFloat = 14) {
+        self.size = size
+        self.cornerRadius = cornerRadius
     }
-}
 
-struct CodeMarkShape: Shape {
-    func path(in rect: CGRect) -> Path {
-        var path = Path()
-        let lineWidth = rect.height * 0.22
-        let leftX = rect.minX + rect.width * 0.28
-        let rightX = rect.minX + rect.width * 0.72
-        let midY = rect.midY
-        let chevronHeight = rect.height * 0.32
-        let chevronWidth = rect.width * 0.18
-
-        var left = Path()
-        left.move(to: CGPoint(x: leftX, y: midY - chevronHeight))
-        left.addLine(to: CGPoint(x: leftX - chevronWidth, y: midY))
-        left.addLine(to: CGPoint(x: leftX, y: midY + chevronHeight))
-        path.addPath(left.strokedPath(StrokeStyle(lineWidth: lineWidth, lineCap: .round, lineJoin: .round)))
-
-        var slash = Path()
-        slash.move(to: CGPoint(x: rect.midX + rect.width * 0.07, y: rect.minY + rect.height * 0.12))
-        slash.addLine(to: CGPoint(x: rect.midX - rect.width * 0.07, y: rect.maxY - rect.height * 0.12))
-        path.addPath(slash.strokedPath(StrokeStyle(lineWidth: lineWidth, lineCap: .round, lineJoin: .round)))
-
-        var right = Path()
-        right.move(to: CGPoint(x: rightX, y: midY - chevronHeight))
-        right.addLine(to: CGPoint(x: rightX + chevronWidth, y: midY))
-        right.addLine(to: CGPoint(x: rightX, y: midY + chevronHeight))
-        path.addPath(right.strokedPath(StrokeStyle(lineWidth: lineWidth, lineCap: .round, lineJoin: .round)))
-
-        return path
+    var body: some View {
+        Image("BrandIcon")
+            .resizable()
+            .interpolation(.high)
+            .scaledToFit()
+            .frame(width: size, height: size)
+            .background(AppColor.ink, in: RoundedRectangle(cornerRadius: cornerRadius))
+            .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
+            .overlay {
+                RoundedRectangle(cornerRadius: cornerRadius)
+                    .stroke(AppColor.line.opacity(0.12), lineWidth: 1)
+            }
+            .shadow(color: AppColor.ink.opacity(0.08), radius: 10, y: 6)
     }
 }

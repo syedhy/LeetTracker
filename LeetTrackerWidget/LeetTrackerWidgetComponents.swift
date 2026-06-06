@@ -202,24 +202,15 @@ struct WidgetBrandMark: View {
     }
 
     var body: some View {
-        VStack(spacing: 2) {
-            Text("</>")
-                .font(.system(size: isCompact ? 12 : 15, weight: .black, design: .rounded))
-                .foregroundStyle(LTWidgetColor.primary)
-                .tracking(-1)
-
-            HStack(spacing: 2) {
-                Circle().fill(LTWidgetColor.easy)
-                Circle().fill(LTWidgetColor.medium)
-                Circle().fill(LTWidgetColor.hard)
-            }
-            .frame(width: isCompact ? 14 : 18, height: isCompact ? 4 : 5)
-        }
+        Image("BrandIcon")
+            .resizable()
+            .interpolation(.high)
+            .scaledToFill()
         .frame(
             width: isCompact ? LTWidgetSizing.smallBrandIcon : LTWidgetSizing.brandIcon,
             height: isCompact ? LTWidgetSizing.smallBrandIcon : LTWidgetSizing.brandIcon
         )
-        .background(LTWidgetColor.panel, in: RoundedRectangle(cornerRadius: isCompact ? 7 : 9))
+        .clipShape(RoundedRectangle(cornerRadius: isCompact ? 7 : 9))
         .overlay {
             RoundedRectangle(cornerRadius: isCompact ? 7 : 9)
                 .stroke(LTWidgetColor.panelStroke, lineWidth: 1)

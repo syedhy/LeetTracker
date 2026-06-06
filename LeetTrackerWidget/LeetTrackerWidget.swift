@@ -251,7 +251,7 @@ struct LeetTrackerWidget: Widget {
         StaticConfiguration(kind: kind, provider: LeetTrackerTimelineProvider()) { entry in
             LeetTrackerWidgetEntryView(entry: entry, variant: .progress)
         }
-        .configurationDisplayName("LeetTracker Progress")
+        .configurationDisplayName("Progress")
         .description("Track solved count, difficulty mix, and target progress.")
         .supportedFamilies([.systemSmall, .systemMedium])
     }
@@ -264,7 +264,7 @@ struct LeetTrackerMotivationWidget: Widget {
         StaticConfiguration(kind: kind, provider: LeetTrackerTimelineProvider()) { entry in
             LeetTrackerWidgetEntryView(entry: entry, variant: .motivation)
         }
-        .configurationDisplayName("LeetTracker Motivation")
+        .configurationDisplayName("Motivation")
         .description("A small desktop nudge for the next useful practice block.")
         .supportedFamilies([.systemSmall, .systemMedium])
     }
@@ -277,7 +277,7 @@ struct LeetTrackerGoalPaceWidget: Widget {
         StaticConfiguration(kind: kind, provider: LeetTrackerTimelineProvider()) { entry in
             LeetTrackerWidgetEntryView(entry: entry, variant: .goalPace)
         }
-        .configurationDisplayName("LeetTracker Goal Pace")
+        .configurationDisplayName("Goal Pace")
         .description("See remaining problems, weekly pace, and target progress.")
         .supportedFamilies([.systemSmall, .systemMedium])
     }

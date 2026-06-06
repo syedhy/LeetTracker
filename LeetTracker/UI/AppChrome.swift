@@ -7,8 +7,7 @@ struct AppSidebar: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 20) {
             HStack(spacing: 12) {
-                AppIconMark()
-                    .frame(width: 38, height: 38)
+                AppIconMark(size: 38, cornerRadius: 10)
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text("LeetTracker")

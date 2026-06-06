@@ -337,17 +337,35 @@ struct ContentView: View {
 
             ViewThatFits(in: .horizontal) {
                 HStack(alignment: .top, spacing: 20) {
-                    WidgetIdeaPanel(title: "Progress", detail: "Current solved count, difficulty mix, and last updated time.", systemImage: "checkmark.seal.fill", tint: AppColor.ink)
-                    WidgetIdeaPanel(title: "Motivation", detail: "A daily nudge that turns the next small practice block into a visible desktop prompt.", systemImage: "quote.bubble.fill", tint: AppColor.medium)
-                    WidgetIdeaPanel(title: "Goal Pace", detail: "Milestone progress, remaining problems, and whether the weekly target is still on track.", systemImage: "speedometer", tint: AppColor.ink)
+                    WidgetStudioHeroPanel(
+                        solvedText: viewModel.totalSolvedText,
+                        username: viewModel.displayUsername,
+                        refreshText: viewModel.widgetDashboardSummaryTitle
+                    )
+                    .frame(maxWidth: .infinity)
+
+                    WidgetSetupPanel(
+                        refreshText: viewModel.widgetDashboardSummaryTitle,
+                        dataText: viewModel.widgetDashboardSummaryDetail
+                    )
+                    .frame(minWidth: 300, idealWidth: 340, maxWidth: 380)
                 }
 
                 VStack(spacing: 20) {
-                    WidgetIdeaPanel(title: "Progress", detail: "Current solved count, difficulty mix, and last updated time.", systemImage: "checkmark.seal.fill", tint: AppColor.ink)
-                    WidgetIdeaPanel(title: "Motivation", detail: "A daily nudge that turns the next small practice block into a visible desktop prompt.", systemImage: "quote.bubble.fill", tint: AppColor.medium)
-                    WidgetIdeaPanel(title: "Goal Pace", detail: "Milestone progress, remaining problems, and whether the weekly target is still on track.", systemImage: "speedometer", tint: AppColor.ink)
+                    WidgetStudioHeroPanel(
+                        solvedText: viewModel.totalSolvedText,
+                        username: viewModel.displayUsername,
+                        refreshText: viewModel.widgetDashboardSummaryTitle
+                    )
+
+                    WidgetSetupPanel(
+                        refreshText: viewModel.widgetDashboardSummaryTitle,
+                        dataText: viewModel.widgetDashboardSummaryDetail
+                    )
                 }
             }
+
+            WidgetCatalogPanel()
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }
@@ -426,7 +444,7 @@ struct ContentView: View {
 
     private var header: some View {
         HStack(alignment: .center, spacing: 14) {
-            AppIconMark()
+            AppIconMark(size: 54, cornerRadius: 15)
 
             VStack(alignment: .leading, spacing: 4) {
                 Text("LeetTracker")

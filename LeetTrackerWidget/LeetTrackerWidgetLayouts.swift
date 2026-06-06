@@ -14,41 +14,43 @@ struct SmallWidgetView: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: LTWidgetSpacing.medium) {
-            HStack(alignment: .top, spacing: LTWidgetSpacing.medium) {
-                WidgetHeader(isCompact: true)
+        WidgetCardContent(size: .small) {
+            VStack(alignment: .leading, spacing: LTWidgetSpacing.compactContentGap) {
+                HStack(alignment: .top, spacing: LTWidgetSpacing.medium) {
+                    WidgetHeader(isCompact: true)
 
-                Spacer(minLength: LTWidgetSpacing.small)
+                    Spacer(minLength: LTWidgetSpacing.small)
 
-                Text("\(stats.totalSolved)")
-                    .font(LTWidgetTypography.display)
-                    .foregroundStyle(LTWidgetColor.primary)
-                    .contentTransition(.numericText())
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.72)
-            }
+                    Text("\(stats.totalSolved)")
+                        .font(LTWidgetTypography.display)
+                        .foregroundStyle(LTWidgetColor.primary)
+                        .contentTransition(.numericText())
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.72)
+                }
 
-            VStack(alignment: .leading, spacing: LTWidgetSpacing.compact) {
-                Text(username)
-                    .font(LTWidgetTypography.compactUser)
-                    .foregroundStyle(LTWidgetColor.primary)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.74)
+                VStack(alignment: .leading, spacing: LTWidgetSpacing.compact) {
+                    Text(username)
+                        .font(LTWidgetTypography.compactUser)
+                        .foregroundStyle(LTWidgetColor.primary)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.74)
 
-                Text("\(goalSettings.remaining(after: stats.totalSolved)) left")
-                    .font(LTWidgetTypography.caption)
-                    .foregroundStyle(LTWidgetColor.secondary)
-                    .lineLimit(1)
-            }
+                    Text("\(goalSettings.remaining(after: stats.totalSolved)) left")
+                        .font(LTWidgetTypography.caption)
+                        .foregroundStyle(LTWidgetColor.secondary)
+                        .lineLimit(1)
+                }
 
-            WidgetDifficultySummary(stats: stats, style: .compact)
+                Spacer(minLength: 0)
 
-            if let status {
-                status
+                WidgetDifficultySummary(stats: stats, style: .compact)
+
+                if let status {
+                    status
+                }
             }
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
-        .padding(LTWidgetSpacing.smallPadding)
     }
 }
 
@@ -66,51 +68,50 @@ struct MediumWidgetView: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: LTWidgetSpacing.large) {
-            HStack(alignment: .top, spacing: LTWidgetSpacing.large) {
-                VStack(alignment: .leading, spacing: LTWidgetSpacing.medium) {
-                    WidgetHeader()
+        WidgetCardContent(size: .mediumProgress, alignment: .center) {
+            VStack(alignment: .leading, spacing: LTWidgetSpacing.medium) {
+                HStack(alignment: .top, spacing: LTWidgetSpacing.large) {
+                    VStack(alignment: .leading, spacing: LTWidgetSpacing.small) {
+                        WidgetHeader()
 
-                    HStack(spacing: LTWidgetSpacing.small) {
-                        Text(username)
-                            .font(LTWidgetTypography.user)
+                        HStack(spacing: LTWidgetSpacing.small) {
+                            Text(username)
+                                .font(LTWidgetTypography.user)
+                                .foregroundStyle(LTWidgetColor.primary)
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.78)
+
+                            Text("·")
+                                .font(LTWidgetTypography.label)
+                                .foregroundStyle(LTWidgetColor.tertiary)
+
+                            WidgetUpdatedText(date: stats.lastUpdated)
+                        }
+                    }
+
+                    Spacer(minLength: LTWidgetSpacing.medium)
+
+                    VStack(alignment: .trailing, spacing: LTWidgetSpacing.compact) {
+                        Text("\(stats.totalSolved)")
+                            .font(LTWidgetTypography.mediumDisplay)
                             .foregroundStyle(LTWidgetColor.primary)
+                            .contentTransition(.numericText())
                             .lineLimit(1)
-                            .minimumScaleFactor(0.78)
+                            .minimumScaleFactor(0.82)
 
-                        Text("·")
+                        Text("solved")
                             .font(LTWidgetTypography.label)
-                            .foregroundStyle(LTWidgetColor.tertiary)
-
-                        WidgetUpdatedText(date: stats.lastUpdated)
+                            .foregroundStyle(LTWidgetColor.secondary)
                     }
                 }
 
-                Spacer(minLength: LTWidgetSpacing.medium)
+                WidgetDifficultySummary(stats: stats, style: .spacious)
 
-                VStack(alignment: .trailing, spacing: LTWidgetSpacing.compact) {
-                    Text("\(stats.totalSolved)")
-                        .font(LTWidgetTypography.mediumDisplay)
-                        .foregroundStyle(LTWidgetColor.primary)
-                        .contentTransition(.numericText())
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.82)
-
-                    Text("solved")
-                        .font(LTWidgetTypography.label)
-                        .foregroundStyle(LTWidgetColor.secondary)
+                if let status {
+                    status
                 }
             }
-
-            WidgetDifficultySummary(stats: stats, style: .spacious)
-
-            if let status {
-                status
-            }
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
-        .padding(.horizontal, 22)
-        .padding(.vertical, LTWidgetSpacing.mediumPadding)
     }
 }
 
@@ -124,34 +125,30 @@ struct MotivationSmallWidgetView: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: LTWidgetSpacing.large) {
-            WidgetHeader(title: "Practice", isCompact: true)
-
+        WidgetCardContent(size: .smallTight, alignment: .center) {
             VStack(alignment: .leading, spacing: LTWidgetSpacing.small) {
-                Text("Practice")
-                    .font(LTWidgetTypography.compactHeadline)
-                    .foregroundStyle(LTWidgetColor.primary)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.74)
+                WidgetHeader(title: "Practice", isCompact: true, showsCompactTitle: true)
 
-                Text(difficulty.sessionCopy)
-                    .font(LTWidgetTypography.caption)
-                    .foregroundStyle(LTWidgetColor.secondary)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.70)
-            }
+                VStack(alignment: .leading, spacing: LTWidgetSpacing.small) {
+                    Text(difficulty.sessionCopy)
+                        .font(LTWidgetTypography.caption)
+                        .foregroundStyle(LTWidgetColor.secondary)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.70)
+                }
 
-            HStack(spacing: LTWidgetSpacing.small) {
-                WidgetDifficultyChip(title: difficulty.rawValue, value: goalSettings.remaining(after: stats.totalSolved), tint: difficulty.tint, isCompact: false)
+                Spacer(minLength: 0)
 
-                Text("left")
-                    .font(LTWidgetTypography.caption)
-                    .foregroundStyle(LTWidgetColor.secondary)
-                    .lineLimit(1)
+                HStack(spacing: LTWidgetSpacing.small) {
+                    WidgetDifficultyChip(title: difficulty.rawValue, value: goalSettings.remaining(after: stats.totalSolved), tint: difficulty.tint, isCompact: false)
+
+                    Text("left")
+                        .font(LTWidgetTypography.caption)
+                        .foregroundStyle(LTWidgetColor.secondary)
+                        .lineLimit(1)
+                }
             }
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
-        .padding(LTWidgetSpacing.smallPadding)
     }
 }
 
@@ -165,52 +162,52 @@ struct MotivationMediumWidgetView: View {
     }
 
     var body: some View {
-        HStack(alignment: .center, spacing: LTWidgetSpacing.large) {
-            VStack(alignment: .leading, spacing: LTWidgetSpacing.medium) {
-                WidgetHeader(title: "Practice")
-
+        WidgetCardContent(size: .medium, alignment: .center) {
+            HStack(alignment: .center, spacing: LTWidgetSpacing.large) {
                 VStack(alignment: .leading, spacing: LTWidgetSpacing.small) {
-                    Text("One small finish")
-                        .font(LTWidgetTypography.headline)
-                        .foregroundStyle(LTWidgetColor.primary)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.72)
+                    WidgetHeader(title: "Practice")
 
-                    Text("\(username)")
-                        .font(LTWidgetTypography.caption)
-                        .foregroundStyle(LTWidgetColor.secondary)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.72)
+                    VStack(alignment: .leading, spacing: LTWidgetSpacing.compact) {
+                        Text("One small finish")
+                            .font(LTWidgetTypography.headline)
+                            .foregroundStyle(LTWidgetColor.primary)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.72)
+
+                        Text(username)
+                            .font(LTWidgetTypography.caption)
+                            .foregroundStyle(LTWidgetColor.secondary)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.72)
+                    }
+
+                    WidgetCallout(
+                        title: "Next move",
+                        detail: difficulty.sessionCopy,
+                        tint: difficulty.tint
+                    )
                 }
+                .frame(maxWidth: .infinity, alignment: .leading)
 
-                WidgetCallout(
-                    title: "Next move",
-                    detail: difficulty.sessionCopy,
-                    tint: difficulty.tint
-                )
+                VStack(alignment: .trailing, spacing: LTWidgetSpacing.small) {
+                    Text("\(goalSettings.remaining(after: stats.totalSolved))")
+                        .font(LTWidgetTypography.mediumDisplay)
+                        .foregroundStyle(LTWidgetColor.primary)
+                        .contentTransition(.numericText())
+                        .lineLimit(1)
+
+                    Text("left")
+                        .font(LTWidgetTypography.label)
+                        .foregroundStyle(LTWidgetColor.secondary)
+
+                    Text(goalSettings.weeklyMixText)
+                        .font(LTWidgetTypography.caption)
+                        .foregroundStyle(LTWidgetColor.tertiary)
+                        .lineLimit(1)
+                }
+                .frame(width: 82, alignment: .trailing)
             }
-
-            VStack(alignment: .trailing, spacing: LTWidgetSpacing.medium) {
-                Text("\(goalSettings.remaining(after: stats.totalSolved))")
-                    .font(LTWidgetTypography.mediumDisplay)
-                    .foregroundStyle(LTWidgetColor.primary)
-                    .contentTransition(.numericText())
-                    .lineLimit(1)
-
-                Text("left")
-                    .font(LTWidgetTypography.label)
-                    .foregroundStyle(LTWidgetColor.secondary)
-
-                Text(goalSettings.weeklyMixText)
-                    .font(LTWidgetTypography.caption)
-                    .foregroundStyle(LTWidgetColor.tertiary)
-                    .lineLimit(1)
-            }
-            .frame(width: 86, alignment: .trailing)
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
-        .padding(.horizontal, 22)
-        .padding(.vertical, LTWidgetSpacing.mediumPadding)
     }
 }
 
@@ -219,33 +216,37 @@ struct GoalPaceSmallWidgetView: View {
     let goalSettings: SharedGoalSettings
 
     var body: some View {
-        VStack(alignment: .leading, spacing: LTWidgetSpacing.large) {
-            WidgetHeader(title: "Goal", isCompact: true)
-
+        WidgetCardContent(size: .smallTight, alignment: .center) {
             VStack(alignment: .leading, spacing: LTWidgetSpacing.small) {
-                Text("\(goalSettings.remaining(after: stats.totalSolved))")
-                    .font(LTWidgetTypography.display)
-                    .foregroundStyle(LTWidgetColor.primary)
-                    .contentTransition(.numericText())
-                    .lineLimit(1)
+                WidgetHeader(title: "Goal", isCompact: true, showsCompactTitle: true)
 
-                Text("problems left")
-                    .font(LTWidgetTypography.label)
-                    .foregroundStyle(LTWidgetColor.secondary)
-            }
+                VStack(alignment: .leading, spacing: LTWidgetSpacing.compact) {
+                    Text("\(goalSettings.remaining(after: stats.totalSolved))")
+                        .font(LTWidgetTypography.display)
+                        .foregroundStyle(LTWidgetColor.primary)
+                        .contentTransition(.numericText())
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.76)
 
-            HStack(spacing: LTWidgetSpacing.small) {
-                WidgetProgressBar(progress: goalSettings.progress(after: stats.totalSolved), tint: LTWidgetColor.primary)
+                    Text("problems left")
+                        .font(LTWidgetTypography.label)
+                        .foregroundStyle(LTWidgetColor.secondary)
+                        .lineLimit(1)
+                }
 
-                Text("\(goalSettings.weeklyTarget)/wk")
-                    .font(LTWidgetTypography.caption)
-                    .foregroundStyle(LTWidgetColor.secondary)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.70)
+                Spacer(minLength: 0)
+
+                HStack(spacing: LTWidgetSpacing.small) {
+                    WidgetProgressBar(progress: goalSettings.progress(after: stats.totalSolved), tint: LTWidgetColor.primary)
+
+                    Text("\(goalSettings.weeklyTarget)/wk")
+                        .font(LTWidgetTypography.caption)
+                        .foregroundStyle(LTWidgetColor.secondary)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.70)
+                }
             }
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
-        .padding(LTWidgetSpacing.smallPadding)
     }
 }
 
@@ -255,40 +256,41 @@ struct GoalPaceMediumWidgetView: View {
     let goalSettings: SharedGoalSettings
 
     var body: some View {
-        HStack(alignment: .center, spacing: LTWidgetSpacing.xLarge) {
-            VStack(alignment: .leading, spacing: LTWidgetSpacing.medium) {
-                WidgetHeader(title: "Goal Pace")
+        WidgetCardContent(size: .mediumTight, alignment: .center) {
+            HStack(alignment: .center, spacing: LTWidgetSpacing.medium) {
+                VStack(alignment: .leading, spacing: LTWidgetSpacing.small) {
+                    WidgetHeader(title: "Goal Pace")
 
-                Text("\(username) · \(goalSettings.weeklyTarget)/week")
-                    .font(LTWidgetTypography.caption)
-                    .foregroundStyle(LTWidgetColor.secondary)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.72)
+                    Text("\(username) · \(goalSettings.weeklyTarget)/week")
+                        .font(LTWidgetTypography.caption)
+                        .foregroundStyle(LTWidgetColor.secondary)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.72)
 
-                WidgetProgressBar(progress: goalSettings.progress(after: stats.totalSolved), tint: LTWidgetColor.primary)
+                    WidgetProgressBar(progress: goalSettings.progress(after: stats.totalSolved), tint: LTWidgetColor.primary)
 
-                HStack(spacing: LTWidgetSpacing.medium) {
-                    WidgetPaceTile(title: "Target", value: "\(goalSettings.targetSolved)", tint: LTWidgetColor.primary)
-                    WidgetPaceTile(title: "Mix", value: goalSettings.weeklyMixText, tint: LTWidgetColor.medium)
-                    WidgetPaceTile(title: "ETA", value: "\(goalSettings.weeksRemaining(after: stats.totalSolved))w", tint: LTWidgetColor.easy)
+                    HStack(spacing: LTWidgetSpacing.small) {
+                        WidgetPaceTile(title: "Target", value: "\(goalSettings.targetSolved)", tint: LTWidgetColor.primary)
+                        WidgetPaceTile(title: "Mix", value: goalSettings.weeklyMixText, tint: LTWidgetColor.medium)
+                        WidgetPaceTile(title: "ETA", value: "\(goalSettings.weeksRemaining(after: stats.totalSolved))w", tint: LTWidgetColor.easy)
+                    }
                 }
-            }
+                .frame(maxWidth: .infinity, alignment: .leading)
 
-            VStack(alignment: .trailing, spacing: LTWidgetSpacing.compact) {
-                Text("\(goalSettings.remaining(after: stats.totalSolved))")
-                    .font(LTWidgetTypography.mediumDisplay)
-                    .foregroundStyle(LTWidgetColor.primary)
-                    .contentTransition(.numericText())
-                    .lineLimit(1)
+                VStack(alignment: .trailing, spacing: LTWidgetSpacing.compact) {
+                    Text("\(goalSettings.remaining(after: stats.totalSolved))")
+                        .font(LTWidgetTypography.mediumDisplay)
+                        .foregroundStyle(LTWidgetColor.primary)
+                        .contentTransition(.numericText())
+                        .lineLimit(1)
 
-                Text("left")
-                    .font(LTWidgetTypography.label)
-                    .foregroundStyle(LTWidgetColor.secondary)
+                    Text("left")
+                        .font(LTWidgetTypography.label)
+                        .foregroundStyle(LTWidgetColor.secondary)
+                }
+                .frame(width: 78, alignment: .trailing)
             }
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
-        .padding(.horizontal, 22)
-        .padding(.vertical, LTWidgetSpacing.mediumPadding)
     }
 }
 
@@ -298,25 +300,22 @@ struct WidgetPaceTile: View {
     let tint: Color
 
     var body: some View {
-        VStack(alignment: .leading, spacing: LTWidgetSpacing.small) {
-            Circle()
-                .fill(tint)
-                .frame(width: LTWidgetSizing.compactDot, height: LTWidgetSizing.compactDot)
-
+        VStack(alignment: .leading, spacing: LTWidgetSpacing.compact) {
             Text(title)
                 .font(LTWidgetTypography.compactLabel)
                 .foregroundStyle(LTWidgetColor.tertiary)
                 .lineLimit(1)
+                .minimumScaleFactor(0.72)
 
             Text(value)
-                .font(LTWidgetTypography.label)
+                .font(LTWidgetTypography.caption)
                 .foregroundStyle(LTWidgetColor.primary)
                 .lineLimit(1)
-                .minimumScaleFactor(0.70)
+                .minimumScaleFactor(0.66)
         }
-        .padding(.horizontal, LTWidgetSpacing.medium)
-        .padding(.vertical, LTWidgetSpacing.small)
-        .frame(maxWidth: .infinity, minHeight: 42, alignment: .leading)
+        .padding(.horizontal, LTWidgetSpacing.compact)
+        .padding(.vertical, LTWidgetSpacing.compact)
+        .frame(maxWidth: .infinity, minHeight: 36, alignment: .leading)
         .background(tint.opacity(0.12), in: RoundedRectangle(cornerRadius: LTWidgetRadius.miniPanel))
         .overlay {
             RoundedRectangle(cornerRadius: LTWidgetRadius.miniPanel)

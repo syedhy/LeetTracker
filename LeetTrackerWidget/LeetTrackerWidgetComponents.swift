@@ -151,6 +151,80 @@ struct WidgetContainer<Content: View>: View {
     }
 }
 
+struct WidgetCardContent<Content: View>: View {
+    enum Size {
+        case small
+        case smallTight
+        case medium
+        case mediumBalanced
+        case mediumProgress
+        case mediumTight
+
+        var edgeInsets: EdgeInsets {
+            switch self {
+            case .small:
+                return EdgeInsets(
+                    top: LTWidgetSpacing.smallPadding,
+                    leading: LTWidgetSpacing.smallPadding,
+                    bottom: LTWidgetSpacing.smallPadding,
+                    trailing: LTWidgetSpacing.smallPadding
+                )
+            case .smallTight:
+                return EdgeInsets(
+                    top: LTWidgetSpacing.large,
+                    leading: LTWidgetSpacing.large,
+                    bottom: LTWidgetSpacing.large,
+                    trailing: LTWidgetSpacing.large
+                )
+            case .medium:
+                return EdgeInsets(
+                    top: LTWidgetSpacing.mediumPadding,
+                    leading: LTWidgetSpacing.mediumHorizontalPadding,
+                    bottom: LTWidgetSpacing.mediumPadding,
+                    trailing: LTWidgetSpacing.mediumHorizontalPadding
+                )
+            case .mediumBalanced:
+                return EdgeInsets(
+                    top: LTWidgetSpacing.mediumPadding,
+                    leading: LTWidgetSpacing.mediumPadding,
+                    bottom: LTWidgetSpacing.mediumPadding,
+                    trailing: LTWidgetSpacing.mediumPadding
+                )
+            case .mediumProgress:
+                return EdgeInsets(
+                    top: LTWidgetSpacing.mediumPadding,
+                    leading: LTWidgetSpacing.large,
+                    bottom: LTWidgetSpacing.mediumPadding,
+                    trailing: LTWidgetSpacing.large
+                )
+            case .mediumTight:
+                return EdgeInsets(
+                    top: LTWidgetSpacing.large,
+                    leading: LTWidgetSpacing.large,
+                    bottom: LTWidgetSpacing.large,
+                    trailing: LTWidgetSpacing.large
+                )
+            }
+        }
+    }
+
+    private let size: Size
+    private let alignment: Alignment
+    private let content: Content
+
+    init(size: Size, alignment: Alignment = .leading, @ViewBuilder content: () -> Content) {
+        self.size = size
+        self.alignment = alignment
+        self.content = content()
+    }
+
+    var body: some View {
+        content
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: alignment)
+            .padding(size.edgeInsets)
+    }
+}
+
 struct WidgetPaperGrid: View {
     var body: some View {
         Canvas { context, size in
@@ -221,19 +295,21 @@ struct WidgetBrandMark: View {
 struct WidgetHeader: View {
     let title: String
     let isCompact: Bool
+    let showsCompactTitle: Bool
 
-    init(title: String = "LeetCode", isCompact: Bool = false) {
+    init(title: String = "LeetCode", isCompact: Bool = false, showsCompactTitle: Bool = false) {
         self.title = title
         self.isCompact = isCompact
+        self.showsCompactTitle = showsCompactTitle
     }
 
     var body: some View {
-        HStack(spacing: LTWidgetSpacing.small) {
+        HStack(alignment: .center, spacing: LTWidgetSpacing.small) {
             WidgetBrandMark(isCompact: isCompact)
 
-            if !isCompact {
+            if !isCompact || showsCompactTitle {
                 Text(title)
-                    .font(LTWidgetTypography.title)
+                    .font(isCompact ? LTWidgetTypography.compactTitle : LTWidgetTypography.title)
                     .foregroundStyle(LTWidgetColor.brand)
                     .lineLimit(1)
                     .minimumScaleFactor(0.72)
@@ -292,8 +368,8 @@ struct WidgetDifficultyMini: View {
                 .minimumScaleFactor(0.75)
         }
         .padding(.horizontal, LTWidgetSpacing.small)
-        .padding(.vertical, 5)
-        .frame(maxWidth: .infinity, minHeight: 27)
+        .padding(.vertical, LTWidgetSpacing.compact)
+        .frame(maxWidth: .infinity, minHeight: 25)
         .background(tint.opacity(0.18), in: RoundedRectangle(cornerRadius: LTWidgetRadius.badge))
     }
 }
@@ -310,10 +386,11 @@ struct WidgetDifficultyCard: View {
                     .fill(tint)
                     .frame(width: LTWidgetSizing.dot, height: LTWidgetSizing.dot)
 
-                Text(title)
-                    .font(LTWidgetTypography.label)
-                    .foregroundStyle(LTWidgetColor.primary)
-                    .lineLimit(1)
+            Text(title)
+                .font(LTWidgetTypography.label)
+                .foregroundStyle(LTWidgetColor.primary)
+                .lineLimit(1)
+                .minimumScaleFactor(0.72)
             }
 
             Text("\(value)")
@@ -324,8 +401,8 @@ struct WidgetDifficultyCard: View {
                 .minimumScaleFactor(0.72)
         }
         .padding(.horizontal, LTWidgetSpacing.medium)
-        .padding(.vertical, LTWidgetSpacing.medium)
-        .frame(maxWidth: .infinity, minHeight: 54, alignment: .leading)
+        .padding(.vertical, LTWidgetSpacing.small)
+        .frame(maxWidth: .infinity, minHeight: 50, alignment: .leading)
         .background(tint.opacity(0.12), in: RoundedRectangle(cornerRadius: LTWidgetRadius.miniPanel))
         .overlay {
             RoundedRectangle(cornerRadius: LTWidgetRadius.miniPanel)
@@ -361,8 +438,8 @@ struct WidgetDifficultyChip: View {
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
         }
-        .padding(.horizontal, isCompact ? 7 : 9)
-        .padding(.vertical, isCompact ? 5 : 6)
+        .padding(.horizontal, isCompact ? 7 : 8)
+        .padding(.vertical, isCompact ? 4 : 5)
         .frame(maxWidth: .infinity)
         .background(tint.opacity(0.16), in: RoundedRectangle(cornerRadius: LTWidgetRadius.badge))
     }
@@ -418,6 +495,7 @@ struct WidgetCallout: View {
                     .lineLimit(2)
                     .minimumScaleFactor(0.72)
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
     }
 }

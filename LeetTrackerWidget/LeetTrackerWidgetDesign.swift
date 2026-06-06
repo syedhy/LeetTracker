@@ -9,8 +9,10 @@ enum LTWidgetSpacing {
     static let large: CGFloat = 12
     static let xLarge: CGFloat = 16
     static let xxLarge: CGFloat = 20
-    static let smallPadding: CGFloat = 16
-    static let mediumPadding: CGFloat = 18
+    static let smallPadding: CGFloat = 13
+    static let mediumPadding: CGFloat = 16
+    static let mediumHorizontalPadding: CGFloat = 18
+    static let compactContentGap: CGFloat = 7
 }
 
 enum LTWidgetTypography {

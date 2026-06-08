@@ -438,6 +438,7 @@ struct ContentView: View {
 
             setupSection
             dataHealthSection
+            privacyEthicsSection
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }
@@ -648,7 +649,24 @@ struct ContentView: View {
 
                 DetailRow(title: "Cache", value: viewModel.cacheStatusText)
                 DetailRow(title: "Auto refresh", value: viewModel.refreshCadenceText)
-                DetailRow(title: "Background", value: "Helper ready")
+                DetailRow(title: "Background", value: "WidgetKit + helper")
+            }
+        }
+    }
+
+    private var privacyEthicsSection: some View {
+        Panel {
+            VStack(alignment: .leading, spacing: 14) {
+                SectionHeader(title: "Privacy & Ethics", systemImage: "hand.raised")
+
+                DetailRow(title: "LeetCode data", value: "Public solved counts only")
+                DetailRow(title: "Credentials", value: "Never requested")
+                DetailRow(title: "Affiliation", value: "Independent app")
+
+                Text("Use a username you own or have permission to track. LeetTracker keeps analytics local, avoids private account data, and refreshes at a low frequency.")
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
             }
         }
     }

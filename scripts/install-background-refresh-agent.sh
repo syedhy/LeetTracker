@@ -3,7 +3,7 @@ set -euo pipefail
 
 LABEL="com.hyder.LeetTracker.background-refresh"
 APP_PATH="${APP_PATH:-/Applications/LeetTracker.app}"
-INTERVAL_SECONDS="${INTERVAL_SECONDS:-120}"
+INTERVAL_SECONDS="${INTERVAL_SECONDS:-1800}"
 PLIST_PATH="$HOME/Library/LaunchAgents/$LABEL.plist"
 LOG_DIR="$HOME/Library/Logs/LeetTracker"
 EXECUTABLE_PATH="$APP_PATH/Contents/MacOS/LeetTracker"
@@ -38,6 +38,9 @@ cat > "$PLIST_PATH" <<PLIST
 </dict>
 </plist>
 PLIST
+
+chmod 644 "$PLIST_PATH"
+plutil -lint "$PLIST_PATH" >/dev/null
 
 launchctl bootout "gui/$(id -u)" "$PLIST_PATH" >/dev/null 2>&1 || true
 launchctl bootstrap "gui/$(id -u)" "$PLIST_PATH"

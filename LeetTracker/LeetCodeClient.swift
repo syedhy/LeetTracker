@@ -40,7 +40,7 @@ struct LeetCodeClient {
         var request = URLRequest(url: endpoint, timeoutInterval: 15)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.setValue("LeetTracker macOS", forHTTPHeaderField: "User-Agent")
+        request.setValue("LeetTracker macOS (https://github.com/syedhy/leettracker)", forHTTPHeaderField: "User-Agent")
         request.httpBody = try JSONEncoder().encode(payload)
 
         let data: Data

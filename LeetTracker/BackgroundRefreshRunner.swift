@@ -44,6 +44,18 @@ enum BackgroundRefreshRunner {
             return RefreshResult(message: "LeetTracker background refresh skipped: no username saved.", exitCode: EXIT_SUCCESS)
         }
 
+        if
+            let cachedStats = store.cachedStats,
+            Date().timeIntervalSince(cachedStats.lastUpdated) < LeetTrackerWidgetConfiguration.refreshInterval
+        {
+            reloadWidgetTimelines()
+
+            return RefreshResult(
+                message: "LeetTracker background refresh skipped: cached stats are still fresh from \(cachedStats.lastUpdated).",
+                exitCode: EXIT_SUCCESS
+            )
+        }
+
         do {
             let stats = try await LeetCodeClient().fetchStats(for: username)
             store.saveUsername(stats.username)
@@ -73,6 +85,8 @@ enum BackgroundRefreshRunner {
 
     private static func reloadWidgetTimelines() {
         WidgetCenter.shared.reloadTimelines(ofKind: LeetTrackerWidgetConfiguration.kind)
+        WidgetCenter.shared.reloadTimelines(ofKind: LeetTrackerWidgetConfiguration.motivationKind)
+        WidgetCenter.shared.reloadTimelines(ofKind: LeetTrackerWidgetConfiguration.goalPaceKind)
     }
 
     private static func writeLog(_ message: String) {

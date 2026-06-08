@@ -4,6 +4,9 @@ xcuserdata/
 DerivedData/
 build/
 dist/
+packaging/homebrew/Casks/*.rb
+docs/ideation/
+docs/plans/
 *.moved-aside
 *.xccheckout
 *.xcscmblueprint

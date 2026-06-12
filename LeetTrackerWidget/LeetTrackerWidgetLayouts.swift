@@ -115,108 +115,12 @@ struct MediumWidgetView: View {
     }
 }
 
-struct MotivationSmallWidgetView: View {
-    let username: String
-    let stats: WidgetStatsSnapshot
-    let goalSettings: SharedGoalSettings
-
-    private var difficulty: WidgetDifficulty {
-        stats.recommendedDifficulty
-    }
-
-    var body: some View {
-        WidgetCardContent(size: .smallTight, alignment: .center) {
-            VStack(alignment: .leading, spacing: LTWidgetSpacing.small) {
-                WidgetHeader(title: "Practice", isCompact: true, showsCompactTitle: true)
-
-                VStack(alignment: .leading, spacing: LTWidgetSpacing.small) {
-                    Text(difficulty.sessionCopy)
-                        .font(LTWidgetTypography.caption)
-                        .foregroundStyle(LTWidgetColor.secondary)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.70)
-                }
-
-                Spacer(minLength: 0)
-
-                HStack(spacing: LTWidgetSpacing.small) {
-                    WidgetDifficultyChip(title: difficulty.rawValue, value: goalSettings.remaining(after: stats.totalSolved), tint: difficulty.tint, isCompact: false)
-
-                    Text("left")
-                        .font(LTWidgetTypography.caption)
-                        .foregroundStyle(LTWidgetColor.secondary)
-                        .lineLimit(1)
-                }
-            }
-        }
-    }
-}
-
-struct MotivationMediumWidgetView: View {
-    let username: String
-    let stats: WidgetStatsSnapshot
-    let goalSettings: SharedGoalSettings
-
-    private var difficulty: WidgetDifficulty {
-        stats.recommendedDifficulty
-    }
-
-    var body: some View {
-        WidgetCardContent(size: .medium, alignment: .center) {
-            HStack(alignment: .center, spacing: LTWidgetSpacing.large) {
-                VStack(alignment: .leading, spacing: LTWidgetSpacing.small) {
-                    WidgetHeader(title: "Practice")
-
-                    VStack(alignment: .leading, spacing: LTWidgetSpacing.compact) {
-                        Text("One small finish")
-                            .font(LTWidgetTypography.headline)
-                            .foregroundStyle(LTWidgetColor.primary)
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.72)
-
-                        Text(username)
-                            .font(LTWidgetTypography.caption)
-                            .foregroundStyle(LTWidgetColor.secondary)
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.72)
-                    }
-
-                    WidgetCallout(
-                        title: "Next move",
-                        detail: difficulty.sessionCopy,
-                        tint: difficulty.tint
-                    )
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-
-                VStack(alignment: .trailing, spacing: LTWidgetSpacing.small) {
-                    Text("\(goalSettings.remaining(after: stats.totalSolved))")
-                        .font(LTWidgetTypography.mediumDisplay)
-                        .foregroundStyle(LTWidgetColor.primary)
-                        .contentTransition(.numericText())
-                        .lineLimit(1)
-
-                    Text("left")
-                        .font(LTWidgetTypography.label)
-                        .foregroundStyle(LTWidgetColor.secondary)
-
-                    Text(goalSettings.weeklyMixText)
-                        .font(LTWidgetTypography.caption)
-                        .foregroundStyle(LTWidgetColor.tertiary)
-                        .lineLimit(1)
-                }
-                .frame(width: 82, alignment: .trailing)
-            }
-        }
-    }
-}
-
 struct GoalPaceSmallWidgetView: View {
     let stats: WidgetStatsSnapshot
     let goalSettings: SharedGoalSettings
 
     var body: some View {
-        WidgetCardContent(size: .smallTight, alignment: .center) {
+        WidgetCardContent(size: .goalSmall, alignment: .center) {
             VStack(alignment: .leading, spacing: LTWidgetSpacing.small) {
                 WidgetHeader(title: "Goal", isCompact: true, showsCompactTitle: true)
 
@@ -256,7 +160,7 @@ struct GoalPaceMediumWidgetView: View {
     let goalSettings: SharedGoalSettings
 
     var body: some View {
-        WidgetCardContent(size: .mediumTight, alignment: .center) {
+        WidgetCardContent(size: .goalMedium, alignment: .center) {
             HStack(alignment: .center, spacing: LTWidgetSpacing.medium) {
                 VStack(alignment: .leading, spacing: LTWidgetSpacing.small) {
                     WidgetHeader(title: "Goal Pace")
@@ -294,6 +198,114 @@ struct GoalPaceMediumWidgetView: View {
     }
 }
 
+struct StreakSmallWidgetView: View {
+    let username: String
+    let stats: WidgetStatsSnapshot
+
+    var body: some View {
+        WidgetCardContent(size: .streakSmall, alignment: .center) {
+            VStack(alignment: .leading, spacing: LTWidgetSpacing.small) {
+                HStack(alignment: .center) {
+                    WidgetHeader(title: "Streak", isCompact: true, showsCompactTitle: true)
+
+                    Spacer(minLength: LTWidgetSpacing.small)
+
+                    Text("\(stats.streakDisplay)")
+                        .font(LTWidgetTypography.display)
+                        .foregroundStyle(LTWidgetColor.primary)
+                        .contentTransition(.numericText())
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.76)
+                }
+
+                Spacer(minLength: 0)
+
+                HStack(alignment: .bottom, spacing: LTWidgetSpacing.medium) {
+                    StreakMascotImage()
+                        .frame(width: 58, height: 58)
+
+                    VStack(alignment: .leading, spacing: LTWidgetSpacing.compact) {
+                        Text(streakTitle)
+                            .font(LTWidgetTypography.compactUser)
+                            .foregroundStyle(LTWidgetColor.primary)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.70)
+
+                        Text("\(stats.activeDaysDisplay) active days")
+                            .font(LTWidgetTypography.caption)
+                            .foregroundStyle(LTWidgetColor.secondary)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.70)
+                    }
+                }
+            }
+        }
+    }
+
+    private var streakTitle: String {
+        stats.streakDisplay == 1 ? "1 day streak" : "\(stats.streakDisplay) day streak"
+    }
+}
+
+struct StreakMediumWidgetView: View {
+    let username: String
+    let stats: WidgetStatsSnapshot
+
+    var body: some View {
+        WidgetCardContent(size: .streakMedium, alignment: .center) {
+            HStack(alignment: .center, spacing: LTWidgetSpacing.large) {
+                StreakMascotImage()
+                    .frame(width: 122, height: 122)
+
+                VStack(alignment: .leading, spacing: LTWidgetSpacing.medium) {
+                    WidgetHeader(title: "Streak")
+
+                    VStack(alignment: .leading, spacing: LTWidgetSpacing.compact) {
+                        Text(username)
+                            .font(LTWidgetTypography.user)
+                            .foregroundStyle(LTWidgetColor.primary)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.76)
+
+                        Text(streakCopy)
+                            .font(LTWidgetTypography.caption)
+                            .foregroundStyle(LTWidgetColor.secondary)
+                            .lineLimit(2)
+                            .minimumScaleFactor(0.72)
+                    }
+
+                    StreakLevelBand(streak: stats.streakDisplay)
+                }
+
+                Spacer(minLength: LTWidgetSpacing.small)
+
+                VStack(alignment: .trailing, spacing: LTWidgetSpacing.compact) {
+                    Text("\(stats.streakDisplay)")
+                        .font(LTWidgetTypography.mediumDisplay)
+                        .foregroundStyle(LTWidgetColor.primary)
+                        .contentTransition(.numericText())
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.76)
+
+                    Text("day streak")
+                        .font(LTWidgetTypography.label)
+                        .foregroundStyle(LTWidgetColor.secondary)
+                        .lineLimit(1)
+                }
+                .frame(width: 96, alignment: .trailing)
+            }
+        }
+    }
+
+    private var streakCopy: String {
+        if stats.streakDisplay == 0 {
+            return "Start with one clean solve today."
+        }
+
+        return "\(stats.activeDaysDisplay) public active days on LeetCode."
+    }
+}
+
 struct WidgetPaceTile: View {
     let title: String
     let value: String
@@ -320,6 +332,65 @@ struct WidgetPaceTile: View {
         .overlay {
             RoundedRectangle(cornerRadius: LTWidgetRadius.miniPanel)
                 .stroke(tint.opacity(0.35), lineWidth: 1)
+        }
+    }
+}
+
+struct StreakMascotImage: View {
+    var body: some View {
+        Image("StreakMascot")
+            .resizable()
+            .interpolation(.high)
+            .scaledToFit()
+            .shadow(color: LTWidgetColor.primary.opacity(0.16), radius: 0, x: 3, y: 3)
+    }
+}
+
+struct StreakLevelBand: View {
+    let streak: Int
+
+    var body: some View {
+        HStack(spacing: LTWidgetSpacing.small) {
+            Circle()
+                .fill(tint)
+                .frame(width: LTWidgetSizing.dot, height: LTWidgetSizing.dot)
+
+            Text(levelText)
+                .font(LTWidgetTypography.label)
+                .foregroundStyle(LTWidgetColor.primary)
+                .lineLimit(1)
+                .minimumScaleFactor(0.72)
+        }
+        .padding(.horizontal, LTWidgetSpacing.medium)
+        .padding(.vertical, LTWidgetSpacing.small)
+        .background(tint.opacity(0.16), in: Capsule())
+        .overlay {
+            Capsule()
+                .stroke(tint.opacity(0.5), lineWidth: 1)
+        }
+    }
+
+    private var tint: Color {
+        switch streak {
+        case 14...:
+            return LTWidgetColor.hard
+        case 7...:
+            return LTWidgetColor.medium
+        default:
+            return LTWidgetColor.easy
+        }
+    }
+
+    private var levelText: String {
+        switch streak {
+        case 14...:
+            return "Hot streak"
+        case 7...:
+            return "Momentum"
+        case 1...:
+            return "Building"
+        default:
+            return "Start today"
         }
     }
 }

@@ -24,7 +24,7 @@ Use LeetTracker with your own LeetCode username, or with a username you have per
 
 ## Network Behavior
 
-The app fetches one public profile at a time. Manual refreshes happen only when the user presses Refresh. Background refresh is low-frequency and defaults to every 30 minutes.
+The app fetches one public profile at a time. Manual refreshes happen only when the user presses Refresh. Background refresh is low-frequency and defaults to every 2 hours.
 
 LeetTracker does not perform bulk profile searches, scrape hidden pages, or bypass authentication.
 

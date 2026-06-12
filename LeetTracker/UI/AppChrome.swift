@@ -53,7 +53,7 @@ struct AppSidebar: View {
                         .fill(AppColor.ink)
                         .frame(width: 8, height: 8)
 
-                    Text("Every \(Int(LeetTrackerWidgetConfiguration.refreshInterval / 60)) min")
+                    Text(LeetTrackerWidgetConfiguration.refreshIntervalDescription)
                         .font(.callout.weight(.medium))
                 }
             }

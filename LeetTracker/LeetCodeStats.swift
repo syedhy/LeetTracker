@@ -6,6 +6,8 @@ struct LeetCodeStats: Equatable {
     let easySolved: Int
     let mediumSolved: Int
     let hardSolved: Int
+    let currentStreak: Int?
+    let totalActiveDays: Int?
     let lastUpdated: Date
 }
 
@@ -17,6 +19,8 @@ extension LeetCodeStats {
             easySolved: cachedStats.easySolved,
             mediumSolved: cachedStats.mediumSolved,
             hardSolved: cachedStats.hardSolved,
+            currentStreak: cachedStats.currentStreak,
+            totalActiveDays: cachedStats.totalActiveDays,
             lastUpdated: cachedStats.lastUpdated
         )
     }
@@ -28,6 +32,8 @@ extension LeetCodeStats {
             easySolved: easySolved,
             mediumSolved: mediumSolved,
             hardSolved: hardSolved,
+            currentStreak: currentStreak,
+            totalActiveDays: totalActiveDays,
             lastUpdated: lastUpdated
         )
     }

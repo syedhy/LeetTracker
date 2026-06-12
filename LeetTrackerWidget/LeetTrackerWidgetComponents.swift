@@ -8,6 +8,8 @@ struct WidgetStatsSnapshot: Equatable {
     let easySolved: Int
     let mediumSolved: Int
     let hardSolved: Int
+    let currentStreak: Int?
+    let totalActiveDays: Int?
     let lastUpdated: Date
 }
 
@@ -19,8 +21,18 @@ extension WidgetStatsSnapshot {
             easySolved: cachedStats.easySolved,
             mediumSolved: cachedStats.mediumSolved,
             hardSolved: cachedStats.hardSolved,
+            currentStreak: cachedStats.currentStreak,
+            totalActiveDays: cachedStats.totalActiveDays,
             lastUpdated: cachedStats.lastUpdated
         )
+    }
+
+    var streakDisplay: Int {
+        max(0, currentStreak ?? 0)
+    }
+
+    var activeDaysDisplay: Int {
+        max(0, totalActiveDays ?? streakDisplay)
     }
 
     var mediumHardSolved: Int {
@@ -58,6 +70,8 @@ extension WidgetStatsSnapshot {
         easySolved: 54,
         mediumSolved: 61,
         hardSolved: 13,
+        currentStreak: 7,
+        totalActiveDays: 42,
         lastUpdated: Date()
     )
 }
@@ -156,6 +170,10 @@ struct WidgetCardContent<Content: View>: View {
         case mediumBalanced
         case mediumProgress
         case mediumTight
+        case goalSmall
+        case goalMedium
+        case streakSmall
+        case streakMedium
 
         var edgeInsets: EdgeInsets {
             switch self {
@@ -200,6 +218,34 @@ struct WidgetCardContent<Content: View>: View {
                     leading: LTWidgetSpacing.large,
                     bottom: LTWidgetSpacing.large,
                     trailing: LTWidgetSpacing.large
+                )
+            case .goalSmall:
+                return EdgeInsets(
+                    top: LTWidgetSpacing.medium,
+                    leading: LTWidgetSpacing.medium,
+                    bottom: LTWidgetSpacing.medium,
+                    trailing: LTWidgetSpacing.medium
+                )
+            case .goalMedium:
+                return EdgeInsets(
+                    top: LTWidgetSpacing.large,
+                    leading: LTWidgetSpacing.medium,
+                    bottom: LTWidgetSpacing.large,
+                    trailing: LTWidgetSpacing.medium
+                )
+            case .streakSmall:
+                return EdgeInsets(
+                    top: LTWidgetSpacing.smallPadding,
+                    leading: LTWidgetSpacing.smallPadding,
+                    bottom: LTWidgetSpacing.smallPadding,
+                    trailing: LTWidgetSpacing.smallPadding
+                )
+            case .streakMedium:
+                return EdgeInsets(
+                    top: LTWidgetSpacing.mediumPadding,
+                    leading: LTWidgetSpacing.mediumPadding,
+                    bottom: LTWidgetSpacing.mediumPadding,
+                    trailing: LTWidgetSpacing.mediumPadding
                 )
             }
         }

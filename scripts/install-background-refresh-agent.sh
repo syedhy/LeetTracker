@@ -3,7 +3,7 @@ set -euo pipefail
 
 LABEL="com.hyder.LeetTracker.background-refresh"
 APP_PATH="${APP_PATH:-/Applications/LeetTracker.app}"
-INTERVAL_SECONDS="${INTERVAL_SECONDS:-1800}"
+INTERVAL_SECONDS="${INTERVAL_SECONDS:-7200}"
 PLIST_PATH="$HOME/Library/LaunchAgents/$LABEL.plist"
 LOG_DIR="$HOME/Library/Logs/LeetTracker"
 EXECUTABLE_PATH="$APP_PATH/Contents/MacOS/LeetTracker"

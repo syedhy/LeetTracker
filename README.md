@@ -29,7 +29,7 @@ Optional background refresh:
 leettracker-install-background-refresh
 ```
 
-This lets LeetTracker refresh widget data every 30 minutes while the app window is closed. Remove it with:
+This lets LeetTracker refresh widget data every 2 hours while the app window is closed. Remove it with:
 
 ```zsh
 leettracker-uninstall-background-refresh

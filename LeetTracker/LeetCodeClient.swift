@@ -31,6 +31,10 @@ struct LeetCodeClient {
                     count
                   }
                 }
+                userCalendar {
+                  streak
+                  totalActiveDays
+                }
               }
             }
             """,
@@ -104,6 +108,8 @@ struct LeetCodeClient {
             easySolved: easySolved,
             mediumSolved: mediumSolved,
             hardSolved: hardSolved,
+            currentStreak: matchedUser.userCalendar?.streak,
+            totalActiveDays: matchedUser.userCalendar?.totalActiveDays,
             lastUpdated: Date()
         )
     }
@@ -145,10 +151,16 @@ private struct GraphQLData: Decodable {
 private struct MatchedUser: Decodable {
     let username: String
     let submitStats: SubmitStats
+    let userCalendar: UserCalendar?
 }
 
 private struct SubmitStats: Decodable {
     let acSubmissionNum: [SolvedCount]
+}
+
+private struct UserCalendar: Decodable {
+    let streak: Int?
+    let totalActiveDays: Int?
 }
 
 private struct SolvedCount: Decodable {

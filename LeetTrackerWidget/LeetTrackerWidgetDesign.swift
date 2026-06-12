@@ -38,12 +38,12 @@ enum LTWidgetColor {
     static let cardBackground = LinearGradient(
         colors: [
             Color.adaptive(
-                light: NSColor(red: 0.999, green: 0.998, blue: 0.988, alpha: 1),
-                dark: NSColor(red: 0.095, green: 0.098, blue: 0.104, alpha: 1)
+                light: NSColor(red: 0.965, green: 0.964, blue: 0.948, alpha: 1),
+                dark: NSColor(red: 0.220, green: 0.224, blue: 0.230, alpha: 1)
             ),
             Color.adaptive(
-                light: NSColor(red: 0.984, green: 0.982, blue: 0.966, alpha: 1),
-                dark: NSColor(red: 0.150, green: 0.154, blue: 0.164, alpha: 1)
+                light: NSColor(red: 0.932, green: 0.930, blue: 0.910, alpha: 1),
+                dark: NSColor(red: 0.292, green: 0.296, blue: 0.304, alpha: 1)
             )
         ],
         startPoint: .topLeading,

@@ -134,7 +134,7 @@ Install:
 
 Background widget refresh:
 - Double-click "Install Background Refresh.command" after moving the app to Applications.
-- This lets the widget refresh every 30 minutes while the app window is closed.
+- This lets the widget refresh every 2 hours while the app window is closed.
 - Double-click "Uninstall Background Refresh.command" to remove the helper.
 - Homebrew users can run leettracker-install-background-refresh instead.
 

@@ -6,8 +6,8 @@ Public users should be able to install LeetTracker with Homebrew or a GitHub rel
 
 ## Before Building
 
-- Confirm `LeetTrackerWidgetConfiguration.refreshInterval` is set to `30 * 60`.
-- Confirm `scripts/install-background-refresh-agent.sh` defaults to `1800` seconds.
+- Confirm `LeetTrackerWidgetConfiguration.refreshInterval` is set to `2 * 60 * 60`.
+- Confirm `scripts/install-background-refresh-agent.sh` defaults to `7200` seconds.
 - Confirm the app only requests public solved-count data and does not ask for credentials.
 - Confirm the release notes include the independent/non-affiliated LeetCode disclaimer.
 - Confirm you are using a Developer ID Application certificate for public distribution, not only an Apple Development certificate.

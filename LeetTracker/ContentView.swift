@@ -174,6 +174,8 @@ struct ContentView: View {
                     dataHealthSection
                 }
             }
+
+            DifficultyDashboardPanel(rows: viewModel.difficultyDistributionRows)
         }
     }
 
@@ -238,31 +240,7 @@ struct ContentView: View {
                 }
             }
 
-            ViewThatFits(in: .horizontal) {
-                HStack(alignment: .top, spacing: 20) {
-                    GoalProjectionPanel(
-                        currentSolved: viewModel.currentSolvedValue,
-                        targetSolved: viewModel.goalTargetNumber,
-                        weeklyTarget: viewModel.weeklyTargetNumber,
-                        completionText: viewModel.estimatedCompletionDateText
-                    )
-                    .frame(maxWidth: .infinity)
-
-                    AnalyticsNarrativePanel(summary: viewModel.analyticsSummary)
-                        .frame(maxWidth: .infinity)
-                }
-
-                VStack(spacing: 20) {
-                    GoalProjectionPanel(
-                        currentSolved: viewModel.currentSolvedValue,
-                        targetSolved: viewModel.goalTargetNumber,
-                        weeklyTarget: viewModel.weeklyTargetNumber,
-                        completionText: viewModel.estimatedCompletionDateText
-                    )
-
-                    AnalyticsNarrativePanel(summary: viewModel.analyticsSummary)
-                }
-            }
+            AnalyticsNarrativePanel(summary: viewModel.analyticsSummary)
         }
     }
 
@@ -331,7 +309,7 @@ struct ContentView: View {
         VStack(alignment: .leading, spacing: 24) {
             pageHeader(
                 title: "Widgets",
-                subtitle: "Three desktop cards for progress, motivation, and goal pace.",
+                subtitle: "Desktop cards for progress, goal pace, and streaks.",
                 systemImage: "square.grid.2x2"
             )
 
@@ -436,8 +414,21 @@ struct ContentView: View {
                 systemImage: "gearshape"
             )
 
-            setupSection
-            dataHealthSection
+            ViewThatFits(in: .horizontal) {
+                HStack(alignment: .top, spacing: 20) {
+                    setupSection
+                        .frame(maxWidth: .infinity)
+
+                    dataHealthSection
+                        .frame(minWidth: 300, idealWidth: 360, maxWidth: 420)
+                }
+
+                VStack(spacing: 20) {
+                    setupSection
+                    dataHealthSection
+                }
+            }
+
             privacyEthicsSection
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -691,6 +682,8 @@ struct ContentView: View {
 
     private func requestWidgetReload() {
         WidgetCenter.shared.reloadTimelines(ofKind: LeetTrackerWidgetConfiguration.kind)
+        WidgetCenter.shared.reloadTimelines(ofKind: LeetTrackerWidgetConfiguration.goalPaceKind)
+        WidgetCenter.shared.reloadTimelines(ofKind: LeetTrackerWidgetConfiguration.streakKind)
         WidgetCenter.shared.reloadAllTimelines()
     }
 }
@@ -1061,8 +1054,7 @@ private final class LeetTrackerViewModel: ObservableObject {
     }
 
     var refreshCadenceText: String {
-        let minutes = Int(LeetTrackerWidgetConfiguration.refreshInterval / 60)
-        return "Every \(minutes) min"
+        LeetTrackerWidgetConfiguration.refreshIntervalDescription
     }
 
     var statsSnapshot: LeetCodeStats? {

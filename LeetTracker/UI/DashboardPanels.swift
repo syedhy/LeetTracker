@@ -285,6 +285,29 @@ struct DashboardCommandCenterPanel: View {
     }
 }
 
+struct DifficultyDashboardPanel: View {
+    let rows: [DifficultyDistributionRow]
+
+    var body: some View {
+        Panel {
+            VStack(alignment: .leading, spacing: 16) {
+                HStack(alignment: .firstTextBaseline) {
+                    SectionHeader(title: "Difficulty Mix", systemImage: "circle.grid.3x3.fill")
+
+                    Spacer()
+
+                    Text("public solved counts")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(.secondary)
+                        .textCase(.uppercase)
+                }
+
+                DifficultyMixCards(rows: rows)
+            }
+        }
+    }
+}
+
 struct DashboardSignalTile: View {
     let title: String
     let value: String

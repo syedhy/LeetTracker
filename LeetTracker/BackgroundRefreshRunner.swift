@@ -85,8 +85,8 @@ enum BackgroundRefreshRunner {
 
     private static func reloadWidgetTimelines() {
         WidgetCenter.shared.reloadTimelines(ofKind: LeetTrackerWidgetConfiguration.kind)
-        WidgetCenter.shared.reloadTimelines(ofKind: LeetTrackerWidgetConfiguration.motivationKind)
         WidgetCenter.shared.reloadTimelines(ofKind: LeetTrackerWidgetConfiguration.goalPaceKind)
+        WidgetCenter.shared.reloadTimelines(ofKind: LeetTrackerWidgetConfiguration.streakKind)
     }
 
     private static func writeLog(_ message: String) {

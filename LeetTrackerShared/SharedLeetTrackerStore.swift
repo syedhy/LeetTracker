@@ -2,9 +2,20 @@ import Foundation
 
 enum LeetTrackerWidgetConfiguration {
     static let kind = "com.hyder.LeetTracker.widget"
-    static let motivationKind = "com.hyder.LeetTracker.widget.motivation"
     static let goalPaceKind = "com.hyder.LeetTracker.widget.goal-pace"
-    static let refreshInterval: TimeInterval = 30 * 60
+    static let streakKind = "com.hyder.LeetTracker.widget.streak"
+    static let refreshInterval: TimeInterval = 2 * 60 * 60
+
+    static var refreshIntervalDescription: String {
+        let minutes = Int(refreshInterval / 60)
+
+        if minutes >= 60, minutes.isMultiple(of: 60) {
+            let hours = minutes / 60
+            return hours == 1 ? "Every hour" : "Every \(hours) hours"
+        }
+
+        return "Every \(minutes) min"
+    }
 }
 
 struct CachedLeetCodeStats: Codable, Equatable {
@@ -13,6 +24,8 @@ struct CachedLeetCodeStats: Codable, Equatable {
     let easySolved: Int
     let mediumSolved: Int
     let hardSolved: Int
+    let currentStreak: Int?
+    let totalActiveDays: Int?
     let lastUpdated: Date
 }
 

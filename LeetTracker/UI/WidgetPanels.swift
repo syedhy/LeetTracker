@@ -45,7 +45,7 @@ struct WidgetStudioHeroPanel: View {
                     .lineLimit(2)
                     .minimumScaleFactor(0.78)
 
-                Text("Progress, motivation, and goal pace are separate desktop cards so you can keep the useful signal visible without opening the app.")
+                Text("Progress, goal pace, and streaks are separate desktop cards so you can keep the useful signal visible without opening the app.")
                     .font(.callout)
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
@@ -69,7 +69,7 @@ struct WidgetStudioHeroPanel: View {
                 .rotationEffect(.degrees(5))
                 .offset(x: 68, y: 14)
 
-            WidgetMiniPreviewCard(title: "Motivation", value: "Next", tint: AppColor.hard)
+            WidgetMiniPreviewCard(title: "Streak", value: "Days", tint: AppColor.hard)
                 .rotationEffect(.degrees(-1))
                 .offset(y: -36)
         }
@@ -159,7 +159,7 @@ struct WidgetSetupPanel: View {
 
                 VStack(spacing: 12) {
                     WidgetSetupStep(number: "1", title: "Open widgets", detail: "Control-click the desktop and choose Edit Widgets.")
-                    WidgetSetupStep(number: "2", title: "Search LeetTracker", detail: "Add Progress, Motivation, or Goal Pace in small or medium size.")
+                    WidgetSetupStep(number: "2", title: "Search LeetTracker", detail: "Add Progress, Goal Pace, or Streak in small or medium size.")
                     WidgetSetupStep(number: "3", title: "Let macOS refresh", detail: "\(refreshText). \(dataText)")
                 }
             }
@@ -204,18 +204,18 @@ struct WidgetCatalogPanel: View {
             tint: AppColor.easy
         ),
         WidgetCatalogItem(
-            title: "Motivation",
-            detail: "A small prompt for the next useful practice block.",
-            value: "Next move",
-            systemImage: "quote.bubble.fill",
-            tint: AppColor.medium
-        ),
-        WidgetCatalogItem(
             title: "Goal Pace",
             detail: "Remaining problems, target pace, weekly mix, and ETA.",
             value: "On track",
             systemImage: "speedometer",
             tint: AppColor.hard
+        ),
+        WidgetCatalogItem(
+            title: "Streak",
+            detail: "Current public LeetCode streak and total active days with a mascot card.",
+            value: "Active days",
+            systemImage: "flame.fill",
+            tint: AppColor.medium
         )
     ]
 

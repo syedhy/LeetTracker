@@ -20,8 +20,8 @@ enum LeetTrackerWidgetState {
 
 enum LeetTrackerWidgetVariant {
     case progress
-    case motivation
     case goalPace
+    case streak
 }
 
 struct LeetTrackerTimelineProvider: TimelineProvider {
@@ -206,10 +206,10 @@ struct LeetTrackerWidgetEntryView: View {
         switch variant {
         case .progress:
             progressView(username: username, status: status)
-        case .motivation:
-            motivationView(username: username)
         case .goalPace:
             goalPaceView(username: username)
+        case .streak:
+            streakView(username: username)
         }
     }
 
@@ -224,22 +224,22 @@ struct LeetTrackerWidgetEntryView: View {
     }
 
     @ViewBuilder
-    private func motivationView(username: String) -> some View {
-        switch family {
-        case .systemMedium:
-            MotivationMediumWidgetView(username: username, stats: entry.stats, goalSettings: entry.goalSettings)
-        default:
-            MotivationSmallWidgetView(username: username, stats: entry.stats, goalSettings: entry.goalSettings)
-        }
-    }
-
-    @ViewBuilder
     private func goalPaceView(username: String) -> some View {
         switch family {
         case .systemMedium:
             GoalPaceMediumWidgetView(username: username, stats: entry.stats, goalSettings: entry.goalSettings)
         default:
             GoalPaceSmallWidgetView(stats: entry.stats, goalSettings: entry.goalSettings)
+        }
+    }
+
+    @ViewBuilder
+    private func streakView(username: String) -> some View {
+        switch family {
+        case .systemMedium:
+            StreakMediumWidgetView(username: username, stats: entry.stats)
+        default:
+            StreakSmallWidgetView(username: username, stats: entry.stats)
         }
     }
 }
@@ -257,19 +257,6 @@ struct LeetTrackerWidget: Widget {
     }
 }
 
-struct LeetTrackerMotivationWidget: Widget {
-    let kind = LeetTrackerWidgetConfiguration.motivationKind
-
-    var body: some WidgetConfiguration {
-        StaticConfiguration(kind: kind, provider: LeetTrackerTimelineProvider()) { entry in
-            LeetTrackerWidgetEntryView(entry: entry, variant: .motivation)
-        }
-        .configurationDisplayName("Motivation")
-        .description("A small desktop nudge for the next useful practice block.")
-        .supportedFamilies([.systemSmall, .systemMedium])
-    }
-}
-
 struct LeetTrackerGoalPaceWidget: Widget {
     let kind = LeetTrackerWidgetConfiguration.goalPaceKind
 
@@ -279,6 +266,19 @@ struct LeetTrackerGoalPaceWidget: Widget {
         }
         .configurationDisplayName("Goal Pace")
         .description("See remaining problems, weekly pace, and target progress.")
+        .supportedFamilies([.systemSmall, .systemMedium])
+    }
+}
+
+struct LeetTrackerStreakWidget: Widget {
+    let kind = LeetTrackerWidgetConfiguration.streakKind
+
+    var body: some WidgetConfiguration {
+        StaticConfiguration(kind: kind, provider: LeetTrackerTimelineProvider()) { entry in
+            LeetTrackerWidgetEntryView(entry: entry, variant: .streak)
+        }
+        .configurationDisplayName("Streak")
+        .description("See your public LeetCode active-day streak.")
         .supportedFamilies([.systemSmall, .systemMedium])
     }
 }

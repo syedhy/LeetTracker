@@ -143,9 +143,6 @@ struct WidgetContainer<Content: View>: View {
                 ZStack {
                     LTWidgetColor.cardBackground
                     WidgetPaperGrid()
-                    WidgetDoodleBackdrop()
-                        .stroke(LTWidgetColor.sketch.opacity(0.07), style: StrokeStyle(lineWidth: 2.5, lineCap: .round))
-                        .padding(6)
                 }
             }
     }
@@ -193,9 +190,9 @@ struct WidgetCardContent<Content: View>: View {
             case .mediumProgress:
                 return EdgeInsets(
                     top: LTWidgetSpacing.mediumPadding,
-                    leading: LTWidgetSpacing.large,
+                    leading: LTWidgetSpacing.xSmall,
                     bottom: LTWidgetSpacing.mediumPadding,
-                    trailing: LTWidgetSpacing.large
+                    trailing: LTWidgetSpacing.xSmall
                 )
             case .mediumTight:
                 return EdgeInsets(
@@ -243,28 +240,6 @@ struct WidgetPaperGrid: View {
 
             context.stroke(path, with: .color(LTWidgetColor.paperLine), lineWidth: 1)
         }
-    }
-}
-
-struct WidgetDoodleBackdrop: Shape {
-    func path(in rect: CGRect) -> Path {
-        var path = Path()
-
-        path.move(to: CGPoint(x: rect.minX + 10, y: rect.minY + 18))
-        path.addCurve(
-            to: CGPoint(x: rect.maxX - 14, y: rect.minY + 30),
-            control1: CGPoint(x: rect.midX * 0.56, y: rect.minY + 2),
-            control2: CGPoint(x: rect.midX * 1.32, y: rect.minY + 42)
-        )
-
-        path.move(to: CGPoint(x: rect.minX + 12, y: rect.maxY - 22))
-        path.addCurve(
-            to: CGPoint(x: rect.maxX - 10, y: rect.maxY - 34),
-            control1: CGPoint(x: rect.midX * 0.70, y: rect.maxY - 44),
-            control2: CGPoint(x: rect.midX * 1.35, y: rect.maxY - 10)
-        )
-
-        return path
     }
 }
 

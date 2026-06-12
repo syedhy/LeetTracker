@@ -61,10 +61,6 @@ enum LTWidgetColor {
         light: NSColor(red: 0.08, green: 0.08, blue: 0.072, alpha: 0.22),
         dark: NSColor(red: 1.00, green: 0.98, blue: 0.90, alpha: 0.18)
     )
-    static let sketch = Color.adaptive(
-        light: NSColor(red: 0.06, green: 0.06, blue: 0.055, alpha: 1),
-        dark: NSColor(red: 0.96, green: 0.94, blue: 0.86, alpha: 1)
-    )
     static let primary = Color.adaptive(
         light: NSColor(red: 0.075, green: 0.075, blue: 0.070, alpha: 1),
         dark: NSColor(red: 0.955, green: 0.950, blue: 0.900, alpha: 1)

@@ -159,7 +159,7 @@ struct WidgetSetupPanel: View {
 
                 VStack(spacing: 12) {
                     WidgetSetupStep(number: "1", title: "Open widgets", detail: "Control-click the desktop and choose Edit Widgets.")
-                    WidgetSetupStep(number: "2", title: "Search LeetTracker", detail: "Add Progress, Goal Pace, or Streak in small or medium size.")
+                    WidgetSetupStep(number: "2", title: "Search LeetTracker", detail: "Add Progress or Goal Pace in small or medium size, plus the compact Streak widget.")
                     WidgetSetupStep(number: "3", title: "Let macOS refresh", detail: "\(refreshText). \(dataText)")
                 }
             }
@@ -212,8 +212,8 @@ struct WidgetCatalogPanel: View {
         ),
         WidgetCatalogItem(
             title: "Streak",
-            detail: "Current public LeetCode streak and total active days with a mascot card.",
-            value: "Active days",
+            detail: "A compact mascot card for the current public LeetCode streak.",
+            value: "Small",
             systemImage: "flame.fill",
             tint: AppColor.medium
         )
@@ -227,7 +227,7 @@ struct WidgetCatalogPanel: View {
 
                     Spacer()
 
-                    Text("small + medium")
+                    Text("desktop set")
                         .font(.caption.weight(.black))
                         .foregroundStyle(.secondary)
                         .textCase(.uppercase)

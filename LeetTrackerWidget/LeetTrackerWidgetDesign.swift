@@ -39,11 +39,11 @@ enum LTWidgetColor {
         colors: [
             Color.adaptive(
                 light: NSColor(red: 0.965, green: 0.964, blue: 0.948, alpha: 1),
-                dark: NSColor(red: 0.220, green: 0.224, blue: 0.230, alpha: 1)
+                dark: NSColor(red: 0.270, green: 0.272, blue: 0.274, alpha: 1)
             ),
             Color.adaptive(
                 light: NSColor(red: 0.932, green: 0.930, blue: 0.910, alpha: 1),
-                dark: NSColor(red: 0.292, green: 0.296, blue: 0.304, alpha: 1)
+                dark: NSColor(red: 0.235, green: 0.238, blue: 0.242, alpha: 1)
             )
         ],
         startPoint: .topLeading,

@@ -209,18 +209,13 @@ struct LeetTrackerWidgetEntryView: View {
         case .goalPace:
             goalPaceView(username: username)
         case .streak:
-            streakView(username: username)
+            streakView()
         }
     }
 
     @ViewBuilder
     private func progressView(username: String, status: WidgetStatusPill?) -> some View {
-        switch family {
-        case .systemMedium:
-            MediumWidgetView(username: username, stats: entry.stats, goalSettings: entry.goalSettings, status: status)
-        default:
-            SmallWidgetView(username: username, stats: entry.stats, goalSettings: entry.goalSettings, status: status)
-        }
+        MediumWidgetView(username: username, stats: entry.stats, goalSettings: entry.goalSettings, status: status)
     }
 
     @ViewBuilder
@@ -234,13 +229,8 @@ struct LeetTrackerWidgetEntryView: View {
     }
 
     @ViewBuilder
-    private func streakView(username: String) -> some View {
-        switch family {
-        case .systemMedium:
-            StreakMediumWidgetView(username: username, stats: entry.stats)
-        default:
-            StreakSmallWidgetView(username: username, stats: entry.stats)
-        }
+    private func streakView() -> some View {
+        StreakSmallWidgetView(stats: entry.stats)
     }
 }
 
@@ -253,7 +243,7 @@ struct LeetTrackerWidget: Widget {
         }
         .configurationDisplayName("Progress")
         .description("Track solved count, difficulty mix, and target progress.")
-        .supportedFamilies([.systemSmall, .systemMedium])
+        .supportedFamilies([.systemMedium])
     }
 }
 
@@ -279,7 +269,7 @@ struct LeetTrackerStreakWidget: Widget {
         }
         .configurationDisplayName("Streak")
         .description("See your public LeetCode active-day streak.")
-        .supportedFamilies([.systemSmall, .systemMedium])
+        .supportedFamilies([.systemSmall])
     }
 }
 

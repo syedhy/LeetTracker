@@ -36,19 +36,16 @@ struct SmallWidgetView: View {
                         .lineLimit(1)
                         .minimumScaleFactor(0.74)
 
-                    Text("\(goalSettings.remaining(after: stats.totalSolved)) left")
+                    Text(status?.compactText ?? "\(goalSettings.remaining(after: stats.totalSolved)) left")
                         .font(LTWidgetTypography.caption)
-                        .foregroundStyle(LTWidgetColor.secondary)
+                        .foregroundStyle(status == nil ? LTWidgetColor.secondary : LTWidgetColor.warning)
                         .lineLimit(1)
+                        .minimumScaleFactor(0.72)
                 }
 
                 Spacer(minLength: 0)
 
                 WidgetDifficultySummary(stats: stats, style: .compact)
-
-                if let status {
-                    status
-                }
             }
         }
     }
@@ -85,7 +82,7 @@ struct MediumWidgetView: View {
                                 .font(LTWidgetTypography.label)
                                 .foregroundStyle(LTWidgetColor.tertiary)
 
-                            WidgetUpdatedText(date: stats.lastUpdated)
+                            WidgetUpdatedText(date: stats.lastUpdated, statusText: status?.text)
                         }
                     }
 
@@ -106,10 +103,6 @@ struct MediumWidgetView: View {
                 }
 
                 WidgetDifficultySummary(stats: stats, style: .spacious)
-
-                if let status {
-                    status
-                }
             }
         }
     }
@@ -199,111 +192,36 @@ struct GoalPaceMediumWidgetView: View {
 }
 
 struct StreakSmallWidgetView: View {
-    let username: String
     let stats: WidgetStatsSnapshot
 
     var body: some View {
         WidgetCardContent(size: .streakSmall, alignment: .center) {
-            VStack(alignment: .leading, spacing: LTWidgetSpacing.small) {
-                HStack(alignment: .center) {
-                    WidgetHeader(title: "Streak", isCompact: true, showsCompactTitle: true)
-
-                    Spacer(minLength: LTWidgetSpacing.small)
-
+            VStack(alignment: .center, spacing: LTWidgetSpacing.xSmall) {
+                VStack(spacing: 0) {
                     Text("\(stats.streakDisplay)")
-                        .font(LTWidgetTypography.display)
+                        .font(Font.system(size: 42, weight: .black, design: .rounded))
                         .foregroundStyle(LTWidgetColor.primary)
                         .contentTransition(.numericText())
                         .lineLimit(1)
-                        .minimumScaleFactor(0.76)
-                }
+                        .minimumScaleFactor(0.58)
 
-                Spacer(minLength: 0)
-
-                HStack(alignment: .bottom, spacing: LTWidgetSpacing.medium) {
-                    StreakMascotImage()
-                        .frame(width: 58, height: 58)
-
-                    VStack(alignment: .leading, spacing: LTWidgetSpacing.compact) {
-                        Text(streakTitle)
-                            .font(LTWidgetTypography.compactUser)
-                            .foregroundStyle(LTWidgetColor.primary)
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.70)
-
-                        Text("\(stats.activeDaysDisplay) active days")
-                            .font(LTWidgetTypography.caption)
-                            .foregroundStyle(LTWidgetColor.secondary)
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.70)
-                    }
-                }
-            }
-        }
-    }
-
-    private var streakTitle: String {
-        stats.streakDisplay == 1 ? "1 day streak" : "\(stats.streakDisplay) day streak"
-    }
-}
-
-struct StreakMediumWidgetView: View {
-    let username: String
-    let stats: WidgetStatsSnapshot
-
-    var body: some View {
-        WidgetCardContent(size: .streakMedium, alignment: .center) {
-            HStack(alignment: .center, spacing: LTWidgetSpacing.large) {
-                StreakMascotImage()
-                    .frame(width: 122, height: 122)
-
-                VStack(alignment: .leading, spacing: LTWidgetSpacing.medium) {
-                    WidgetHeader(title: "Streak")
-
-                    VStack(alignment: .leading, spacing: LTWidgetSpacing.compact) {
-                        Text(username)
-                            .font(LTWidgetTypography.user)
-                            .foregroundStyle(LTWidgetColor.primary)
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.76)
-
-                        Text(streakCopy)
-                            .font(LTWidgetTypography.caption)
-                            .foregroundStyle(LTWidgetColor.secondary)
-                            .lineLimit(2)
-                            .minimumScaleFactor(0.72)
-                    }
-
-                    StreakLevelBand(streak: stats.streakDisplay)
-                }
-
-                Spacer(minLength: LTWidgetSpacing.small)
-
-                VStack(alignment: .trailing, spacing: LTWidgetSpacing.compact) {
-                    Text("\(stats.streakDisplay)")
-                        .font(LTWidgetTypography.mediumDisplay)
-                        .foregroundStyle(LTWidgetColor.primary)
-                        .contentTransition(.numericText())
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.76)
-
-                    Text("day streak")
-                        .font(LTWidgetTypography.label)
+                    Text(streakLabel)
+                        .font(LTWidgetTypography.compactLabel)
                         .foregroundStyle(LTWidgetColor.secondary)
                         .lineLimit(1)
+                        .minimumScaleFactor(0.58)
                 }
-                .frame(width: 96, alignment: .trailing)
+                .frame(maxWidth: .infinity)
+
+                StreakMascotImage()
+                    .frame(width: 94, height: 72)
+                    .frame(maxWidth: .infinity)
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
         }
     }
 
-    private var streakCopy: String {
-        if stats.streakDisplay == 0 {
-            return "Start with one clean solve today."
-        }
-
-        return "\(stats.activeDaysDisplay) public active days on LeetCode."
-    }
+    private var streakLabel: String { "day streak" }
 }
 
 struct WidgetPaceTile: View {
@@ -343,54 +261,5 @@ struct StreakMascotImage: View {
             .interpolation(.high)
             .scaledToFit()
             .shadow(color: LTWidgetColor.primary.opacity(0.16), radius: 0, x: 3, y: 3)
-    }
-}
-
-struct StreakLevelBand: View {
-    let streak: Int
-
-    var body: some View {
-        HStack(spacing: LTWidgetSpacing.small) {
-            Circle()
-                .fill(tint)
-                .frame(width: LTWidgetSizing.dot, height: LTWidgetSizing.dot)
-
-            Text(levelText)
-                .font(LTWidgetTypography.label)
-                .foregroundStyle(LTWidgetColor.primary)
-                .lineLimit(1)
-                .minimumScaleFactor(0.72)
-        }
-        .padding(.horizontal, LTWidgetSpacing.medium)
-        .padding(.vertical, LTWidgetSpacing.small)
-        .background(tint.opacity(0.16), in: Capsule())
-        .overlay {
-            Capsule()
-                .stroke(tint.opacity(0.5), lineWidth: 1)
-        }
-    }
-
-    private var tint: Color {
-        switch streak {
-        case 14...:
-            return LTWidgetColor.hard
-        case 7...:
-            return LTWidgetColor.medium
-        default:
-            return LTWidgetColor.easy
-        }
-    }
-
-    private var levelText: String {
-        switch streak {
-        case 14...:
-            return "Hot streak"
-        case 7...:
-            return "Momentum"
-        case 1...:
-            return "Building"
-        default:
-            return "Start today"
-        }
     }
 }

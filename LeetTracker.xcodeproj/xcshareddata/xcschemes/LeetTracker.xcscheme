@@ -21,6 +21,20 @@
                ReferencedContainer = "container:LeetTracker.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "111111111111111111115002"
+               BuildableName = "LeetTrackerWidgetExtension.appex"
+               BlueprintName = "LeetTrackerWidgetExtension"
+               ReferencedContainer = "container:LeetTracker.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction

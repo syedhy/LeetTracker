@@ -173,7 +173,6 @@ struct WidgetCardContent<Content: View>: View {
         case goalSmall
         case goalMedium
         case streakSmall
-        case streakMedium
 
         var edgeInsets: EdgeInsets {
             switch self {
@@ -221,31 +220,24 @@ struct WidgetCardContent<Content: View>: View {
                 )
             case .goalSmall:
                 return EdgeInsets(
+                    top: LTWidgetSpacing.small,
+                    leading: LTWidgetSpacing.small,
+                    bottom: LTWidgetSpacing.small,
+                    trailing: LTWidgetSpacing.small
+                )
+            case .goalMedium:
+                return EdgeInsets(
+                    top: LTWidgetSpacing.medium,
+                    leading: LTWidgetSpacing.small,
+                    bottom: LTWidgetSpacing.medium,
+                    trailing: LTWidgetSpacing.small
+                )
+            case .streakSmall:
+                return EdgeInsets(
                     top: LTWidgetSpacing.medium,
                     leading: LTWidgetSpacing.medium,
                     bottom: LTWidgetSpacing.medium,
                     trailing: LTWidgetSpacing.medium
-                )
-            case .goalMedium:
-                return EdgeInsets(
-                    top: LTWidgetSpacing.large,
-                    leading: LTWidgetSpacing.medium,
-                    bottom: LTWidgetSpacing.large,
-                    trailing: LTWidgetSpacing.medium
-                )
-            case .streakSmall:
-                return EdgeInsets(
-                    top: LTWidgetSpacing.smallPadding,
-                    leading: LTWidgetSpacing.smallPadding,
-                    bottom: LTWidgetSpacing.smallPadding,
-                    trailing: LTWidgetSpacing.smallPadding
-                )
-            case .streakMedium:
-                return EdgeInsets(
-                    top: LTWidgetSpacing.mediumPadding,
-                    leading: LTWidgetSpacing.mediumPadding,
-                    bottom: LTWidgetSpacing.mediumPadding,
-                    trailing: LTWidgetSpacing.mediumPadding
                 )
             }
         }
@@ -523,13 +515,30 @@ struct WidgetCallout: View {
 
 struct WidgetUpdatedText: View {
     let date: Date
+    let statusText: String?
+
+    init(date: Date, statusText: String? = nil) {
+        self.date = date
+        self.statusText = statusText
+    }
 
     var body: some View {
-        Text("Updated \(Self.timeFormatter.string(from: date))")
+        Text(displayText)
             .font(LTWidgetTypography.caption)
             .foregroundStyle(LTWidgetColor.tertiary)
             .lineLimit(1)
             .minimumScaleFactor(0.72)
+    }
+
+    private var displayText: String {
+        let updatedText = "Updated \(Self.timeFormatter.string(from: date))"
+
+        guard let statusText else {
+            return updatedText
+        }
+
+        let compactStatus = WidgetStatusPill.compactText(for: statusText)
+        return "\(compactStatus) · \(updatedText)"
     }
 
     private static let timeFormatter: DateFormatter = {
@@ -543,6 +552,10 @@ struct WidgetUpdatedText: View {
 struct WidgetStatusPill: View {
     let text: String
     let tint: Color
+
+    var compactText: String {
+        Self.compactText(for: text)
+    }
 
     var body: some View {
         HStack(spacing: LTWidgetSpacing.compact) {
@@ -563,6 +576,10 @@ struct WidgetStatusPill: View {
             Capsule()
                 .stroke(LTWidgetColor.panelStroke, lineWidth: 1)
         }
+    }
+
+    static func compactText(for text: String) -> String {
+        text == "Showing saved data" ? "Saved data" : text
     }
 }
 

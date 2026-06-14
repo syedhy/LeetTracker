@@ -10,6 +10,19 @@ struct LeetTrackerEntry: TimelineEntry {
     let state: LeetTrackerWidgetState
 }
 
+extension LeetTrackerEntry {
+    static var sample: LeetTrackerEntry {
+        LeetTrackerEntry(
+            date: Date(),
+            username: "Syed__hy",
+            stats: .placeholder,
+            goalSettings: .default,
+            hasGoalSettings: true,
+            state: .success
+        )
+    }
+}
+
 enum LeetTrackerWidgetState {
     case loading
     case empty
@@ -29,14 +42,7 @@ struct LeetTrackerTimelineProvider: TimelineProvider {
     private let sharedStore = SharedLeetTrackerStore()
 
     func placeholder(in context: Context) -> LeetTrackerEntry {
-        LeetTrackerEntry(
-            date: Date(),
-            username: "leetcode-user",
-            stats: .placeholder,
-            goalSettings: .default,
-            hasGoalSettings: false,
-            state: .loading
-        )
+        .sample
     }
 
     func getSnapshot(in context: Context, completion: @escaping (LeetTrackerEntry) -> Void) {
@@ -276,12 +282,5 @@ struct LeetTrackerStreakWidget: Widget {
 #Preview(as: .systemMedium) {
     LeetTrackerWidget()
 } timeline: {
-    LeetTrackerEntry(
-        date: Date(),
-        username: "Syed__hy",
-        stats: .placeholder,
-        goalSettings: .default,
-        hasGoalSettings: true,
-        state: .success
-    )
+    LeetTrackerEntry.sample
 }

@@ -32,8 +32,8 @@ struct LeetCodeClient {
                   }
                 }
                 userCalendar {
-                  streak
                   totalActiveDays
+                  submissionCalendar
                 }
               }
             }
@@ -108,10 +108,48 @@ struct LeetCodeClient {
             easySolved: easySolved,
             mediumSolved: mediumSolved,
             hardSolved: hardSolved,
-            currentStreak: matchedUser.userCalendar?.streak,
+            currentStreak: currentStreak(from: matchedUser.userCalendar?.submissionCalendar) ?? 0,
             totalActiveDays: matchedUser.userCalendar?.totalActiveDays,
             lastUpdated: Date()
         )
+    }
+
+    private func currentStreak(from submissionCalendar: String?) -> Int? {
+        guard
+            let submissionCalendar,
+            let data = submissionCalendar.data(using: .utf8),
+            let acceptedByTimestamp = try? JSONDecoder().decode([String: Int].self, from: data)
+        else {
+            return nil
+        }
+
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = .current
+
+        let solvedDays = Set(
+            acceptedByTimestamp.compactMap { timestamp, acceptedCount -> Date? in
+                guard acceptedCount > 0, let seconds = TimeInterval(timestamp) else {
+                    return nil
+                }
+
+                return calendar.startOfDay(for: Date(timeIntervalSince1970: seconds))
+            }
+        )
+
+        var cursor = calendar.startOfDay(for: Date())
+        var streak = 0
+
+        while solvedDays.contains(cursor) {
+            streak += 1
+
+            guard let previousDay = calendar.date(byAdding: .day, value: -1, to: cursor) else {
+                break
+            }
+
+            cursor = previousDay
+        }
+
+        return streak
     }
 
     private func map(_ error: URLError) -> LeetCodeProfileError {
@@ -159,8 +197,8 @@ private struct SubmitStats: Decodable {
 }
 
 private struct UserCalendar: Decodable {
-    let streak: Int?
     let totalActiveDays: Int?
+    let submissionCalendar: String?
 }
 
 private struct SolvedCount: Decodable {

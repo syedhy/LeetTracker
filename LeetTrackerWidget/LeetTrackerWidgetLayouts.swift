@@ -214,7 +214,7 @@ struct StreakSmallWidgetView: View {
                 .frame(maxWidth: .infinity)
 
                 StreakMascotImage()
-                    .frame(width: 94, height: 72)
+                    .frame(width: 112, height: 82)
                     .frame(maxWidth: .infinity)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)

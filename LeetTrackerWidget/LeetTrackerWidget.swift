@@ -42,7 +42,7 @@ struct LeetTrackerTimelineProvider: TimelineProvider {
     private let sharedStore = SharedLeetTrackerStore()
 
     func placeholder(in context: Context) -> LeetTrackerEntry {
-        .sample
+        cachedEntry
     }
 
     func getSnapshot(in context: Context, completion: @escaping (LeetTrackerEntry) -> Void) {

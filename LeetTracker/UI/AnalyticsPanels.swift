@@ -17,39 +17,39 @@ struct AnalyticsHeroPanel: View {
             VStack(alignment: .leading, spacing: 20) {
                 SectionHeader(title: "Practice Compass", systemImage: "scope")
 
-                ViewThatFits(in: .horizontal) {
-                    HStack(alignment: .center, spacing: 24) {
-                        compassSummary
-                            .frame(minWidth: 360, idealWidth: 560, maxWidth: .infinity)
-
-                        heroCopy
-                            .frame(minWidth: 300, idealWidth: 380, maxWidth: 440)
-                    }
-
-                    VStack(alignment: .leading, spacing: 20) {
-                        compassSummary
-                        heroCopy
-                    }
+                #if os(iOS)
+                VStack(alignment: .leading, spacing: 20) {
+                    compassSummary
+                    heroCopy
                 }
+                #else
+                HStack(alignment: .center, spacing: 24) {
+                    compassSummary
+                        .frame(minWidth: 360, idealWidth: 560, maxWidth: .infinity)
+
+                    heroCopy
+                        .frame(minWidth: 300, idealWidth: 380, maxWidth: 440)
+                }
+                #endif
             }
         }
     }
 
     private var compassSummary: some View {
         VStack(alignment: .leading, spacing: 18) {
-            ViewThatFits(in: .horizontal) {
-                HStack(spacing: 12) {
-                    AnalyticsCompassMetric(title: "Solved", value: stats.map { "\($0.totalSolved)" } ?? "--", detail: "Public profile")
-                    AnalyticsCompassMetric(title: "Health", value: "\(score)", detail: "Local signal")
-                    AnalyticsCompassMetric(title: "Remaining", value: remainingText, detail: "To target")
-                }
-
-                LazyVGrid(columns: [GridItem(.adaptive(minimum: 140), spacing: 12)], spacing: 12) {
-                    AnalyticsCompassMetric(title: "Solved", value: stats.map { "\($0.totalSolved)" } ?? "--", detail: "Public profile")
-                    AnalyticsCompassMetric(title: "Health", value: "\(score)", detail: "Local signal")
-                    AnalyticsCompassMetric(title: "Remaining", value: remainingText, detail: "To target")
-                }
+            #if os(iOS)
+            LazyVGrid(columns: [GridItem(.adaptive(minimum: 100), spacing: 10)], spacing: 10) {
+                AnalyticsCompassMetric(title: "Solved", value: stats.map { "\($0.totalSolved)" } ?? "--", detail: "Public profile")
+                AnalyticsCompassMetric(title: "Health", value: "\(score)", detail: "Local signal")
+                AnalyticsCompassMetric(title: "Remaining", value: remainingText, detail: "To target")
             }
+            #else
+            HStack(spacing: 12) {
+                AnalyticsCompassMetric(title: "Solved", value: stats.map { "\($0.totalSolved)" } ?? "--", detail: "Public profile")
+                AnalyticsCompassMetric(title: "Health", value: "\(score)", detail: "Local signal")
+                AnalyticsCompassMetric(title: "Remaining", value: remainingText, detail: "To target")
+            }
+            #endif
 
             DifficultyMixCards(rows: rows)
 
@@ -134,7 +134,7 @@ struct AnalyticsCompassMetric: View {
                 .foregroundStyle(.secondary)
 
             Text(value)
-                .font(.system(size: 42, weight: .black, design: .rounded))
+                .font(.system(.largeTitle, design: .rounded).weight(.black))
                 .monospacedDigit()
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
@@ -580,20 +580,20 @@ struct AnalyticsScorePanel: View {
             VStack(alignment: .leading, spacing: 18) {
                 SectionHeader(title: "Practice Health", systemImage: "gauge.with.dots.needle.67percent")
 
-                ViewThatFits(in: .horizontal) {
-                    HStack(alignment: .center, spacing: 20) {
-                        scoreRing
-
-                        scoreCopy
-
-                        Spacer(minLength: 0)
-                    }
-
-                    VStack(alignment: .leading, spacing: 16) {
-                        scoreRing
-                        scoreCopy
-                    }
+                #if os(iOS)
+                VStack(alignment: .leading, spacing: 16) {
+                    scoreRing
+                    scoreCopy
                 }
+                #else
+                HStack(alignment: .center, spacing: 20) {
+                    scoreRing
+
+                    scoreCopy
+
+                    Spacer(minLength: 0)
+                }
+                #endif
             }
         }
     }
@@ -613,7 +613,7 @@ struct AnalyticsScorePanel: View {
                 .animation(.spring(response: 0.45, dampingFraction: 0.82), value: progress)
 
             Text("\(score)")
-                .font(.system(size: 34, weight: .semibold, design: .rounded))
+                .font(.system(.title, design: .rounded).weight(.semibold))
                 .monospacedDigit()
         }
         .frame(width: 112, height: 112)

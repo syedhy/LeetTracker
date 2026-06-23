@@ -138,23 +138,23 @@ struct DifficultyGoalGrid: View {
                     .minimumScaleFactor(0.72)
             }
 
-            ViewThatFits(in: .horizontal) {
-                HStack(alignment: .top, spacing: 10) {
-                    DifficultyGoalField(title: "Easy", text: $easyText, tint: AppColor.easy)
-                    DifficultyGoalField(title: "Medium", text: $mediumText, tint: AppColor.medium)
-                    DifficultyGoalField(title: "Hard", text: $hardText, tint: AppColor.hard)
-                }
-
-                LazyVGrid(
-                    columns: [GridItem(.adaptive(minimum: 128), spacing: 10)],
-                    alignment: .leading,
-                    spacing: 10
-                ) {
-                    DifficultyGoalField(title: "Easy", text: $easyText, tint: AppColor.easy)
-                    DifficultyGoalField(title: "Medium", text: $mediumText, tint: AppColor.medium)
-                    DifficultyGoalField(title: "Hard", text: $hardText, tint: AppColor.hard)
-                }
+            #if os(iOS)
+            LazyVGrid(
+                columns: [GridItem(.adaptive(minimum: 100), spacing: 10)],
+                alignment: .leading,
+                spacing: 10
+            ) {
+                DifficultyGoalField(title: "Easy", text: $easyText, tint: AppColor.easy)
+                DifficultyGoalField(title: "Medium", text: $mediumText, tint: AppColor.medium)
+                DifficultyGoalField(title: "Hard", text: $hardText, tint: AppColor.hard)
             }
+            #else
+            HStack(alignment: .top, spacing: 10) {
+                DifficultyGoalField(title: "Easy", text: $easyText, tint: AppColor.easy)
+                DifficultyGoalField(title: "Medium", text: $mediumText, tint: AppColor.medium)
+                DifficultyGoalField(title: "Hard", text: $hardText, tint: AppColor.hard)
+            }
+            #endif
 
             Text(projectedMixText)
                 .font(.caption)

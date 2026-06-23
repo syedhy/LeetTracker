@@ -1,29 +1,40 @@
 import SwiftUI
 
 enum AppColor {
-    static let ink = Color(red: 0.08, green: 0.08, blue: 0.075)
-    static let paper = Color(red: 0.999, green: 0.999, blue: 0.996)
-    static let paperWarm = Color(red: 0.992, green: 0.992, blue: 0.986)
-    static let graphite = Color(red: 0.42, green: 0.42, blue: 0.39)
-    static let line = Color(red: 0.12, green: 0.12, blue: 0.11)
-    static let quietLine = Color(red: 0.86, green: 0.86, blue: 0.82)
-    static let sky = Color(red: 0.32, green: 0.63, blue: 0.94)
-    static let coral = Color(red: 0.95, green: 0.36, blue: 0.32)
-    static let sunflower = Color(red: 1.0, green: 0.80, blue: 0.18)
-    static let mint = Color(red: 0.40, green: 0.79, blue: 0.61)
+    #if os(macOS)
+    static let ink = Color(nsColor: .labelColor)
+    static let paper = Color(nsColor: .windowBackgroundColor)
+    static let paperWarm = Color(nsColor: .controlBackgroundColor)
+    static let graphite = Color(nsColor: .secondaryLabelColor)
+    static let line = Color(nsColor: .separatorColor)
+    static let quietLine = Color(nsColor: .gridColor)
+    #else
+    static let ink = Color(uiColor: .label)
+    static let paper = Color(uiColor: .systemBackground)
+    static let paperWarm = Color(uiColor: .secondarySystemBackground)
+    static let graphite = Color(uiColor: .secondaryLabel)
+    static let line = Color(uiColor: .separator)
+    static let quietLine = Color(uiColor: .systemGray4)
+    #endif
+
+    static let sky = Color.blue
+    static let coral = Color.red
+    static let sunflower = Color.yellow
+    static let mint = Color.green
+    
     static let brand = ink
-    static let easy = Color(red: 0.18, green: 0.73, blue: 0.38)
-    static let medium = Color(red: 0.95, green: 0.58, blue: 0.08)
-    static let hard = Color(red: 0.92, green: 0.25, blue: 0.42)
+    static let easy = Color.green
+    static let medium = Color.orange
+    static let hard = Color.red
 }
 
 struct AppSurfaceBackground: View {
     var body: some View {
         ZStack {
-            AppColor.paper
+            AppColor.paperWarm
 
             PaperGridBackdrop()
-                .stroke(AppColor.line.opacity(0.035), lineWidth: 1)
+                .stroke(AppColor.line.opacity(0.06), lineWidth: 1)
                 .padding(10)
         }
         .ignoresSafeArea()

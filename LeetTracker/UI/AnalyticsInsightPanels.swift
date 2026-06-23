@@ -85,19 +85,19 @@ struct DifficultyMixCards: View {
     let rows: [DifficultyDistributionRow]
 
     var body: some View {
-        ViewThatFits(in: .horizontal) {
-            HStack(spacing: 12) {
-                ForEach(rows) { row in
-                    DifficultyMixCard(row: row)
-                }
-            }
-
-            LazyVGrid(columns: [GridItem(.adaptive(minimum: 126), spacing: 12)], spacing: 12) {
-                ForEach(rows) { row in
-                    DifficultyMixCard(row: row)
-                }
+        #if os(iOS)
+        VStack(spacing: 12) {
+            ForEach(rows) { row in
+                DifficultyMixCard(row: row)
             }
         }
+        #else
+        HStack(spacing: 12) {
+            ForEach(rows) { row in
+                DifficultyMixCard(row: row)
+            }
+        }
+        #endif
     }
 }
 
@@ -137,7 +137,7 @@ struct DifficultyMixCard: View {
 
             HStack(alignment: .lastTextBaseline, spacing: 8) {
                 Text("\(row.value)")
-                    .font(.system(size: 38, weight: .black, design: .rounded))
+                    .font(.system(.largeTitle, design: .rounded).weight(.black))
                     .monospacedDigit()
                     .lineLimit(1)
                     .minimumScaleFactor(0.72)
@@ -267,7 +267,7 @@ struct GoalProjectionPanel: View {
                     VStack(alignment: .leading, spacing: 8) {
                         HStack(alignment: .lastTextBaseline) {
                             Text("\(remaining)")
-                                .font(.system(size: 44, weight: .semibold, design: .rounded))
+                                .font(.system(.largeTitle, design: .rounded).weight(.semibold))
                                 .monospacedDigit()
 
                             Text(remaining == 1 ? "problem left" : "problems left")

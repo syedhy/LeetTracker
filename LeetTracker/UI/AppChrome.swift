@@ -190,6 +190,7 @@ struct StatusPill: View {
 
 struct Panel<Content: View>: View {
     private let content: Content
+    @State private var isHovered = false
 
     init(@ViewBuilder content: () -> Content) {
         self.content = content()
@@ -199,22 +200,13 @@ struct Panel<Content: View>: View {
         content
             .padding(24)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(
-                LinearGradient(
-                    colors: [
-                        AppColor.paper.opacity(0.985),
-                        AppColor.paperWarm.opacity(0.92)
-                    ],
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                ),
-                in: RoundedRectangle(cornerRadius: 18)
-            )
+            .background(AppColor.paper)
+            .clipShape(RoundedRectangle(cornerRadius: 18))
             .overlay {
                 RoundedRectangle(cornerRadius: 18)
-                    .stroke(AppColor.line.opacity(0.28), lineWidth: 1.15)
+                    .stroke(AppColor.ink.opacity(0.8), lineWidth: 2)
             }
-            .shadow(color: AppColor.ink.opacity(0.018), radius: 2, x: 1, y: 2)
+            .shadow(color: AppColor.ink.opacity(0.15), radius: 0, x: 2, y: 4)
     }
 }
 
@@ -274,7 +266,7 @@ struct PrimaryActionButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .font(.callout.weight(.semibold))
-            .foregroundStyle(.white)
+            .foregroundStyle(AppColor.paper)
             .padding(.horizontal, 14)
             .frame(height: 38)
             .background(AppColor.ink.opacity(isEnabled ? (configuration.isPressed ? 0.74 : 1) : 0.42), in: RoundedRectangle(cornerRadius: 10))

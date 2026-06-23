@@ -1,4 +1,10 @@
+#if os(macOS)
 import AppKit
+typealias PlatformColor = NSColor
+#else
+import UIKit
+typealias PlatformColor = UIColor
+#endif
 import SwiftUI
 
 enum LTWidgetSpacing {
@@ -38,44 +44,44 @@ enum LTWidgetColor {
     static let cardBackground = LinearGradient(
         colors: [
             Color.adaptive(
-                light: NSColor(red: 0.965, green: 0.964, blue: 0.948, alpha: 1),
-                dark: NSColor(red: 0.270, green: 0.272, blue: 0.274, alpha: 1)
+                light: PlatformColor(red: 0.965, green: 0.964, blue: 0.948, alpha: 1),
+                dark: PlatformColor(red: 0.270, green: 0.272, blue: 0.274, alpha: 1)
             ),
             Color.adaptive(
-                light: NSColor(red: 0.932, green: 0.930, blue: 0.910, alpha: 1),
-                dark: NSColor(red: 0.235, green: 0.238, blue: 0.242, alpha: 1)
+                light: PlatformColor(red: 0.932, green: 0.930, blue: 0.910, alpha: 1),
+                dark: PlatformColor(red: 0.235, green: 0.238, blue: 0.242, alpha: 1)
             )
         ],
         startPoint: .topLeading,
         endPoint: .bottomTrailing
     )
     static let panel = Color.adaptive(
-        light: NSColor(red: 1.000, green: 0.998, blue: 0.982, alpha: 0.82),
-        dark: NSColor(red: 0.190, green: 0.194, blue: 0.204, alpha: 0.82)
+        light: PlatformColor(red: 1.000, green: 0.998, blue: 0.982, alpha: 0.82),
+        dark: PlatformColor(red: 0.190, green: 0.194, blue: 0.204, alpha: 0.82)
     )
     static let tintedPanel = Color.adaptive(
-        light: NSColor(red: 0.998, green: 0.996, blue: 0.980, alpha: 0.58),
-        dark: NSColor(red: 0.130, green: 0.134, blue: 0.144, alpha: 0.62)
+        light: PlatformColor(red: 0.998, green: 0.996, blue: 0.980, alpha: 0.58),
+        dark: PlatformColor(red: 0.130, green: 0.134, blue: 0.144, alpha: 0.62)
     )
     static let panelStroke = Color.adaptive(
-        light: NSColor(red: 0.08, green: 0.08, blue: 0.072, alpha: 0.22),
-        dark: NSColor(red: 1.00, green: 0.98, blue: 0.90, alpha: 0.18)
+        light: PlatformColor(red: 0.08, green: 0.08, blue: 0.072, alpha: 0.22),
+        dark: PlatformColor(red: 1.00, green: 0.98, blue: 0.90, alpha: 0.18)
     )
     static let primary = Color.adaptive(
-        light: NSColor(red: 0.075, green: 0.075, blue: 0.070, alpha: 1),
-        dark: NSColor(red: 0.955, green: 0.950, blue: 0.900, alpha: 1)
+        light: PlatformColor(red: 0.075, green: 0.075, blue: 0.070, alpha: 1),
+        dark: PlatformColor(red: 0.955, green: 0.950, blue: 0.900, alpha: 1)
     )
     static let secondary = Color.adaptive(
-        light: NSColor(red: 0.300, green: 0.295, blue: 0.270, alpha: 1),
-        dark: NSColor(red: 0.780, green: 0.765, blue: 0.700, alpha: 1)
+        light: PlatformColor(red: 0.300, green: 0.295, blue: 0.270, alpha: 1),
+        dark: PlatformColor(red: 0.780, green: 0.765, blue: 0.700, alpha: 1)
     )
     static let tertiary = Color.adaptive(
-        light: NSColor(red: 0.470, green: 0.462, blue: 0.430, alpha: 1),
-        dark: NSColor(red: 0.640, green: 0.625, blue: 0.570, alpha: 1)
+        light: PlatformColor(red: 0.470, green: 0.462, blue: 0.430, alpha: 1),
+        dark: PlatformColor(red: 0.640, green: 0.625, blue: 0.570, alpha: 1)
     )
     static let paperLine = Color.adaptive(
-        light: NSColor(red: 0.12, green: 0.12, blue: 0.10, alpha: 0.07),
-        dark: NSColor(red: 1.00, green: 0.96, blue: 0.86, alpha: 0.045)
+        light: PlatformColor(red: 0.12, green: 0.12, blue: 0.10, alpha: 0.07),
+        dark: PlatformColor(red: 1.00, green: 0.96, blue: 0.86, alpha: 0.045)
     )
     static let brand = primary
     static let easy = Color(red: 0.25, green: 0.78, blue: 0.43)
@@ -100,10 +106,16 @@ enum LTWidgetRadius {
 }
 
 extension Color {
-    static func adaptive(light: NSColor, dark: NSColor) -> Color {
+    static func adaptive(light: PlatformColor, dark: PlatformColor) -> Color {
+        #if os(macOS)
         Color(nsColor: NSColor(name: nil) { appearance in
             let match = appearance.bestMatch(from: [.darkAqua, .aqua])
             return match == .darkAqua ? dark : light
         })
+        #else
+        Color(uiColor: UIColor { traitCollection in
+            return traitCollection.userInterfaceStyle == .dark ? dark : light
+        })
+        #endif
     }
 }

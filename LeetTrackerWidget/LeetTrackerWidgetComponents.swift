@@ -152,6 +152,7 @@ struct WidgetContainer<Content: View>: View {
 
     var body: some View {
         content
+            .unredacted()
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
             .containerBackground(for: .widget) {
                 ZStack {
@@ -260,24 +261,29 @@ struct WidgetCardContent<Content: View>: View {
     }
 }
 
+struct WidgetPaperGridShape: Shape {
+    func path(in rect: CGRect) -> Path {
+        let spacing: CGFloat = 26
+        var path = Path()
+
+        for x in stride(from: CGFloat.zero, through: rect.width, by: spacing) {
+            path.move(to: CGPoint(x: x, y: 0))
+            path.addLine(to: CGPoint(x: x, y: rect.height))
+        }
+
+        for y in stride(from: CGFloat.zero, through: rect.height, by: spacing) {
+            path.move(to: CGPoint(x: 0, y: y))
+            path.addLine(to: CGPoint(x: rect.width, y: y))
+        }
+
+        return path
+    }
+}
+
 struct WidgetPaperGrid: View {
     var body: some View {
-        Canvas { context, size in
-            let spacing: CGFloat = 26
-            var path = Path()
-
-            stride(from: CGFloat.zero, through: size.width, by: spacing).forEach { x in
-                path.move(to: CGPoint(x: x, y: 0))
-                path.addLine(to: CGPoint(x: x, y: size.height))
-            }
-
-            stride(from: CGFloat.zero, through: size.height, by: spacing).forEach { y in
-                path.move(to: CGPoint(x: 0, y: y))
-                path.addLine(to: CGPoint(x: size.width, y: y))
-            }
-
-            context.stroke(path, with: .color(LTWidgetColor.paperLine), lineWidth: 1)
-        }
+        WidgetPaperGridShape()
+            .stroke(LTWidgetColor.paperLine, lineWidth: 1)
     }
 }
 
@@ -458,26 +464,6 @@ struct WidgetDifficultyChip: View {
     }
 }
 
-struct WidgetProgressBar: View {
-    let progress: Double
-    let tint: Color
-
-    var body: some View {
-        GeometryReader { proxy in
-            let clamped = min(max(progress, 0), 1)
-
-            ZStack(alignment: .leading) {
-                Capsule()
-                    .fill(LTWidgetColor.primary.opacity(0.10))
-
-                Capsule()
-                    .fill(tint)
-                    .frame(width: max(8, proxy.size.width * clamped))
-            }
-        }
-        .frame(height: 8)
-    }
-}
 
 struct WidgetCallout: View {
     let title: String
@@ -603,7 +589,8 @@ struct WidgetEmptyStateView: View {
                 Text(message)
                     .font(LTWidgetTypography.caption)
                     .foregroundStyle(LTWidgetColor.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
+                    .lineLimit(3)
+                    .minimumScaleFactor(0.7)
             }
         }
         .padding(LTWidgetSpacing.smallPadding)
@@ -632,7 +619,8 @@ struct WidgetErrorStateView: View {
                 Text(message)
                     .font(LTWidgetTypography.caption)
                     .foregroundStyle(LTWidgetColor.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
+                    .lineLimit(3)
+                    .minimumScaleFactor(0.7)
             }
         }
         .padding(LTWidgetSpacing.smallPadding)

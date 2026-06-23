@@ -7,18 +7,19 @@ struct WidgetStudioHeroPanel: View {
 
     var body: some View {
         Panel {
-            ViewThatFits(in: .horizontal) {
-                HStack(alignment: .center, spacing: 24) {
-                    heroCopy
-                    Spacer(minLength: 12)
-                    widgetStack
-                }
-
-                VStack(alignment: .leading, spacing: 22) {
-                    heroCopy
-                    widgetStack
-                }
+            #if os(iOS)
+            VStack(alignment: .leading, spacing: 22) {
+                heroCopy
+                widgetStack
+                    .frame(maxWidth: .infinity, alignment: .center)
             }
+            #else
+            HStack(alignment: .center, spacing: 24) {
+                heroCopy
+                Spacer(minLength: 12)
+                widgetStack
+            }
+            #endif
         }
     }
 
@@ -40,12 +41,12 @@ struct WidgetStudioHeroPanel: View {
 
             VStack(alignment: .leading, spacing: 8) {
                 Text("Pin your practice loop")
-                    .font(.system(size: 40, weight: .black, design: .rounded))
+                    .font(.system(.largeTitle, design: .rounded).weight(.black))
                     .foregroundStyle(AppColor.ink)
                     .lineLimit(2)
                     .minimumScaleFactor(0.78)
 
-                Text("Progress, goal pace, and streaks are separate desktop cards so you can keep the useful signal visible without opening the app.")
+                Text("Progress and streaks are separate desktop cards so you can keep the useful signal visible without opening the app.")
                     .font(.callout)
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)
@@ -63,15 +64,11 @@ struct WidgetStudioHeroPanel: View {
         ZStack {
             WidgetMiniPreviewCard(title: "Progress", value: solvedText, tint: AppColor.easy)
                 .rotationEffect(.degrees(-4))
-                .offset(x: -82, y: 22)
-
-            WidgetMiniPreviewCard(title: "Goal Pace", value: "ETA", tint: AppColor.medium)
-                .rotationEffect(.degrees(5))
-                .offset(x: 68, y: 14)
+                .offset(x: -40, y: 18)
 
             WidgetMiniPreviewCard(title: "Streak", value: "Days", tint: AppColor.hard)
-                .rotationEffect(.degrees(-1))
-                .offset(y: -36)
+                .rotationEffect(.degrees(2))
+                .offset(x: 40, y: -20)
         }
         .frame(width: 300, height: 210)
     }
@@ -159,7 +156,7 @@ struct WidgetSetupPanel: View {
 
                 VStack(spacing: 12) {
                     WidgetSetupStep(number: "1", title: "Open widgets", detail: "Control-click the desktop and choose Edit Widgets.")
-                    WidgetSetupStep(number: "2", title: "Search LeetTracker", detail: "Add Progress or Goal Pace in small or medium size, plus the compact Streak widget.")
+                    WidgetSetupStep(number: "2", title: "Search LeetTracker", detail: "Add Progress in small or medium size, plus the compact Streak widget.")
                     WidgetSetupStep(number: "3", title: "Let macOS refresh", detail: "\(refreshText). \(dataText)")
                 }
             }
@@ -201,20 +198,15 @@ struct WidgetCatalogPanel: View {
             detail: "Solved count, difficulty mix, and the last successful update.",
             value: "Live data",
             systemImage: "checkmark.seal.fill",
+            assetImage: nil,
             tint: AppColor.easy
-        ),
-        WidgetCatalogItem(
-            title: "Goal Pace",
-            detail: "Remaining problems, target pace, weekly mix, and ETA.",
-            value: "On track",
-            systemImage: "speedometer",
-            tint: AppColor.hard
         ),
         WidgetCatalogItem(
             title: "Streak",
             detail: "A compact mascot card for the current public LeetCode streak.",
             value: "Small",
-            systemImage: "flame.fill",
+            systemImage: nil,
+            assetImage: "StreakMascot",
             tint: AppColor.medium
         )
     ]
@@ -247,7 +239,8 @@ struct WidgetCatalogItem: Identifiable {
     let title: String
     let detail: String
     let value: String
-    let systemImage: String
+    let systemImage: String?
+    let assetImage: String?
     let tint: Color
 
     var id: String { title }
@@ -259,7 +252,15 @@ struct WidgetCatalogCard: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
             HStack(alignment: .top) {
-                Image(systemName: item.systemImage)
+                Group {
+                    if let asset = item.assetImage {
+                        Image(asset)
+                            .resizable()
+                            .scaledToFit()
+                    } else if let sys = item.systemImage {
+                        Image(systemName: sys)
+                    }
+                }
                     .font(.title3.weight(.semibold))
                     .foregroundStyle(AppColor.ink)
                     .frame(width: 42, height: 42)

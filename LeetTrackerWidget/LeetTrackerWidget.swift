@@ -33,7 +33,6 @@ enum LeetTrackerWidgetState {
 
 enum LeetTrackerWidgetVariant {
     case progress
-    case goalPace
     case streak
 }
 
@@ -199,7 +198,6 @@ struct LeetTrackerWidgetEntryView: View {
             }
         }
     }
-
     private var emptyView: some View {
         WidgetEmptyStateView(
             title: "Add a username",
@@ -212,8 +210,6 @@ struct LeetTrackerWidgetEntryView: View {
         switch variant {
         case .progress:
             progressView(username: username, status: status)
-        case .goalPace:
-            goalPaceView(username: username)
         case .streak:
             streakView()
         }
@@ -222,16 +218,6 @@ struct LeetTrackerWidgetEntryView: View {
     @ViewBuilder
     private func progressView(username: String, status: WidgetStatusPill?) -> some View {
         MediumWidgetView(username: username, stats: entry.stats, goalSettings: entry.goalSettings, status: status)
-    }
-
-    @ViewBuilder
-    private func goalPaceView(username: String) -> some View {
-        switch family {
-        case .systemMedium:
-            GoalPaceMediumWidgetView(username: username, stats: entry.stats, goalSettings: entry.goalSettings)
-        default:
-            GoalPaceSmallWidgetView(stats: entry.stats, goalSettings: entry.goalSettings)
-        }
     }
 
     @ViewBuilder
@@ -250,19 +236,6 @@ struct LeetTrackerWidget: Widget {
         .configurationDisplayName("Progress")
         .description("Track solved count, difficulty mix, and target progress.")
         .supportedFamilies([.systemMedium])
-    }
-}
-
-struct LeetTrackerGoalPaceWidget: Widget {
-    let kind = LeetTrackerWidgetConfiguration.goalPaceKind
-
-    var body: some WidgetConfiguration {
-        StaticConfiguration(kind: kind, provider: LeetTrackerTimelineProvider()) { entry in
-            LeetTrackerWidgetEntryView(entry: entry, variant: .goalPace)
-        }
-        .configurationDisplayName("Goal Pace")
-        .description("See remaining problems, weekly pace, and target progress.")
-        .supportedFamilies([.systemSmall, .systemMedium])
     }
 }
 

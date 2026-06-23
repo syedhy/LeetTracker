@@ -5,6 +5,7 @@ import WidgetKit
 enum BackgroundRefreshRunner {
     static let argument = "--background-refresh"
 
+    #if os(macOS)
     static func runAndExitIfRequested() {
         guard CommandLine.arguments.contains(argument) else {
             return
@@ -36,8 +37,9 @@ enum BackgroundRefreshRunner {
             result
         }
     }
+    #endif
 
-    private static func refreshWidgetData() async -> RefreshResult {
+    static func refreshWidgetData() async -> RefreshResult {
         let store = SharedLeetTrackerStore()
 
         guard let username = store.username else {
@@ -85,7 +87,6 @@ enum BackgroundRefreshRunner {
 
     private static func reloadWidgetTimelines() {
         WidgetCenter.shared.reloadTimelines(ofKind: LeetTrackerWidgetConfiguration.kind)
-        WidgetCenter.shared.reloadTimelines(ofKind: LeetTrackerWidgetConfiguration.goalPaceKind)
         WidgetCenter.shared.reloadTimelines(ofKind: LeetTrackerWidgetConfiguration.streakKind)
     }
 
@@ -94,7 +95,7 @@ enum BackgroundRefreshRunner {
     }
 }
 
-private struct RefreshResult {
+struct RefreshResult {
     let message: String
     let exitCode: Int32
 }

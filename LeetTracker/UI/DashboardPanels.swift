@@ -9,46 +9,57 @@ struct DashboardHeroBoard: View {
 
     var body: some View {
         Panel {
-            ViewThatFits(in: .horizontal) {
-                HStack(alignment: .center, spacing: 28) {
-                    heroCopy
-                        .frame(minWidth: 340, idealWidth: 520, maxWidth: .infinity, alignment: .leading)
-
-                    scoreSheet
-                        .frame(minWidth: 300, idealWidth: 380, maxWidth: 460)
-                }
-
-                VStack(alignment: .leading, spacing: 22) {
-                    heroCopy
-                    scoreSheet
-                }
+            #if os(iOS)
+            VStack(alignment: .leading, spacing: 22) {
+                heroCopy
+                scoreSheet
             }
-            .frame(minHeight: 278, alignment: .center)
+            #else
+            HStack(alignment: .center, spacing: 28) {
+                heroCopy
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                scoreSheet
+                    .frame(minWidth: 300, idealWidth: 380, maxWidth: 460)
+            }
+            #endif
         }
     }
 
     private var heroCopy: some View {
         VStack(alignment: .leading, spacing: 22) {
-            HStack(alignment: .center, spacing: 22) {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("Practice")
-                        .font(.system(size: 52, weight: .black, design: .rounded))
-                        .lineLimit(1)
+            #if os(iOS)
+            HStack(alignment: .center, spacing: 8) {
+                Text("Practice Lab")
+                    .font(.system(.title, design: .rounded).weight(.black))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.4)
 
-                    Text("Lab")
-                        .font(.system(size: 52, weight: .black, design: .rounded))
-                        .lineLimit(1)
-                }
+                Spacer(minLength: 0)
+
+                PracticePulseSketch()
+                    .frame(width: 168, height: 128)
+                    .scaleEffect(0.65)
+                    .frame(width: 120, height: 90)
+            }
+            #else
+            HStack(alignment: .center, spacing: 12) {
+                Text("Practice Lab")
+                    .font(.system(.largeTitle, design: .rounded).weight(.black))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.4)
 
                 PracticePulseSketch()
                     .frame(width: 168, height: 128)
                     .padding(.leading, 2)
+                    .scaleEffect(0.85)
             }
+            #endif
 
             HStack(spacing: 10) {
                 Text(username)
                     .font(.title3.weight(.semibold))
                     .lineLimit(1)
+                    .minimumScaleFactor(0.6)
 
                 Circle()
                     .fill(AppColor.ink.opacity(0.42))
@@ -58,7 +69,7 @@ struct DashboardHeroBoard: View {
                     .font(.callout.weight(.medium))
                     .foregroundStyle(.secondary)
                     .lineLimit(1)
-                    .minimumScaleFactor(0.82)
+                    .minimumScaleFactor(0.6)
             }
         }
     }
@@ -67,7 +78,7 @@ struct DashboardHeroBoard: View {
         VStack(alignment: .leading, spacing: 18) {
             HStack(alignment: .firstTextBaseline) {
                 Text(total)
-                    .font(.system(size: 78, weight: .black, design: .rounded))
+                    .font(.system(.largeTitle, design: .rounded).weight(.black))
                     .monospacedDigit()
                     .lineLimit(1)
                     .minimumScaleFactor(0.65)
@@ -133,6 +144,7 @@ struct PracticePulseSketch: View {
                     AppColor.ink.opacity(0.88),
                     style: StrokeStyle(lineWidth: 4.4, lineCap: .round, lineJoin: .round)
                 )
+                .drawingGroup()
                 .frame(width: 140, height: 96)
                 .offset(x: 12, y: 10)
 
@@ -150,6 +162,7 @@ struct PracticePulseSketch: View {
                 .offset(x: -12, y: 42)
         }
         .frame(width: 168, height: 128)
+        .drawingGroup()
     }
 }
 
@@ -229,57 +242,57 @@ struct DashboardCommandCenterPanel: View {
                         .textCase(.uppercase)
                 }
 
-                ViewThatFits(in: .horizontal) {
-                    HStack(spacing: 10) {
-                        DashboardSignalTile(
-                            title: "Target",
-                            value: goalTitle,
-                            detail: goalDetail,
-                            systemImage: "target",
-                            tint: AppColor.ink
-                        )
-
-                        DashboardSignalTile(
-                            title: "Analytics",
-                            value: analyticsTitle,
-                            detail: analyticsDetail,
-                            systemImage: "chart.xyaxis.line",
-                            tint: AppColor.ink
-                        )
-
-                        DashboardSignalTile(
-                            title: "Reminders",
-                            value: reminderTitle,
-                            detail: reminderDetail,
-                            systemImage: "bell.badge",
-                            tint: AppColor.medium
-                        )
-
-                        DashboardSignalTile(
-                            title: "Planner",
-                            value: plannerTitle,
-                            detail: plannerDetail,
-                            systemImage: "calendar.badge.checkmark",
-                            tint: AppColor.ink
-                        )
-
-                        DashboardSignalTile(
-                            title: "Widget",
-                            value: widgetTitle,
-                            detail: widgetDetail,
-                            systemImage: "square.grid.2x2",
-                            tint: AppColor.ink
-                        )
-                    }
-
-                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 190), spacing: 10)], spacing: 10) {
-                        DashboardSignalTile(title: "Target", value: goalTitle, detail: goalDetail, systemImage: "target", tint: AppColor.ink)
-                        DashboardSignalTile(title: "Analytics", value: analyticsTitle, detail: analyticsDetail, systemImage: "chart.xyaxis.line", tint: AppColor.ink)
-                        DashboardSignalTile(title: "Reminders", value: reminderTitle, detail: reminderDetail, systemImage: "bell.badge", tint: AppColor.medium)
-                        DashboardSignalTile(title: "Planner", value: plannerTitle, detail: plannerDetail, systemImage: "calendar.badge.checkmark", tint: AppColor.ink)
-                        DashboardSignalTile(title: "Widget", value: widgetTitle, detail: widgetDetail, systemImage: "square.grid.2x2", tint: AppColor.ink)
-                    }
+                #if os(iOS)
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: 150), spacing: 10)], spacing: 10) {
+                    DashboardSignalTile(title: "Target", value: goalTitle, detail: goalDetail, systemImage: "target", tint: AppColor.ink)
+                    DashboardSignalTile(title: "Analytics", value: analyticsTitle, detail: analyticsDetail, systemImage: "chart.xyaxis.line", tint: AppColor.ink)
+                    DashboardSignalTile(title: "Reminders", value: reminderTitle, detail: reminderDetail, systemImage: "bell.badge", tint: AppColor.medium)
+                    DashboardSignalTile(title: "Planner", value: plannerTitle, detail: plannerDetail, systemImage: "calendar.badge.checkmark", tint: AppColor.ink)
+                    DashboardSignalTile(title: "Widget", value: widgetTitle, detail: widgetDetail, systemImage: "square.grid.2x2", tint: AppColor.ink)
                 }
+                #else
+                HStack(spacing: 10) {
+                    DashboardSignalTile(
+                        title: "Target",
+                        value: goalTitle,
+                        detail: goalDetail,
+                        systemImage: "target",
+                        tint: AppColor.ink
+                    )
+
+                    DashboardSignalTile(
+                        title: "Analytics",
+                        value: analyticsTitle,
+                        detail: analyticsDetail,
+                        systemImage: "chart.xyaxis.line",
+                        tint: AppColor.ink
+                    )
+
+                    DashboardSignalTile(
+                        title: "Reminders",
+                        value: reminderTitle,
+                        detail: reminderDetail,
+                        systemImage: "bell.badge",
+                        tint: AppColor.medium
+                    )
+
+                    DashboardSignalTile(
+                        title: "Planner",
+                        value: plannerTitle,
+                        detail: plannerDetail,
+                        systemImage: "calendar.badge.checkmark",
+                        tint: AppColor.ink
+                    )
+
+                    DashboardSignalTile(
+                        title: "Widget",
+                        value: widgetTitle,
+                        detail: widgetDetail,
+                        systemImage: "square.grid.2x2",
+                        tint: AppColor.ink
+                    )
+                }
+                #endif
             }
         }
     }
@@ -387,7 +400,7 @@ struct TotalSolvedCard: View {
 
             HStack(alignment: .lastTextBaseline, spacing: 8) {
                 Text(total)
-                    .font(.system(size: 58, weight: .semibold, design: .rounded))
+                    .font(.system(.largeTitle, design: .rounded).weight(.semibold))
                     .foregroundStyle(AppColor.paper)
                     .lineLimit(1)
                     .minimumScaleFactor(0.7)

@@ -2,7 +2,6 @@ import Foundation
 
 enum LeetTrackerWidgetConfiguration {
     static let kind = "com.hyder.LeetTracker.widget"
-    static let goalPaceKind = "com.hyder.LeetTracker.widget.goal-pace"
     static let streakKind = "com.hyder.LeetTracker.widget.streak"
     static let refreshInterval: TimeInterval = 2 * 60 * 60
 

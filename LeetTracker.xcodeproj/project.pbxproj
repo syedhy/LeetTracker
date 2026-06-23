@@ -35,6 +35,11 @@
 		111111111111111111111027 /* WidgetPanels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 111111111111111111112027 /* WidgetPanels.swift */; };
 		1BCFE48B2FCF8B3400138000 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1BCFE48A2FCF8B3400138000 /* Assets.xcassets */; };
 		1BCFE48C2FCF8B3400138000 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1BCFE48A2FCF8B3400138000 /* Assets.xcassets */; };
+		203CE76F01F7D584C8FC3AAA /* LeetTrackerViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 376B29D518A1812453DC6EC1 /* LeetTrackerViewModel.swift */; };
+		3DD44B1F18E1EDBB3E6A3786 /* WidgetsPageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B97B53905DC5EF2E003DD174 /* WidgetsPageView.swift */; };
+		481B2D253543C6725C16F53E /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29DE0F72180B997D999C01B0 /* DashboardView.swift */; };
+		713B41C40C7AD681D113C6C4 /* PracticeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B28828E234E0EAE48F2180E2 /* PracticeView.swift */; };
+		7EEEB6AA11D4B5ECB32D51EF /* SettingsPageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB95B72DE4500357BC752A70 /* SettingsPageView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -90,6 +95,11 @@
 		111111111111111111113001 /* LeetTracker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LeetTracker.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		111111111111111111113002 /* LeetTrackerWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = LeetTrackerWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		1BCFE48A2FCF8B3400138000 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		29DE0F72180B997D999C01B0 /* DashboardView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DashboardView.swift; sourceTree = "<group>"; };
+		376B29D518A1812453DC6EC1 /* LeetTrackerViewModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LeetTrackerViewModel.swift; sourceTree = "<group>"; };
+		B28828E234E0EAE48F2180E2 /* PracticeView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PracticeView.swift; sourceTree = "<group>"; };
+		B97B53905DC5EF2E003DD174 /* WidgetsPageView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WidgetsPageView.swift; sourceTree = "<group>"; };
+		CB95B72DE4500357BC752A70 /* SettingsPageView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SettingsPageView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -137,6 +147,11 @@
 				111111111111111111118006 /* UI */,
 				111111111111111111112005 /* Info.plist */,
 				111111111111111111112007 /* LeetTracker.entitlements */,
+				376B29D518A1812453DC6EC1 /* LeetTrackerViewModel.swift */,
+				29DE0F72180B997D999C01B0 /* DashboardView.swift */,
+				B28828E234E0EAE48F2180E2 /* PracticeView.swift */,
+				B97B53905DC5EF2E003DD174 /* WidgetsPageView.swift */,
+				CB95B72DE4500357BC752A70 /* SettingsPageView.swift */,
 			);
 			path = LeetTracker;
 			sourceTree = "<group>";
@@ -340,6 +355,11 @@
 				111111111111111111111008 /* LeetCodeClient.swift in Sources */,
 				111111111111111111111009 /* LeetCodeStats.swift in Sources */,
 				111111111111111111111010 /* LeetCodeProfileError.swift in Sources */,
+				203CE76F01F7D584C8FC3AAA /* LeetTrackerViewModel.swift in Sources */,
+				481B2D253543C6725C16F53E /* DashboardView.swift in Sources */,
+				713B41C40C7AD681D113C6C4 /* PracticeView.swift in Sources */,
+				3DD44B1F18E1EDBB3E6A3786 /* WidgetsPageView.swift in Sources */,
+				7EEEB6AA11D4B5ECB32D51EF /* SettingsPageView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -423,14 +443,17 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
-				SDKROOT = macosx;
+				SDKROOT = auto;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
@@ -481,12 +504,15 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
-				SDKROOT = macosx;
+				SDKROOT = auto;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
 				SWIFT_COMPILATION_MODE = wholemodule;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};

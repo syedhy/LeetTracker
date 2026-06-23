@@ -143,18 +143,18 @@ struct PlannerOverviewPanel: View {
 
     var body: some View {
         Panel {
-            ViewThatFits(in: .horizontal) {
-                HStack(alignment: .center, spacing: 24) {
-                    overviewCopy
-                    Spacer(minLength: 16)
-                    progressSummary
-                }
-
-                VStack(alignment: .leading, spacing: 20) {
-                    overviewCopy
-                    progressSummary
-                }
+            #if os(iOS)
+            VStack(alignment: .leading, spacing: 20) {
+                overviewCopy
+                progressSummary
             }
+            #else
+            HStack(alignment: .center, spacing: 24) {
+                overviewCopy
+                Spacer(minLength: 16)
+                progressSummary
+            }
+            #endif
         }
     }
 
@@ -182,7 +182,7 @@ struct PlannerOverviewPanel: View {
         VStack(alignment: .leading, spacing: 10) {
             HStack(alignment: .lastTextBaseline, spacing: 7) {
                 Text("\(completedCount)")
-                    .font(.system(size: 44, weight: .semibold, design: .rounded))
+                    .font(.system(.largeTitle, design: .rounded).weight(.semibold))
                     .monospacedDigit()
 
                 Text("of \(sessionCount) sessions")

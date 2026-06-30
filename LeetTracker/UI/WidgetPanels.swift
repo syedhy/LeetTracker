@@ -13,6 +13,7 @@ struct WidgetStudioHeroPanel: View {
                 widgetStack
                     .frame(maxWidth: .infinity, alignment: .center)
             }
+            .frame(maxHeight: .infinity, alignment: .top)
             #else
             ViewThatFits(in: .horizontal) {
                 HStack(alignment: .center, spacing: 24) {
@@ -20,11 +21,13 @@ struct WidgetStudioHeroPanel: View {
                     Spacer(minLength: 12)
                     widgetStack
                 }
+                .frame(maxHeight: .infinity, alignment: .top)
                 VStack(alignment: .leading, spacing: 22) {
                     heroCopy
                     widgetStack
                         .frame(maxWidth: .infinity, alignment: .center)
                 }
+                .frame(maxHeight: .infinity, alignment: .top)
             }
             #endif
         }
@@ -167,6 +170,7 @@ struct WidgetSetupPanel: View {
                     WidgetSetupStep(number: "3", title: "Let macOS refresh", detail: "\(refreshText). \(dataText)")
                 }
             }
+            .frame(maxHeight: .infinity, alignment: .top)
         }
     }
 }

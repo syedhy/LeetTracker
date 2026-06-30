@@ -74,20 +74,16 @@ struct ContentView: View {
         .background(AppSurfaceBackground())
         #else
         NavigationSplitView {
-            ZStack {
-                AppSurfaceBackground()
-                
-                VStack(spacing: 8) {
-                    ForEach([AppSection.dashboard, .practice, .widgets]) { section in
-                        sidebarButton(for: section)
-                    }
-                    
-                    Spacer()
-                    
-                    sidebarButton(for: .settings)
+            VStack(spacing: 8) {
+                ForEach([AppSection.dashboard, .practice, .widgets]) { section in
+                    sidebarButton(for: section)
                 }
-                .padding(14)
+                
+                Spacer()
+                
+                sidebarButton(for: .settings)
             }
+            .padding(14)
             .navigationTitle("LeetTracker")
         } detail: {
             ZStack {

@@ -61,7 +61,10 @@ enum WeeklyPlannerFactory {
         hard: Int,
         referenceDate: Date = Date()
     ) -> [PlannerSession] {
-        let orderedDifficulties = difficultySequence(easy: easy, medium: medium, hard: hard)
+        var orderedDifficulties = difficultySequence(easy: easy, medium: medium, hard: hard)
+        if orderedDifficulties.count > 21 {
+            orderedDifficulties = Array(orderedDifficulties.prefix(21))
+        }
         let weekStart = startOfWeek(containing: referenceDate)
         let weekID = weekIdentifier(for: referenceDate)
         let count = orderedDifficulties.count
@@ -303,29 +306,4 @@ struct PlannerSessionCard: View {
     }
 }
 
-struct PlannerGuidePanel: View {
-    let mixText: String
-    let targetText: String
-    let paceText: String
-    let reminderText: String
 
-    var body: some View {
-        Panel {
-            VStack(alignment: .leading, spacing: 16) {
-                SectionHeader(title: "Plan Rules", systemImage: "slider.horizontal.3")
-
-                DetailRow(title: "Difficulty mix", value: mixText)
-                DetailRow(title: "Goal distance", value: targetText)
-                DetailRow(title: "Practice pace", value: paceText)
-                DetailRow(title: "Daily reminder", value: reminderText)
-
-                Divider()
-
-                Text("The board is regenerated from your saved goal settings, so changing the weekly mix updates the schedule without needing private LeetCode activity.")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-        }
-    }
-}

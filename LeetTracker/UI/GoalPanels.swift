@@ -18,9 +18,8 @@ struct GoalEditorPanel: View {
             VStack(alignment: .leading, spacing: 18) {
                 SectionHeader(title: "Set Goal", systemImage: "slider.horizontal.3")
 
-                #if os(iOS)
                 HStack(alignment: .bottom, spacing: 12) {
-                    GoalField(title: "Target solved", text: $targetText, systemImage: "target")
+                    GoalField(title: "Target solved", text: $targetText, systemImage: "target", onSubmit: saveAction)
                         .frame(maxWidth: .infinity)
 
                     VStack(alignment: .leading, spacing: 6) {
@@ -29,17 +28,12 @@ struct GoalEditorPanel: View {
                             .foregroundStyle(.secondary)
 
                         Text(weeklyDifficultyTotalText)
-                            .font(.title3.weight(.semibold))
+                            .font(.title3.weight(.bold))
                             .monospacedDigit()
+                            .foregroundStyle(AppColor.brand)
                             .lineLimit(1)
                             .minimumScaleFactor(0.72)
-                            .padding(.horizontal, 12)
                             .frame(maxWidth: .infinity, minHeight: 40, alignment: .leading)
-                            .background(AppColor.paperWarm.opacity(0.58), in: RoundedRectangle(cornerRadius: 13))
-                            .overlay {
-                                RoundedRectangle(cornerRadius: 13)
-                                    .stroke(AppColor.line.opacity(0.28), lineWidth: 1)
-                            }
                     }
                     .frame(maxWidth: .infinity)
                 }
@@ -49,11 +43,9 @@ struct GoalEditorPanel: View {
                     mediumText: $weeklyMediumTargetText,
                     hardText: $weeklyHardTargetText,
                     projectedMixText: projectedMixText,
-                    totalText: weeklyDifficultyTotalText
+                    totalText: weeklyDifficultyTotalText,
+                    onSubmit: saveAction
                 )
-                #else
-                GoalField(title: "Weekly pace", text: $weeklyTargetText, systemImage: "calendar")
-                #endif
 
                 ReminderGoalCard(
                     remindersEnabled: $remindersEnabled,
@@ -73,6 +65,45 @@ struct GoalEditorPanel: View {
                         .minimumScaleFactor(0.8)
                 }
             }
+        }
+        .onChange(of: weeklyEasyTargetText) { oldValue, newValue in
+            enforceWeeklyLimit(fieldValue: &weeklyEasyTargetText, newValue: newValue)
+        }
+        .onChange(of: weeklyMediumTargetText) { oldValue, newValue in
+            enforceWeeklyLimit(fieldValue: &weeklyMediumTargetText, newValue: newValue)
+        }
+        .onChange(of: weeklyHardTargetText) { oldValue, newValue in
+            enforceWeeklyLimit(fieldValue: &weeklyHardTargetText, newValue: newValue)
+        }
+        .onChange(of: targetText) { oldValue, newValue in
+            let maxTarget = Int(newValue) ?? 0
+            let easy = Int(weeklyEasyTargetText) ?? 0
+            let medium = Int(weeklyMediumTargetText) ?? 0
+            let hard = Int(weeklyHardTargetText) ?? 0
+            let sum = easy + medium + hard
+            if sum > maxTarget {
+                // If target drops below sum, zero out the hard/medium first as a simple fallback
+                weeklyEasyTargetText = String(min(easy, maxTarget))
+                weeklyMediumTargetText = String(min(medium, max(0, maxTarget - Int(weeklyEasyTargetText)!)))
+                weeklyHardTargetText = String(min(hard, max(0, maxTarget - Int(weeklyEasyTargetText)! - Int(weeklyMediumTargetText)!)))
+            }
+        }
+    }
+    
+    private func enforceWeeklyLimit(fieldValue: inout String, newValue: String) {
+        if newValue.isEmpty { return }
+        
+        let maxTarget = Int(targetText) ?? 0
+        let easy = Int(weeklyEasyTargetText) ?? 0
+        let medium = Int(weeklyMediumTargetText) ?? 0
+        let hard = Int(weeklyHardTargetText) ?? 0
+        
+        let sum = easy + medium + hard
+        
+        if sum > maxTarget {
+            let otherTwo = sum - (Int(newValue) ?? 0)
+            let allowed = maxTarget - otherTwo
+            fieldValue = String(max(0, allowed))
         }
     }
 
@@ -96,6 +127,7 @@ struct GoalField: View {
     let title: String
     @Binding var text: String
     let systemImage: String
+    var onSubmit: (() -> Void)? = nil
 
     var body: some View {
         VStack(alignment: .leading, spacing: 7) {
@@ -107,6 +139,20 @@ struct GoalField: View {
                 .textFieldStyle(.plain)
                 .font(.title3.weight(.semibold))
                 .monospacedDigit()
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .onSubmit {
+                    onSubmit?()
+                }
+                #if os(iOS)
+                .keyboardType(.numbersAndPunctuation)
+                .submitLabel(.done)
+                #endif
+                .onChange(of: text) { _, newValue in
+                    let filtered = newValue.filter { $0.isNumber }
+                    if newValue != filtered {
+                        text = filtered
+                    }
+                }
                 .padding(.horizontal, 12)
                 .frame(height: 40)
                 .background(AppColor.paperWarm.opacity(0.58), in: RoundedRectangle(cornerRadius: 13))
@@ -125,6 +171,7 @@ struct DifficultyGoalGrid: View {
 
     let projectedMixText: String
     let totalText: String
+    var onSubmit: (() -> Void)? = nil
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -142,23 +189,11 @@ struct DifficultyGoalGrid: View {
                     .minimumScaleFactor(0.72)
             }
 
-            #if os(iOS)
-            LazyVGrid(
-                columns: Array(repeating: GridItem(.flexible()), count: 3),
-                alignment: .leading,
-                spacing: 10
-            ) {
-                DifficultyGoalField(title: "Easy", text: $easyText, tint: AppColor.easy)
-                DifficultyGoalField(title: "Medium", text: $mediumText, tint: AppColor.medium)
-                DifficultyGoalField(title: "Hard", text: $hardText, tint: AppColor.hard)
-            }
-            #else
             HStack(alignment: .top, spacing: 10) {
-                DifficultyGoalField(title: "Easy", text: $easyText, tint: AppColor.easy)
-                DifficultyGoalField(title: "Medium", text: $mediumText, tint: AppColor.medium)
-                DifficultyGoalField(title: "Hard", text: $hardText, tint: AppColor.hard)
+                DifficultyGoalField(title: "Easy", text: $easyText, tint: AppColor.easy, onSubmit: onSubmit)
+                DifficultyGoalField(title: "Medium", text: $mediumText, tint: AppColor.medium, onSubmit: onSubmit)
+                DifficultyGoalField(title: "Hard", text: $hardText, tint: AppColor.hard, onSubmit: onSubmit)
             }
-            #endif
 
             Text(projectedMixText)
                 .font(.caption)
@@ -178,6 +213,7 @@ struct DifficultyGoalField: View {
     let title: String
     @Binding var text: String
     let tint: Color
+    var onSubmit: (() -> Void)? = nil
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -196,6 +232,20 @@ struct DifficultyGoalField: View {
                 .textFieldStyle(.plain)
                 .font(.title3.weight(.semibold))
                 .monospacedDigit()
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .onSubmit {
+                    onSubmit?()
+                }
+                #if os(iOS)
+                .keyboardType(.numbersAndPunctuation)
+                .submitLabel(.done)
+                #endif
+                .onChange(of: text) { _, newValue in
+                    let filtered = newValue.filter { $0.isNumber }
+                    if newValue != filtered {
+                        text = filtered
+                    }
+                }
                 .padding(.horizontal, 10)
                 .frame(height: 38)
                 .background(AppColor.paper, in: RoundedRectangle(cornerRadius: 13))
@@ -208,79 +258,7 @@ struct DifficultyGoalField: View {
     }
 }
 
-struct GoalWeekPreviewPanel: View {
-    let title: String
-    let subtitle: String
-    let rows: [(String, String)]
-    let nextSession: String
-    let reminderText: String
 
-    var body: some View {
-        Panel {
-            VStack(alignment: .leading, spacing: 16) {
-                SectionHeader(title: "This Week", systemImage: "calendar.badge.checkmark")
-
-                HStack(alignment: .center, spacing: 14) {
-                    Image(systemName: "arrow.up.right.circle.fill")
-                        .font(.title2.weight(.semibold))
-                        .foregroundStyle(AppColor.medium)
-                        .frame(width: 42, height: 42)
-                        .background(AppColor.paperWarm.opacity(0.85), in: Circle())
-
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(title)
-                            .font(.title3.weight(.semibold))
-
-                        Text(subtitle)
-                            .font(.callout)
-                            .foregroundStyle(.secondary)
-                            .lineLimit(2)
-                            .fixedSize(horizontal: false, vertical: true)
-                    }
-                }
-
-                HStack(alignment: .top, spacing: 10) {
-                    GoalWeekMiniTile(title: "Next", value: nextSession, tint: AppColor.ink)
-                    GoalWeekMiniTile(title: "Reminder", value: reminderText, tint: AppColor.medium)
-
-                    ForEach(rows.prefix(2), id: \.0) { row in
-                        GoalWeekMiniTile(title: row.0, value: row.1, tint: AppColor.ink)
-                    }
-                }
-            }
-        }
-    }
-}
-
-struct GoalWeekMiniTile: View {
-    let title: String
-    let value: String
-    let tint: Color
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            Circle()
-                .fill(tint)
-                .frame(width: 8, height: 8)
-
-            Text(title)
-                .font(.caption.weight(.semibold))
-                .foregroundStyle(.secondary)
-
-            Text(value)
-                .font(.callout.weight(.semibold))
-                .lineLimit(2)
-                .minimumScaleFactor(0.72)
-        }
-        .padding(12)
-        .frame(maxWidth: .infinity, minHeight: 86, alignment: .topLeading)
-        .background(AppColor.paperWarm.opacity(0.54), in: RoundedRectangle(cornerRadius: 14))
-        .overlay {
-            RoundedRectangle(cornerRadius: 14)
-                .stroke(AppColor.line.opacity(0.16), lineWidth: 1)
-        }
-    }
-}
 
 struct ReminderGoalCard: View {
     @Binding var remindersEnabled: Bool
@@ -319,6 +297,7 @@ struct ReminderGoalCard: View {
                         .foregroundStyle(.secondary)
 
                     DatePicker("", selection: $reminderTime, displayedComponents: .hourAndMinute)
+                        .datePickerStyle(.compact)
                         .labelsHidden()
                         .disabled(!remindersEnabled)
                 }
@@ -333,87 +312,7 @@ struct ReminderGoalCard: View {
     }
 }
 
-struct GoalPlanPanel: View {
-    let title: String
-    let subtitle: String
-    let progress: Double
-    let detailRows: [(String, String)]
 
-    var body: some View {
-        Panel {
-            VStack(alignment: .leading, spacing: 18) {
-                SectionHeader(title: "Active Goal", systemImage: "target")
-
-                VStack(alignment: .leading, spacing: 6) {
-                    Text(title)
-                        .font(.title.weight(.semibold))
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.78)
-
-                    Text(subtitle)
-                        .font(.callout)
-                        .foregroundStyle(.secondary)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
-
-                ProgressView(value: progress)
-                    .tint(AppColor.brand)
-
-                VStack(alignment: .leading, spacing: 10) {
-                    ForEach(detailRows, id: \.0) { row in
-                        DetailRow(title: row.0, value: row.1)
-                    }
-                }
-            }
-        }
-    }
-}
-
-struct PracticePlanPanel: View {
-    let title: String
-    let subtitle: String
-    let rows: [(String, String)]
-    let tint: Color
-
-    var body: some View {
-        Panel {
-            VStack(alignment: .leading, spacing: 18) {
-                SectionHeader(title: "Practice Plan", systemImage: "calendar.badge.checkmark")
-
-                HStack(alignment: .top, spacing: 14) {
-                    Image(systemName: "list.clipboard.fill")
-                        .font(.title2.weight(.semibold))
-                        .foregroundStyle(tint)
-                        .frame(width: 42, height: 42)
-                        .background(AppColor.paperWarm.opacity(0.85), in: RoundedRectangle(cornerRadius: 8))
-                        .overlay {
-                            RoundedRectangle(cornerRadius: 8)
-                                .stroke(tint.opacity(0.52), lineWidth: 1)
-                        }
-
-                    VStack(alignment: .leading, spacing: 5) {
-                        Text(title)
-                            .font(.title3.weight(.semibold))
-                            .fixedSize(horizontal: false, vertical: true)
-
-                        Text(subtitle)
-                            .font(.callout)
-                            .foregroundStyle(.secondary)
-                            .fixedSize(horizontal: false, vertical: true)
-                    }
-                }
-
-                Divider()
-
-                VStack(alignment: .leading, spacing: 10) {
-                    ForEach(rows, id: \.0) { row in
-                        DetailRow(title: row.0, value: row.1)
-                    }
-                }
-            }
-        }
-    }
-}
 
 struct ReminderPlanPanel: View {
     let refreshText: String
@@ -475,54 +374,4 @@ struct ReminderRow: View {
     }
 }
 
-struct WidgetIdeaPanel: View {
-    let title: String
-    let detail: String
-    let systemImage: String
-    let tint: Color
 
-    var body: some View {
-        Panel {
-            VStack(alignment: .leading, spacing: 18) {
-                HStack(alignment: .top) {
-                    Image(systemName: systemImage)
-                        .font(.title2.weight(.semibold))
-                        .foregroundStyle(AppColor.ink)
-                        .frame(width: 48, height: 48)
-                        .background(AppColor.paperWarm.opacity(0.85), in: Circle())
-                        .overlay {
-                            Circle()
-                                .stroke(tint.opacity(0.62), lineWidth: 1.6)
-                        }
-
-                    Spacer()
-
-                    Text("Live")
-                        .font(.caption.weight(.semibold))
-                        .foregroundStyle(AppColor.paper)
-                        .padding(.horizontal, 9)
-                        .padding(.vertical, 5)
-                        .background(AppColor.ink, in: Capsule())
-                        .overlay {
-                            Capsule()
-                                .stroke(AppColor.line.opacity(0.28), lineWidth: 1)
-                        }
-                }
-
-                VStack(alignment: .leading, spacing: 6) {
-                    Text(title)
-                        .font(.title2.weight(.semibold))
-
-                    Text(detail)
-                        .font(.callout)
-                        .foregroundStyle(.secondary)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
-
-                Capsule()
-                    .fill(tint.opacity(0.82))
-                    .frame(height: 7)
-            }
-        }
-    }
-}

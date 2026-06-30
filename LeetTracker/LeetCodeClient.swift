@@ -93,14 +93,10 @@ struct LeetCodeClient {
             partialResult[row.difficulty.lowercased(), default: 0] += row.count
         }
 
-        guard
-            let totalSolved = counts["all"],
-            let easySolved = counts["easy"],
-            let mediumSolved = counts["medium"],
-            let hardSolved = counts["hard"]
-        else {
-            throw LeetCodeProfileError.endpointChanged
-        }
+        let totalSolved = counts["all"] ?? 0
+        let easySolved = counts["easy"] ?? 0
+        let mediumSolved = counts["medium"] ?? 0
+        let hardSolved = counts["hard"] ?? 0
 
         return LeetCodeStats(
             username: matchedUser.username,
@@ -137,6 +133,13 @@ struct LeetCodeClient {
         )
 
         var cursor = calendar.startOfDay(for: Date())
+        
+        if !solvedDays.contains(cursor) {
+            if let previousDay = calendar.date(byAdding: .day, value: -1, to: cursor) {
+                cursor = previousDay
+            }
+        }
+
         var streak = 0
 
         while solvedDays.contains(cursor) {

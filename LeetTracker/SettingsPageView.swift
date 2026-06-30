@@ -20,7 +20,7 @@ struct SettingsPageView: View {
                 #else
                 HStack(alignment: .top, spacing: 20) {
                     setupSection
-                        .frame(maxWidth: .infinity)
+                        .frame(minWidth: 280, maxWidth: .infinity)
 
                     dataHealthSection
                         .frame(minWidth: 300, idealWidth: 360, maxWidth: 420)
@@ -71,6 +71,10 @@ struct SettingsPageView: View {
                     TextField("username", text: $viewModel.username)
                         .textFieldStyle(.plain)
                         .font(.body)
+                        #if os(iOS)
+                        .textInputAutocapitalization(.never)
+                        #endif
+                        .autocorrectionDisabled(true)
                         .padding(.horizontal, 13)
                         .frame(height: 38)
                         .background(AppColor.paperWarm.opacity(0.55), in: RoundedRectangle(cornerRadius: 8))

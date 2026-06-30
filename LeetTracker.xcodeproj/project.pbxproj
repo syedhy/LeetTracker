@@ -27,10 +27,8 @@
 		111111111111111111111019 /* AppTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 111111111111111111112019 /* AppTheme.swift */; };
 		111111111111111111111020 /* AppChrome.swift in Sources */ = {isa = PBXBuildFile; fileRef = 111111111111111111112020 /* AppChrome.swift */; };
 		111111111111111111111021 /* DashboardPanels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 111111111111111111112021 /* DashboardPanels.swift */; };
-		111111111111111111111022 /* AnalyticsPanels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 111111111111111111112022 /* AnalyticsPanels.swift */; };
 		111111111111111111111023 /* GoalPanels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 111111111111111111112023 /* GoalPanels.swift */; };
 		111111111111111111111024 /* ReminderScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 111111111111111111112024 /* ReminderScheduler.swift */; };
-		111111111111111111111025 /* AnalyticsInsightPanels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 111111111111111111112025 /* AnalyticsInsightPanels.swift */; };
 		111111111111111111111026 /* PlannerPanels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 111111111111111111112026 /* PlannerPanels.swift */; };
 		111111111111111111111027 /* WidgetPanels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 111111111111111111112027 /* WidgetPanels.swift */; };
 		1BCFE48B2FCF8B3400138000 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1BCFE48A2FCF8B3400138000 /* Assets.xcassets */; };
@@ -86,10 +84,8 @@
 		111111111111111111112019 /* AppTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTheme.swift; sourceTree = "<group>"; };
 		111111111111111111112020 /* AppChrome.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppChrome.swift; sourceTree = "<group>"; };
 		111111111111111111112021 /* DashboardPanels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardPanels.swift; sourceTree = "<group>"; };
-		111111111111111111112022 /* AnalyticsPanels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsPanels.swift; sourceTree = "<group>"; };
 		111111111111111111112023 /* GoalPanels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoalPanels.swift; sourceTree = "<group>"; };
 		111111111111111111112024 /* ReminderScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReminderScheduler.swift; sourceTree = "<group>"; };
-		111111111111111111112025 /* AnalyticsInsightPanels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalyticsInsightPanels.swift; sourceTree = "<group>"; };
 		111111111111111111112026 /* PlannerPanels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlannerPanels.swift; sourceTree = "<group>"; };
 		111111111111111111112027 /* WidgetPanels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetPanels.swift; sourceTree = "<group>"; };
 		111111111111111111113001 /* LeetTracker.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LeetTracker.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -183,8 +179,6 @@
 				111111111111111111112019 /* AppTheme.swift */,
 				111111111111111111112020 /* AppChrome.swift */,
 				111111111111111111112021 /* DashboardPanels.swift */,
-				111111111111111111112022 /* AnalyticsPanels.swift */,
-				111111111111111111112025 /* AnalyticsInsightPanels.swift */,
 				111111111111111111112023 /* GoalPanels.swift */,
 				111111111111111111112026 /* PlannerPanels.swift */,
 				111111111111111111112027 /* WidgetPanels.swift */,
@@ -286,7 +280,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1600;
-				LastUpgradeCheck = 2650;
+				LastUpgradeCheck = 2660;
 				TargetAttributes = {
 					111111111111111111115001 = {
 						CreatedOnToolsVersion = 16.0;
@@ -346,8 +340,6 @@
 				111111111111111111111019 /* AppTheme.swift in Sources */,
 				111111111111111111111020 /* AppChrome.swift in Sources */,
 				111111111111111111111021 /* DashboardPanels.swift in Sources */,
-				111111111111111111111022 /* AnalyticsPanels.swift in Sources */,
-				111111111111111111111025 /* AnalyticsInsightPanels.swift in Sources */,
 				111111111111111111111023 /* GoalPanels.swift in Sources */,
 				111111111111111111111026 /* PlannerPanels.swift in Sources */,
 				111111111111111111111027 /* WidgetPanels.swift in Sources */,

@@ -141,9 +141,9 @@ final class SharedLeetTrackerStore {
     }
 
     private static func resolveStoreURL(fileManager: FileManager) -> URL {
+        let fallbackBaseURL = fileManager.urls(for: .applicationSupportDirectory, in: .userDomainMask).first ?? URL(fileURLWithPath: NSTemporaryDirectory())
         let baseURL = fileManager.containerURL(forSecurityApplicationGroupIdentifier: appGroupIdentifier)
-            ?? fileManager.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
-                .appendingPathComponent("LeetTracker", isDirectory: true)
+            ?? fallbackBaseURL.appendingPathComponent("LeetTracker", isDirectory: true)
 
         return baseURL.appendingPathComponent(storeFileName)
     }

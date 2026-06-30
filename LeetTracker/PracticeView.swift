@@ -2,7 +2,6 @@ import SwiftUI
 
 struct PracticeView: View {
     @ObservedObject var viewModel: LeetTrackerViewModel
-    @Binding var selectedPracticeMode: PracticeMode
 
     var body: some View {
         ScrollView(.vertical, showsIndicators: true) {

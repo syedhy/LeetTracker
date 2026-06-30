@@ -13,7 +13,7 @@ enum AppColor {
     static let sky = Color(red: 0.35, green: 0.70, blue: 1.00)
     static let coral = Color(red: 1.00, green: 0.40, blue: 0.40)
     static let sunflower = Color(red: 1.00, green: 0.85, blue: 0.25)
-    static let mint = Color(red: 0.35, green: 0.90, blue: 0.65)
+    static let mint = Color(red: 0.28, green: 0.76, blue: 0.54)
     static let pink = Color(red: 1.00, green: 0.40, blue: 0.70)
     static let orange = Color(red: 1.00, green: 0.55, blue: 0.15)
     static let purple = Color(red: 0.65, green: 0.40, blue: 1.00)

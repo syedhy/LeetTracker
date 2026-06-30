@@ -22,29 +22,10 @@ enum AppSection: String, CaseIterable, Identifiable {
     }
 }
 
-enum PracticeMode: String, CaseIterable, Identifiable {
-    case plan = "Plan"
-    case analytics = "Analytics"
-    case goals = "Goals"
-
-    var id: String { rawValue }
-
-    var systemImage: String {
-        switch self {
-        case .plan:
-            return "calendar.badge.checkmark"
-        case .analytics:
-            return "chart.xyaxis.line"
-        case .goals:
-            return "target"
-        }
-    }
-}
 
 struct ContentView: View {
     @StateObject private var viewModel = LeetTrackerViewModel()
     @State private var selectedSection = AppSection.dashboard
-    @State private var selectedPracticeMode = PracticeMode.plan
 
     var body: some View {
         #if os(iOS)
@@ -53,7 +34,7 @@ struct ContentView: View {
                 .tabItem { Label(AppSection.dashboard.rawValue, systemImage: AppSection.dashboard.systemImage) }
                 .tag(AppSection.dashboard)
             
-            PracticeView(viewModel: viewModel, selectedPracticeMode: $selectedPracticeMode)
+            PracticeView(viewModel: viewModel)
                 .tabItem { Label(AppSection.practice.rawValue, systemImage: AppSection.practice.systemImage) }
                 .tag(AppSection.practice)
                 
@@ -91,7 +72,7 @@ struct ContentView: View {
                 
                 VStack(alignment: .leading, spacing: 26) {
                     selectedContent
-                        .sectionEntrance(trigger: "\(selectedSection.rawValue)-\(selectedPracticeMode.rawValue)")
+                        .sectionEntrance(trigger: "\(selectedSection.rawValue)")
                 }
                 .padding(.horizontal, 14)
                 .padding(.vertical, 14)
@@ -113,7 +94,7 @@ struct ContentView: View {
         case .dashboard:
             DashboardView(viewModel: viewModel)
         case .practice:
-            PracticeView(viewModel: viewModel, selectedPracticeMode: $selectedPracticeMode)
+            PracticeView(viewModel: viewModel)
         case .widgets:
             WidgetsPageView(viewModel: viewModel)
         case .settings:

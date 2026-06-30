@@ -17,12 +17,12 @@ struct WidgetsPageView: View {
                     WidgetStudioHeroPanel(
                         solvedText: viewModel.totalSolvedText,
                         username: viewModel.displayUsername,
-                        refreshText: viewModel.widgetDashboardSummaryTitle
+                        refreshText: viewModel.refreshCadenceText
                     )
 
                     WidgetSetupPanel(
-                        refreshText: viewModel.widgetDashboardSummaryTitle,
-                        dataText: viewModel.widgetDashboardSummaryDetail
+                        refreshText: viewModel.refreshCadenceText,
+                        dataText: "Auto refresh when macOS allows it"
                     )
                 }
                 #else
@@ -31,13 +31,13 @@ struct WidgetsPageView: View {
                         WidgetStudioHeroPanel(
                             solvedText: viewModel.totalSolvedText,
                             username: viewModel.displayUsername,
-                            refreshText: viewModel.widgetDashboardSummaryTitle
+                            refreshText: viewModel.refreshCadenceText
                         )
                         .frame(maxWidth: .infinity)
 
                         WidgetSetupPanel(
-                            refreshText: viewModel.widgetDashboardSummaryTitle,
-                            dataText: viewModel.widgetDashboardSummaryDetail
+                            refreshText: viewModel.refreshCadenceText,
+                            dataText: "Auto refresh when macOS allows it"
                         )
                         .frame(minWidth: 300, idealWidth: 340, maxWidth: 380)
                     }
@@ -45,12 +45,12 @@ struct WidgetsPageView: View {
                         WidgetStudioHeroPanel(
                             solvedText: viewModel.totalSolvedText,
                             username: viewModel.displayUsername,
-                            refreshText: viewModel.widgetDashboardSummaryTitle
+                            refreshText: viewModel.refreshCadenceText
                         )
 
                         WidgetSetupPanel(
-                            refreshText: viewModel.widgetDashboardSummaryTitle,
-                            dataText: viewModel.widgetDashboardSummaryDetail
+                            refreshText: viewModel.refreshCadenceText,
+                            dataText: "Auto refresh when macOS allows it"
                         )
                     }
                 }

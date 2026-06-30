@@ -86,63 +86,7 @@ final class LeetTrackerViewModel: ObservableObject {
         return "\(stats.username) · \(stats.totalSolved) solved"
     }
 
-    var goalDashboardSummaryTitle: String {
-        guard stats != nil else {
-            return "Goal"
-        }
 
-        return "\(goalRemainingText) left"
-    }
-
-    var goalDashboardSummaryDetail: String {
-        guard stats != nil else {
-            return "Refresh a profile, then set a target."
-        }
-
-        return "Target \(goalTargetValue) · \(weeklyPracticeMixText) · \(estimatedWeeksText)"
-    }
-
-    var analyticsDashboardSummaryTitle: String {
-        difficultyMixText
-    }
-
-    var analyticsDashboardSummaryDetail: String {
-        guard stats != nil else {
-            return "Analytics appear after a refresh."
-        }
-
-        return "\(readinessTitle) · \(focusRecommendationTitle)"
-    }
-
-    var reminderDashboardSummaryTitle: String {
-        remindersEnabled ? reminderTimeText : "Off"
-    }
-
-    var reminderDashboardSummaryDetail: String {
-        remindersEnabled
-            ? "Daily nudge plus Sunday review"
-            : "Turn on nudges when you want the app to pull you back in"
-    }
-
-    var plannerDashboardSummaryTitle: String {
-        "\(plannerCompletedCount)/\(plannerSessions.count) sessions"
-    }
-
-    var plannerDashboardSummaryDetail: String {
-        guard let nextSession = plannerSessions.first(where: { !completedPlannerSessionIDs.contains($0.id) }) else {
-            return plannerSessions.isEmpty ? "Set a weekly mix to generate the board" : "Weekly board complete"
-        }
-
-        return "Next \(nextSession.dayText) · \(nextSession.difficulty.sessionTitle)"
-    }
-
-    var widgetDashboardSummaryTitle: String {
-        refreshCadenceText
-    }
-
-    var widgetDashboardSummaryDetail: String {
-        "Auto refresh when macOS allows it"
-    }
 
     var difficultyMixText: String {
         guard let stats, stats.totalSolved > 0 else {
@@ -171,7 +115,7 @@ final class LeetTrackerViewModel: ObservableObject {
             return "Set a target"
         }
 
-        return "Target \(goalTargetValue)"
+        return "Target \(savedGoalSettings.targetSolved)"
     }
 
     var focusGoalSubtitle: String {
@@ -187,62 +131,10 @@ final class LeetTrackerViewModel: ObservableObject {
             return "--"
         }
 
-        return "\(max(0, goalTargetValue - totalSolved))"
+        return "\(max(0, savedGoalSettings.targetSolved - totalSolved))"
     }
 
-    var goalProgress: Double {
-        guard let totalSolved = stats?.totalSolved else {
-            return 0
-        }
 
-        guard goalTargetValue > 0 else {
-            return 0
-        }
-
-        return min(1, Double(totalSolved) / Double(goalTargetValue))
-    }
-
-    var estimatedWeeksText: String {
-        guard let totalSolved = stats?.totalSolved else {
-            return "--"
-        }
-
-        let remaining = max(0, goalTargetValue - totalSolved)
-
-        guard remaining > 0 else {
-            return "Done"
-        }
-
-        let weeks = Int(ceil(Double(remaining) / Double(max(1, weeklyTargetValue))))
-        return weeks == 1 ? "1 week" : "\(weeks) weeks"
-    }
-
-    var estimatedCompletionDateText: String {
-        guard let totalSolved = stats?.totalSolved else {
-            return "--"
-        }
-
-        let remaining = max(0, goalTargetValue - totalSolved)
-
-        guard remaining > 0 else {
-            return "Reached"
-        }
-
-        let weeks = Int(ceil(Double(remaining) / Double(max(1, weeklyTargetValue))))
-        let days = max(1, weeks * 7)
-        let completionDate = Calendar.current.date(byAdding: .day, value: days, to: Date()) ?? Date()
-        return DateFormatter.localizedString(from: completionDate, dateStyle: .medium, timeStyle: .none)
-    }
-
-    var dailyPaceText: String {
-        if weeklyTargetValue >= 7 {
-            let perDay = Double(weeklyTargetValue) / 7
-            return String(format: "%.1f per day", perDay)
-        }
-
-        let spacing = Int(ceil(7.0 / Double(max(1, weeklyTargetValue))))
-        return spacing <= 1 ? "1 per day" : "1 every \(spacing) days"
-    }
 
     var weeklyPracticeMixText: String {
         let easy = weeklyEasyTargetValue
@@ -326,34 +218,7 @@ final class LeetTrackerViewModel: ObservableObject {
         return "Next: \(nextSession.dayText) · \(nextSession.difficulty.sessionTitle) · \(nextSession.difficulty.rawValue)"
     }
 
-    var analyticsHeroTitle: String {
-        guard let stats, stats.totalSolved > 0 else {
-            return "Refresh once to draw your practice map"
-        }
 
-        return "\(stats.totalSolved) solved · \(readinessTitle)"
-    }
-
-    var analyticsHeroDetail: String {
-        guard stats != nil else {
-            return "LeetTracker will turn public solved counts and your local goals into readable signals without pretending to know private activity."
-        }
-
-        return "This is a local practice-health view: difficulty balance, target distance, and the next useful move."
-    }
-
-    var planIntensityText: String {
-        switch weeklyTargetValue {
-        case 1...3:
-            return "Light"
-        case 4...7:
-            return "Steady"
-        case 8...14:
-            return "Focused"
-        default:
-            return "Aggressive"
-        }
-    }
 
     var cacheStatusText: String {
         guard let lastUpdated = stats?.lastUpdated else {
@@ -375,304 +240,17 @@ final class LeetTrackerViewModel: ObservableObject {
         stats?.totalSolved
     }
 
-    var goalTargetNumber: Int {
-        goalTargetValue
+
+
+
+
+    var goalProgress: Double {
+        guard let totalSolved = stats?.totalSolved else { return 0 }
+        guard savedGoalSettings.targetSolved > 0 else { return 0 }
+        return min(1, Double(totalSolved) / Double(savedGoalSettings.targetSolved))
     }
 
-    var weeklyTargetNumber: Int {
-        weeklyTargetValue
-    }
 
-    var difficultyDistributionRows: [DifficultyDistributionRow] {
-        let total = stats?.totalSolved ?? 0
-
-        return [
-            DifficultyDistributionRow(title: "Easy", value: stats?.easySolved ?? 0, total: total, tint: AppColor.easy),
-            DifficultyDistributionRow(title: "Medium", value: stats?.mediumSolved ?? 0, total: total, tint: AppColor.medium),
-            DifficultyDistributionRow(title: "Hard", value: stats?.hardSolved ?? 0, total: total, tint: AppColor.hard)
-        ]
-    }
-
-    var balanceNarrative: String {
-        guard let stats, stats.totalSolved > 0 else {
-            return "Balance appears after the first successful refresh."
-        }
-
-        let mediumHard = stats.mediumSolved + stats.hardSolved
-        let mediumHardPercentage = Int((Double(mediumHard) / Double(stats.totalSolved) * 100).rounded())
-
-        if stats.hardSolved == 0, stats.totalSolved >= 20 {
-            return "Your volume is growing, but Hard is still empty. Add one carefully reviewed Hard problem when you have enough time to study the pattern."
-        }
-
-        if mediumHardPercentage < 45 {
-            return "Your solved count is still easy-heavy. That is fine for warmups, but the next useful improvement is more Medium practice."
-        }
-
-        if mediumHardPercentage >= 65 {
-            return "Your mix is challenge-heavy. Keep Medium as the default and use Easy problems only to stay warm."
-        }
-
-        return "Your difficulty mix is balanced enough for steady practice. Keep the weekly target consistent and avoid overcorrecting."
-    }
-
-    var progressSignals: [ProgressSignal] {
-        guard let stats, stats.totalSolved > 0 else {
-            return [
-                ProgressSignal(
-                    title: "Profile",
-                    value: "Empty",
-                    detail: "Save a username and refresh once to unlock analytics.",
-                    systemImage: "person.crop.circle.badge.questionmark",
-                    tint: AppColor.ink
-                ),
-                ProgressSignal(
-                    title: "Data source",
-                    value: "Public",
-                    detail: "LeetTracker only uses public profile-level solved counts.",
-                    systemImage: "lock.open",
-                    tint: AppColor.ink
-                )
-            ]
-        }
-
-        let remaining = max(0, goalTargetValue - stats.totalSolved)
-        let mediumHard = stats.mediumSolved + stats.hardSolved
-        let mediumHardPercentage = Int((Double(mediumHard) / Double(stats.totalSolved) * 100).rounded())
-
-        return [
-            ProgressSignal(
-                title: "Difficulty balance",
-                value: "\(mediumHardPercentage)% M/H",
-                detail: "Useful practice progress usually comes from raising this without ignoring warmups.",
-                systemImage: "chart.bar.fill",
-                tint: focusRecommendationTint
-            ),
-            ProgressSignal(
-                title: "Goal distance",
-                value: remaining == 0 ? "Reached" : "\(remaining) left",
-                detail: remaining == 0 ? "Set a new target to keep the next milestone visible." : "\(estimatedWeeksText) at your saved weekly pace.",
-                systemImage: "target",
-                tint: remaining == 0 ? AppColor.easy : AppColor.ink
-            ),
-            ProgressSignal(
-                title: "Practice rhythm",
-                value: dailyPaceText,
-                detail: "\(weeklyPracticeMixText) keeps the week concrete instead of vague.",
-                systemImage: "calendar.badge.clock",
-                tint: AppColor.medium
-            ),
-            ProgressSignal(
-                title: "Next milestone",
-                value: nextMilestoneText,
-                detail: "A small visible milestone is easier to finish than a huge abstract target.",
-                systemImage: "flag.checkered",
-                tint: AppColor.ink
-            )
-        ]
-    }
-
-    var milestoneTitle: String {
-        guard let stats else {
-            return "Refresh to find the next milestone"
-        }
-
-        return "\(stats.totalSolved) → \(nextMilestone(after: stats.totalSolved)) solved"
-    }
-
-    var milestoneSubtitle: String {
-        guard let stats else {
-            return "LeetTracker will use your current solved count to suggest the next small visible target."
-        }
-
-        let next = nextMilestone(after: stats.totalSolved)
-        let remaining = max(0, next - stats.totalSolved)
-
-        if remaining == 1 {
-            return "One problem closes the next milestone. Make it intentional."
-        }
-
-        return "\(remaining) problems closes the next milestone. Keep the scope small and finishable."
-    }
-
-    var milestoneRows: [(String, String)] {
-        guard let stats else {
-            return [
-                ("Current", "--"),
-                ("Next", "--"),
-                ("Milestone gap", "--")
-            ]
-        }
-
-        let next = nextMilestone(after: stats.totalSolved)
-        let remaining = max(0, next - stats.totalSolved)
-
-        return [
-            ("Current", "\(stats.totalSolved) solved"),
-            ("Next", "\(next) solved"),
-            ("Milestone gap", remaining == 1 ? "1 problem" : "\(remaining) problems"),
-            ("Suggested mix", weeklyPracticeMixText)
-        ]
-    }
-
-    var goalDetailRows: [(String, String)] {
-        [
-            ("Target", goalTargetDisplayText),
-            ("Remaining", goalRemainingText),
-            ("Weekly mix", weeklyPracticeMixText),
-            ("Finish by", estimatedCompletionDateText)
-        ]
-    }
-
-    var practicePlanTitle: String {
-        guard stats != nil else {
-            return "Load a profile first"
-        }
-
-        return "\(weeklyTargetValue) problem\(weeklyTargetValue == 1 ? "" : "s") this week"
-    }
-
-    var practicePlanSubtitle: String {
-        guard let stats, stats.totalSolved > 0 else {
-            return "After your first refresh, the plan will turn your goal into a weekly practice target."
-        }
-
-        if max(0, goalTargetValue - stats.totalSolved) == 0 {
-            return "Your active target is complete. Set the next milestone to keep momentum visible."
-        }
-
-        return "\(dailyPaceText). \(focusRecommendationDetail)"
-    }
-
-    var practicePlanRows: [(String, String)] {
-        [
-            ("Daily pace", dailyPaceText),
-            ("Weekly mix", weeklyPracticeMixText),
-            ("Finish date", estimatedCompletionDateText),
-            ("Intensity", planIntensityText)
-        ]
-    }
-
-    var readinessScore: Int {
-        guard let stats, stats.totalSolved > 0 else {
-            return 0
-        }
-
-        let goalComponent = min(45, Int((goalProgress * 45).rounded()))
-        let mediumHardRatio = Double(stats.mediumSolved + stats.hardSolved) / Double(stats.totalSolved)
-        let balanceComponent = min(35, Int((mediumHardRatio * 70).rounded()))
-        let hardComponent = min(20, stats.hardSolved * 2)
-
-        return min(100, max(0, goalComponent + balanceComponent + hardComponent))
-    }
-
-    var readinessTitle: String {
-        switch readinessScore {
-        case 80...:
-            return "Strong momentum"
-        case 55..<80:
-            return "Solid base"
-        case 25..<55:
-            return "Building up"
-        default:
-            return stats == nil ? "Waiting for data" : "Early stage"
-        }
-    }
-
-    var readinessDetail: String {
-        guard let stats, stats.totalSolved > 0 else {
-            return "Refresh a profile once to calculate a local practice score from solved count, goal progress, and difficulty balance."
-        }
-
-        return "\(difficultyMixText) are Medium or Hard. This is a local practice signal, not an official readiness score."
-    }
-
-    var focusRecommendationTitle: String {
-        guard let stats, stats.totalSolved > 0 else {
-            return "Load profile"
-        }
-
-        let mediumHard = stats.mediumSolved + stats.hardSolved
-        let mediumHardRatio = Double(mediumHard) / Double(stats.totalSolved)
-
-        if stats.hardSolved == 0, stats.totalSolved >= 20 {
-            return "Add one Hard"
-        }
-
-        if mediumHardRatio < 0.45 {
-            return "Lean into Medium"
-        }
-
-        if max(0, goalTargetValue - stats.totalSolved) <= weeklyTargetValue {
-            return "Finish the goal"
-        }
-
-        return "Keep balance"
-    }
-
-    var focusRecommendationDetail: String {
-        guard let stats, stats.totalSolved > 0 else {
-            return "Save your username and refresh to get a useful next action."
-        }
-
-        switch focusRecommendationTitle {
-        case "Add one Hard":
-            return "You have enough volume to try a carefully chosen Hard problem and learn from the pattern."
-        case "Lean into Medium":
-            return "Your solved mix is still easy-heavy. Medium problems should drive the next practice block."
-        case "Finish the goal":
-            return "You are within this week's pace. A short push can close the target cleanly."
-        default:
-            return "Keep Easy warmups short, make Medium the default, and use Hard problems deliberately."
-        }
-    }
-
-    var focusRecommendationTint: Color {
-        switch focusRecommendationTitle {
-        case "Add one Hard":
-            return AppColor.hard
-        case "Lean into Medium":
-            return AppColor.medium
-        case "Finish the goal":
-            return AppColor.easy
-        default:
-            return AppColor.brand
-        }
-    }
-
-    var analyticsSummary: String {
-        guard let stats, stats.totalSolved > 0 else {
-            return "No profile data is loaded yet. Save your LeetCode username and refresh once so LeetTracker can turn your public solved counts into readable progress signals."
-        }
-
-        let mediumHard = stats.mediumSolved + stats.hardSolved
-        let mediumHardPercentage = Int((Double(mediumHard) / Double(stats.totalSolved) * 100).rounded())
-        let remaining = max(0, goalTargetValue - stats.totalSolved)
-
-        return "Based only on public solved counts, you have solved \(stats.totalSolved) problems and \(mediumHardPercentage)% are Medium or Hard. Treat this as a practice-health signal, not an official ranking or readiness score. Your current target is \(goalTargetValue) solved, so \(remaining) more problem\(remaining == 1 ? "" : "s") gets you there at about \(estimatedWeeksText)."
-    }
-
-    var goalPlanTitle: String {
-        guard stats != nil else {
-            return "Set your first goal"
-        }
-
-        return "Reach \(goalTargetValue) solved"
-    }
-
-    var goalPlanSubtitle: String {
-        guard let totalSolved = stats?.totalSolved else {
-            return "After a profile refresh, LeetTracker will suggest a simple milestone goal from your current solved count."
-        }
-
-        let remaining = max(0, goalTargetValue - totalSolved)
-
-        if remaining == 0 {
-            return "Goal reached. Set the next target when you are ready."
-        }
-
-        return "\(remaining) problem\(remaining == 1 ? "" : "s") left at \(weeklyTargetValue) per week. Keep the goal small, measurable, and visible."
-    }
 
     var reminderTimeText: String {
         formattedTime(reminderTime)
@@ -709,22 +287,21 @@ final class LeetTrackerViewModel: ObservableObject {
 
     func saveGoalSettings() {
         let currentTotal = stats?.totalSolved ?? 0
-        let target = max(currentTotal + 1, parsePositiveInt(goalTargetText, fallback: savedGoalSettings.targetSolved))
-        let requestedWeeklyTarget = max(1, parsePositiveInt(weeklyTargetText, fallback: savedGoalSettings.weeklyTarget))
-        let difficultyTargets = normalizedDifficultyTargets(fallbackWeeklyTarget: requestedWeeklyTarget)
-        #if os(macOS)
-        let weeklyTarget = requestedWeeklyTarget
-        #else
-        let weeklyTarget = max(1, difficultyTargets.easy + difficultyTargets.medium + difficultyTargets.hard)
-        #endif
+        let target = max(currentTotal, parsePositiveInt(goalTargetText, fallback: savedGoalSettings.targetSolved))
+        
+        let easy = max(0, parsePositiveInt(weeklyEasyTargetText, fallback: savedGoalSettings.weeklyEasyTarget ?? 0))
+        let medium = max(0, parsePositiveInt(weeklyMediumTargetText, fallback: savedGoalSettings.weeklyMediumTarget ?? 0))
+        let hard = max(0, parsePositiveInt(weeklyHardTargetText, fallback: savedGoalSettings.weeklyHardTarget ?? 0))
+        
+        let weeklyTarget = max(1, easy + medium + hard)
         let components = Calendar.current.dateComponents([.hour, .minute], from: reminderTime)
 
         let settings = SharedGoalSettings(
             targetSolved: target,
             weeklyTarget: weeklyTarget,
-            weeklyEasyTarget: difficultyTargets.easy,
-            weeklyMediumTarget: difficultyTargets.medium,
-            weeklyHardTarget: difficultyTargets.hard,
+            weeklyEasyTarget: easy,
+            weeklyMediumTarget: medium,
+            weeklyHardTarget: hard,
             remindersEnabled: remindersEnabled,
             reminderHour: components.hour ?? savedGoalSettings.reminderHour,
             reminderMinute: components.minute ?? savedGoalSettings.reminderMinute,
@@ -903,7 +480,8 @@ final class LeetTrackerViewModel: ObservableObject {
 
     private func parsePositiveInt(_ text: String, fallback: Int) -> Int {
         let digits = text.filter(\.isNumber)
-        return Int(digits) ?? fallback
+        let truncated = String(digits.prefix(6))
+        return Int(truncated) ?? fallback
     }
 
     private func normalizedDifficultyTargets(fallbackWeeklyTarget: Int) -> (easy: Int, medium: Int, hard: Int) {

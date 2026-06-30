@@ -77,13 +77,16 @@ struct ContentView: View {
             ZStack {
                 AppSurfaceBackground()
                 
-                List(AppSection.allCases, selection: $selectedSection) { section in
-                    NavigationLink(value: section) {
-                        Label(section.rawValue, systemImage: section.systemImage)
+                VStack(spacing: 8) {
+                    ForEach([AppSection.dashboard, .practice, .widgets]) { section in
+                        sidebarButton(for: section)
                     }
-                    .listRowBackground(Color.clear)
+                    
+                    Spacer()
+                    
+                    sidebarButton(for: .settings)
                 }
-                .scrollContentBackground(.hidden)
+                .padding(14)
             }
             .navigationTitle("LeetTracker")
         } detail: {
@@ -120,6 +123,29 @@ struct ContentView: View {
         case .settings:
             SettingsPageView(viewModel: viewModel)
         }
+    }
+
+    @ViewBuilder
+    private func sidebarButton(for section: AppSection) -> some View {
+        Button(action: { selectedSection = section }) {
+            HStack(spacing: 12) {
+                Image(systemName: section.systemImage)
+                    .font(.title3.weight(.bold))
+                    .frame(width: 24)
+                Text(section.rawValue)
+                    .font(.title3.weight(.semibold))
+                Spacer()
+            }
+            .padding(.vertical, 10)
+            .padding(.horizontal, 14)
+            .foregroundStyle(selectedSection == section ? AppColor.paper : AppColor.ink)
+            .background(
+                selectedSection == section ? AppColor.ink : Color.clear,
+                in: RoundedRectangle(cornerRadius: 12)
+            )
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
     }
 }
 

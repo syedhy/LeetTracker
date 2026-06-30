@@ -3,8 +3,8 @@ import SwiftUI
 enum AppColor {
     // Doodle Theme Colors
     static let ink = Color(red: 0.10, green: 0.10, blue: 0.11)
-    static let paper = Color(red: 0.94, green: 0.92, blue: 0.86)
-    static let paperWarm = Color(red: 1.00, green: 0.99, blue: 0.95)
+    static let paper = Color(red: 0.98, green: 0.97, blue: 0.96)
+    static let paperWarm = Color(red: 1.00, green: 0.99, blue: 0.98)
     static let graphite = Color(red: 0.60, green: 0.60, blue: 0.65)
     static let line = ink
     static let quietLine = ink.opacity(0.1)

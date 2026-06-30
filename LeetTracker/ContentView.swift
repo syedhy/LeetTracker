@@ -68,6 +68,8 @@ struct ContentView: View {
         .onAppear {
             viewModel.loadSavedState()
         }
+        .preferredColorScheme(.light)
+        .background(AppSurfaceBackground())
         #else
         NavigationSplitView {
             List(AppSection.allCases, selection: $selectedSection) { section in
@@ -78,17 +80,22 @@ struct ContentView: View {
             .navigationTitle("LeetTracker")
             .listStyle(.sidebar)
         } detail: {
-            VStack(alignment: .leading, spacing: 26) {
-                selectedContent
-                    .sectionEntrance(trigger: "\(selectedSection.rawValue)-\(selectedPracticeMode.rawValue)")
+            ZStack {
+                AppSurfaceBackground()
+                
+                VStack(alignment: .leading, spacing: 26) {
+                    selectedContent
+                        .sectionEntrance(trigger: "\(selectedSection.rawValue)-\(selectedPracticeMode.rawValue)")
+                }
+                .padding(.horizontal, 14)
+                .padding(.vertical, 14)
+                .frame(maxWidth: .infinity, alignment: .topLeading)
             }
-            .padding(.horizontal, 14)
-            .padding(.vertical, 14)
-            .frame(maxWidth: .infinity, alignment: .topLeading)
         }
         .onAppear {
             viewModel.loadSavedState()
         }
+        .preferredColorScheme(.light)
         #endif
     }
 

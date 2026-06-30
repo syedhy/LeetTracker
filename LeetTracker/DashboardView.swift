@@ -92,13 +92,14 @@ struct DashboardView: View {
 
                 VStack(spacing: 20) {
                     goalSection
-                    dataHealthSection
                 }
                 .frame(minWidth: 300, idealWidth: 340, maxWidth: 380)
             }
             #endif
 
+            #if os(iOS)
             DifficultyDashboardPanel(rows: viewModel.difficultyDistributionRows)
+            #endif
         }
     }
 

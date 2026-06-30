@@ -200,13 +200,7 @@ struct Panel<Content: View>: View {
         content
             .padding(24)
             .frame(maxWidth: .infinity, alignment: .leading)
-            .background(AppColor.paper)
-            .clipShape(RoundedRectangle(cornerRadius: 18))
-            .overlay {
-                RoundedRectangle(cornerRadius: 18)
-                    .stroke(AppColor.ink.opacity(0.8), lineWidth: 2)
-            }
-            .shadow(color: AppColor.ink.opacity(0.15), radius: 0, x: 2, y: 4)
+            .doodlePanel(cornerRadius: 18, shadowOffset: 4)
     }
 }
 

@@ -712,7 +712,11 @@ final class LeetTrackerViewModel: ObservableObject {
         let target = max(currentTotal + 1, parsePositiveInt(goalTargetText, fallback: savedGoalSettings.targetSolved))
         let requestedWeeklyTarget = max(1, parsePositiveInt(weeklyTargetText, fallback: savedGoalSettings.weeklyTarget))
         let difficultyTargets = normalizedDifficultyTargets(fallbackWeeklyTarget: requestedWeeklyTarget)
+        #if os(macOS)
+        let weeklyTarget = requestedWeeklyTarget
+        #else
         let weeklyTarget = max(1, difficultyTargets.easy + difficultyTargets.medium + difficultyTargets.hard)
+        #endif
         let components = Calendar.current.dateComponents([.hour, .minute], from: reminderTime)
 
         let settings = SharedGoalSettings(

@@ -18,6 +18,7 @@ struct GoalEditorPanel: View {
             VStack(alignment: .leading, spacing: 18) {
                 SectionHeader(title: "Set Goal", systemImage: "slider.horizontal.3")
 
+                #if os(iOS)
                 HStack(alignment: .bottom, spacing: 12) {
                     GoalField(title: "Target solved", text: $targetText, systemImage: "target")
                         .frame(maxWidth: .infinity)
@@ -50,6 +51,9 @@ struct GoalEditorPanel: View {
                     projectedMixText: projectedMixText,
                     totalText: weeklyDifficultyTotalText
                 )
+                #else
+                GoalField(title: "Weekly pace", text: $weeklyTargetText, systemImage: "calendar")
+                #endif
 
                 ReminderGoalCard(
                     remindersEnabled: $remindersEnabled,

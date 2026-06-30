@@ -168,21 +168,7 @@ struct PracticeView: View {
             #else
             HStack(alignment: .top, spacing: 20) {
                 goalEditorPanel
-                    .frame(minWidth: 360, idealWidth: 430, maxWidth: 500)
-
-                VStack(spacing: 20) {
-                    goalPlanPanel
-
-                    GoalWeekPreviewPanel(
-                        title: viewModel.practicePlanTitle,
-                        subtitle: viewModel.practicePlanSubtitle,
-                        rows: viewModel.practicePlanRows,
-                        nextSession: viewModel.plannerNextSessionText,
-                        reminderText: viewModel.remindersEnabled ? viewModel.reminderTimeText : "Off"
-                    )
-                }
-                .frame(minWidth: 460, maxWidth: .infinity)
-                .layoutPriority(1)
+                    .frame(maxWidth: 500)
             }
             #endif
         }

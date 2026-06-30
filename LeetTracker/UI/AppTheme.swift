@@ -1,21 +1,13 @@
 import SwiftUI
 
 enum AppColor {
-    #if os(macOS)
-    static let ink = Color(nsColor: .labelColor)
-    static let paper = Color(nsColor: .windowBackgroundColor)
-    static let paperWarm = Color(nsColor: .controlBackgroundColor)
-    static let graphite = Color(nsColor: .secondaryLabelColor)
-    static let line = Color(nsColor: .separatorColor)
-    static let quietLine = Color(nsColor: .gridColor)
-    #else
-    static let ink = Color(uiColor: .label)
-    static let paper = Color(uiColor: .systemBackground)
-    static let paperWarm = Color(uiColor: .secondarySystemBackground)
-    static let graphite = Color(uiColor: .secondaryLabel)
-    static let line = Color(uiColor: .separator)
-    static let quietLine = Color(uiColor: .systemGray4)
-    #endif
+    // Doodle Theme Colors
+    static let ink = Color(red: 0.11, green: 0.11, blue: 0.11)
+    static let paper = Color(red: 0.99, green: 0.98, blue: 0.96)
+    static let paperWarm = Color(red: 0.96, green: 0.95, blue: 0.90)
+    static let graphite = Color.gray
+    static let line = ink
+    static let quietLine = ink.opacity(0.1)
 
     static let sky = Color.blue
     static let coral = Color.red
@@ -33,34 +25,54 @@ struct AppSurfaceBackground: View {
         ZStack {
             AppColor.paperWarm
 
-            PaperGridBackdrop()
-                .stroke(AppColor.line.opacity(0.06), lineWidth: 1)
+            DotGridBackdrop()
+                .fill(AppColor.ink.opacity(0.1))
                 .padding(10)
         }
         .ignoresSafeArea()
     }
 }
 
-struct PaperGridBackdrop: Shape {
+struct DotGridBackdrop: Shape {
     func path(in rect: CGRect) -> Path {
         var path = Path()
-        let step: CGFloat = 42
-
-        var x = rect.minX
-        while x <= rect.maxX {
-            path.move(to: CGPoint(x: x, y: rect.minY))
-            path.addLine(to: CGPoint(x: x, y: rect.maxY))
-            x += step
-        }
-
+        let step: CGFloat = 24
+        let dotSize: CGFloat = 2
+        
         var y = rect.minY
         while y <= rect.maxY {
-            path.move(to: CGPoint(x: rect.minX, y: y))
-            path.addLine(to: CGPoint(x: rect.maxX, y: y))
+            var x = rect.minX
+            while x <= rect.maxX {
+                path.addEllipse(in: CGRect(x: x, y: y, width: dotSize, height: dotSize))
+                x += step
+            }
             y += step
         }
-
         return path
+    }
+}
+
+// MARK: - Doodle Style Modifiers
+
+struct DoodlePanelStyle: ViewModifier {
+    var cornerRadius: CGFloat = 16
+    var shadowOffset: CGFloat = 4
+
+    func body(content: Content) -> some View {
+        content
+            .background(AppColor.paper)
+            .clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
+            .overlay {
+                RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                    .stroke(AppColor.ink, lineWidth: 3)
+            }
+            .shadow(color: AppColor.ink, radius: 0, x: shadowOffset, y: shadowOffset)
+    }
+}
+
+extension View {
+    func doodlePanel(cornerRadius: CGFloat = 16, shadowOffset: CGFloat = 4) -> some View {
+        modifier(DoodlePanelStyle(cornerRadius: cornerRadius, shadowOffset: shadowOffset))
     }
 }
 

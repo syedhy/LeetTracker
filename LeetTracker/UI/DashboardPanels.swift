@@ -1,218 +1,78 @@
 import SwiftUI
 
-struct DashboardHeroBoard: View {
+struct StatsHighlightBoard: View {
     let total: String
+    let easy: String
+    let medium: String
+    let hard: String
     let username: String
     let lastUpdated: String
-    let focusTitle: String
-    let focusDetail: String
 
     var body: some View {
         Panel {
-            #if os(iOS)
-            VStack(alignment: .leading, spacing: 22) {
-                heroCopy
-                scoreSheet
-            }
-            #else
-            HStack(alignment: .center, spacing: 28) {
-                heroCopy
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                scoreSheet
-                    .frame(minWidth: 300, idealWidth: 380, maxWidth: 460)
-            }
-            #endif
-        }
-    }
-
-    private var heroCopy: some View {
-        VStack(alignment: .leading, spacing: 22) {
-            #if os(iOS)
-            HStack(alignment: .center, spacing: 8) {
-                Text("Practice Lab")
-                    .font(.system(.title, design: .rounded).weight(.black))
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.4)
-
-                Spacer(minLength: 0)
-
-                PracticePulseSketch()
-                    .frame(width: 168, height: 128)
-                    .scaleEffect(0.65)
-                    .frame(width: 120, height: 90)
-            }
-            #else
-            HStack(alignment: .center, spacing: 12) {
-                Text("Practice Lab")
-                    .font(.system(.largeTitle, design: .rounded).weight(.black))
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.4)
-
-                PracticePulseSketch()
-                    .frame(width: 168, height: 128)
-                    .padding(.leading, 2)
-                    .scaleEffect(0.85)
-            }
-            #endif
-
-            HStack(spacing: 10) {
-                Text(username)
-                    .font(.title3.weight(.semibold))
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.6)
-
-                Circle()
-                    .fill(AppColor.ink.opacity(0.42))
-                    .frame(width: 5, height: 5)
-
-                Text(lastUpdated)
-                    .font(.callout.weight(.medium))
-                    .foregroundStyle(.secondary)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.6)
-            }
-        }
-    }
-
-    private var scoreSheet: some View {
-        VStack(alignment: .leading, spacing: 18) {
-            HStack(alignment: .firstTextBaseline) {
-                Text(total)
-                    .font(.system(.largeTitle, design: .rounded).weight(.black))
-                    .monospacedDigit()
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.65)
-
-                Text("solved")
-                    .font(.title2.weight(.semibold))
-                    .foregroundStyle(.secondary)
-
-                Spacer()
-            }
-
-            HStack(alignment: .top, spacing: 12) {
-                Image(systemName: "arrow.up.right.circle.fill")
-                    .font(.title2.weight(.semibold))
-                    .foregroundStyle(focusTint)
-                    .frame(width: 42, height: 42)
-                    .background(AppColor.paper, in: Circle())
-                    .overlay {
-                        Circle()
-                            .stroke(focusTint.opacity(0.6), lineWidth: 1.6)
-                    }
-
-                VStack(alignment: .leading, spacing: 5) {
-                    Text(focusTitle)
-                        .font(.headline.weight(.semibold))
-                        .fixedSize(horizontal: false, vertical: true)
-
-                    Text(focusDetail)
-                        .font(.callout)
+            VStack(spacing: 24) {
+                HStack(spacing: 10) {
+                    Text(username)
+                        .font(.title3.weight(.semibold))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.6)
+                    
+                    Circle()
+                        .fill(AppColor.ink.opacity(0.42))
+                        .frame(width: 5, height: 5)
+                    
+                    Text(lastUpdated)
+                        .font(.callout.weight(.medium))
                         .foregroundStyle(.secondary)
-                        .lineLimit(3)
-                        .fixedSize(horizontal: false, vertical: true)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.6)
+                }
+                
+                VStack(spacing: 4) {
+                    Text(total)
+                        .font(.system(size: 64, weight: .black, design: .rounded))
+                        .monospacedDigit()
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.5)
+                        
+                    Text("Total Solved")
+                        .font(.headline.weight(.semibold))
+                        .foregroundStyle(.secondary)
+                        .textCase(.uppercase)
+                }
+                
+                Divider()
+                    .padding(.horizontal, 20)
+                
+                HStack(spacing: 0) {
+                    difficultyColumn(title: "Easy", count: easy, color: AppColor.easy)
+                    
+                    Divider().frame(height: 40)
+                    
+                    difficultyColumn(title: "Medium", count: medium, color: AppColor.medium)
+                    
+                    Divider().frame(height: 40)
+                    
+                    difficultyColumn(title: "Hard", count: hard, color: AppColor.hard)
                 }
             }
-        }
-        .padding(20)
-        .background(AppColor.paperWarm.opacity(0.54), in: RoundedRectangle(cornerRadius: 12))
-        .overlay {
-            RoundedRectangle(cornerRadius: 12)
-                .stroke(AppColor.line.opacity(0.28), lineWidth: 1.2)
+            .padding(.vertical, 10)
         }
     }
-
-    private var focusTint: Color {
-        switch focusTitle {
-        case "Add one Hard":
-            return AppColor.hard
-        case "Lean into Medium":
-            return AppColor.medium
-        case "Finish the goal":
-            return AppColor.easy
-        default:
-            return AppColor.ink
+    
+    private func difficultyColumn(title: String, count: String, color: Color) -> some View {
+        VStack(spacing: 8) {
+            Text(count)
+                .font(.system(.title2, design: .rounded).weight(.bold))
+                .monospacedDigit()
+                .foregroundStyle(color)
+            
+            Text(title)
+                .font(.caption.weight(.bold))
+                .foregroundStyle(.secondary)
+                .textCase(.uppercase)
         }
-    }
-}
-
-struct PracticePulseSketch: View {
-    var body: some View {
-        ZStack {
-            PracticeConnector()
-                .stroke(
-                    AppColor.ink.opacity(0.88),
-                    style: StrokeStyle(lineWidth: 4.4, lineCap: .round, lineJoin: .round)
-                )
-                .drawingGroup()
-                .frame(width: 140, height: 96)
-                .offset(x: 12, y: 10)
-
-            AppIconMark(size: 58, cornerRadius: 14)
-                .rotationEffect(.degrees(-2))
-                .offset(x: -38, y: -4)
-
-            PracticeNode(size: 38, tint: AppColor.easy, systemImage: "checkmark")
-                .offset(x: 42, y: -36)
-
-            PracticeNode(size: 38, tint: AppColor.medium, systemImage: "arrow.up.right")
-                .offset(x: 64, y: 16)
-
-            PracticeNode(size: 38, tint: AppColor.hard, systemImage: "flame.fill")
-                .offset(x: -12, y: 42)
-        }
-        .frame(width: 168, height: 128)
-        .drawingGroup()
-    }
-}
-
-struct PracticeNode: View {
-    let size: CGFloat
-    let tint: Color
-    let systemImage: String
-
-    var body: some View {
-        Image(systemName: systemImage)
-            .font(.system(size: size * 0.42, weight: .black, design: .rounded))
-            .foregroundStyle(AppColor.ink)
-            .frame(width: size, height: size)
-            .background(tint.opacity(0.88), in: Circle())
-            .overlay {
-                Circle()
-                    .stroke(AppColor.ink, lineWidth: 2.6)
-            }
-            .shadow(color: AppColor.ink.opacity(0.12), radius: 0, x: 4, y: 4)
-    }
-}
-
-struct PracticeConnector: Shape {
-    func path(in rect: CGRect) -> Path {
-        var path = Path()
-
-        let hub = CGPoint(x: rect.minX + rect.width * 0.34, y: rect.minY + rect.height * 0.44)
-
-        path.move(to: hub)
-        path.addCurve(
-            to: CGPoint(x: rect.minX + rect.width * 0.72, y: rect.minY + rect.height * 0.16),
-            control1: CGPoint(x: rect.minX + rect.width * 0.46, y: rect.minY + rect.height * 0.30),
-            control2: CGPoint(x: rect.minX + rect.width * 0.56, y: rect.minY + rect.height * 0.18)
-        )
-
-        path.move(to: hub)
-        path.addCurve(
-            to: CGPoint(x: rect.minX + rect.width * 0.86, y: rect.minY + rect.height * 0.58),
-            control1: CGPoint(x: rect.minX + rect.width * 0.52, y: rect.minY + rect.height * 0.54),
-            control2: CGPoint(x: rect.minX + rect.width * 0.68, y: rect.minY + rect.height * 0.52)
-        )
-
-        path.move(to: hub)
-        path.addCurve(
-            to: CGPoint(x: rect.minX + rect.width * 0.38, y: rect.minY + rect.height * 0.86),
-            control1: CGPoint(x: rect.minX + rect.width * 0.20, y: rect.minY + rect.height * 0.56),
-            control2: CGPoint(x: rect.minX + rect.width * 0.24, y: rect.minY + rect.height * 0.78)
-        )
-
-        return path
+        .frame(maxWidth: .infinity)
     }
 }
 
@@ -243,7 +103,7 @@ struct DashboardCommandCenterPanel: View {
                 }
 
                 #if os(iOS)
-                LazyVGrid(columns: [GridItem(.adaptive(minimum: 150), spacing: 10)], spacing: 10) {
+                LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 2), spacing: 10) {
                     DashboardSignalTile(title: "Target", value: goalTitle, detail: goalDetail, systemImage: "target", tint: AppColor.ink)
                     DashboardSignalTile(title: "Analytics", value: analyticsTitle, detail: analyticsDetail, systemImage: "chart.xyaxis.line", tint: AppColor.ink)
                     DashboardSignalTile(title: "Reminders", value: reminderTitle, detail: reminderDetail, systemImage: "bell.badge", tint: AppColor.medium)
@@ -298,28 +158,6 @@ struct DashboardCommandCenterPanel: View {
     }
 }
 
-struct DifficultyDashboardPanel: View {
-    let rows: [DifficultyDistributionRow]
-
-    var body: some View {
-        Panel {
-            VStack(alignment: .leading, spacing: 16) {
-                HStack(alignment: .firstTextBaseline) {
-                    SectionHeader(title: "Difficulty Mix", systemImage: "circle.grid.3x3.fill")
-
-                    Spacer()
-
-                    Text("public solved counts")
-                        .font(.caption.weight(.semibold))
-                        .foregroundStyle(.secondary)
-                        .textCase(.uppercase)
-                }
-
-                DifficultyMixCards(rows: rows)
-            }
-        }
-    }
-}
 
 struct DashboardSignalTile: View {
     let title: String
@@ -357,7 +195,6 @@ struct DashboardSignalTile: View {
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 .lineLimit(2)
-                .fixedSize(horizontal: false, vertical: true)
         }
         .padding(14)
         .frame(maxWidth: .infinity, minHeight: 102, alignment: .leading)

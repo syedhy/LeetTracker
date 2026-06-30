@@ -69,16 +69,23 @@ struct ContentView: View {
             viewModel.loadSavedState()
         }
         .preferredColorScheme(.light)
+        .fontDesign(.rounded)
+        .fontWeight(.black)
         .background(AppSurfaceBackground())
         #else
         NavigationSplitView {
-            List(AppSection.allCases, selection: $selectedSection) { section in
-                NavigationLink(value: section) {
-                    Label(section.rawValue, systemImage: section.systemImage)
+            ZStack {
+                AppSurfaceBackground()
+                
+                List(AppSection.allCases, selection: $selectedSection) { section in
+                    NavigationLink(value: section) {
+                        Label(section.rawValue, systemImage: section.systemImage)
+                    }
+                    .listRowBackground(Color.clear)
                 }
+                .scrollContentBackground(.hidden)
             }
             .navigationTitle("LeetTracker")
-            .listStyle(.sidebar)
         } detail: {
             ZStack {
                 AppSurfaceBackground()
@@ -96,6 +103,8 @@ struct ContentView: View {
             viewModel.loadSavedState()
         }
         .preferredColorScheme(.light)
+        .fontDesign(.rounded)
+        .fontWeight(.black)
         #endif
     }
 

@@ -144,7 +144,7 @@ struct DifficultyGoalGrid: View {
 
             #if os(iOS)
             LazyVGrid(
-                columns: [GridItem(.adaptive(minimum: 100), spacing: 10)],
+                columns: Array(repeating: GridItem(.flexible()), count: 3),
                 alignment: .leading,
                 spacing: 10
             ) {

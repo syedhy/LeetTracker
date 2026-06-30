@@ -6,15 +6,14 @@ struct DashboardView: View {
 
     var body: some View {
         ScrollView(.vertical, showsIndicators: true) {
-            VStack(alignment: .leading, spacing: 24) {
+            VStack(spacing: 24) {
                 header
-
+                
                 dashboardSnapshotSection
-
-
             }
             .padding()
-            .frame(maxWidth: .infinity, alignment: .leading)
+            .frame(maxWidth: 720)
+            .frame(maxWidth: .infinity, alignment: .center)
         }
     }
 
@@ -67,39 +66,18 @@ struct DashboardView: View {
         VStack(alignment: .leading, spacing: 18) {
             SectionHeader(title: "Today’s Snapshot", systemImage: "chart.bar.xaxis")
 
-            #if os(iOS)
-            VStack(spacing: 20) {
-                DashboardHeroBoard(
-                    total: viewModel.totalSolvedText,
-                    username: viewModel.displayUsername,
-                    lastUpdated: viewModel.lastUpdatedText,
-                    focusTitle: viewModel.focusRecommendationTitle,
-                    focusDetail: viewModel.focusRecommendationDetail
-                )
-                goalSection
-                dataHealthSection
-            }
-            #else
-            HStack(alignment: .top, spacing: 20) {
-                DashboardHeroBoard(
-                    total: viewModel.totalSolvedText,
-                    username: viewModel.displayUsername,
-                    lastUpdated: viewModel.lastUpdatedText,
-                    focusTitle: viewModel.focusRecommendationTitle,
-                    focusDetail: viewModel.focusRecommendationDetail
-                )
-                .frame(maxWidth: .infinity)
-
-                VStack(spacing: 20) {
-                    goalSection
-                }
-                .frame(minWidth: 300, idealWidth: 340, maxWidth: 380)
-            }
-            #endif
-
-            #if os(iOS)
-            DifficultyDashboardPanel(rows: viewModel.difficultyDistributionRows)
-            #endif
+            StatsHighlightBoard(
+                total: viewModel.totalSolvedText,
+                easy: viewModel.easySolvedText,
+                medium: viewModel.mediumSolvedText,
+                hard: viewModel.hardSolvedText,
+                username: viewModel.displayUsername,
+                lastUpdated: viewModel.lastUpdatedText
+            )
+            
+            goalSection
+            
+            reminderSection
         }
     }
 
@@ -125,15 +103,13 @@ struct DashboardView: View {
         }
     }
 
-    private var dataHealthSection: some View {
-        Panel {
-            VStack(alignment: .leading, spacing: 14) {
-                SectionHeader(title: "Data Health", systemImage: "waveform.path.ecg")
-
-                DetailRow(title: "Cache", value: viewModel.cacheStatusText)
-                DetailRow(title: "Auto refresh", value: viewModel.refreshCadenceText)
-                DetailRow(title: "Background", value: "WidgetKit + helper")
-            }
-        }
+    private var reminderSection: some View {
+        ReminderPlanPanel(
+            refreshText: viewModel.refreshCadenceText,
+            remindersEnabled: viewModel.plannerRemindersEnabled,
+            reminderTimeText: viewModel.plannerReminderTimeText,
+            weeklyReviewText: viewModel.plannerWeeklyReviewText,
+            permissionText: viewModel.reminderPermissionText
+        )
     }
 }

@@ -2,50 +2,57 @@ import SwiftUI
 
 enum AppColor {
     // Doodle Theme Colors
-    static let ink = Color(red: 0.11, green: 0.11, blue: 0.11)
-    static let paper = Color(red: 0.99, green: 0.98, blue: 0.96)
-    static let paperWarm = Color(red: 0.96, green: 0.95, blue: 0.90)
-    static let graphite = Color.gray
+    static let ink = Color(red: 0.10, green: 0.10, blue: 0.11)
+    static let paper = Color(red: 0.94, green: 0.92, blue: 0.86)
+    static let paperWarm = Color(red: 1.00, green: 0.99, blue: 0.95)
+    static let graphite = Color(red: 0.60, green: 0.60, blue: 0.65)
     static let line = ink
     static let quietLine = ink.opacity(0.1)
 
-    static let sky = Color.blue
-    static let coral = Color.red
-    static let sunflower = Color.yellow
-    static let mint = Color.green
+    // Vibrant Doodle Accents
+    static let sky = Color(red: 0.35, green: 0.70, blue: 1.00)
+    static let coral = Color(red: 1.00, green: 0.40, blue: 0.40)
+    static let sunflower = Color(red: 1.00, green: 0.85, blue: 0.25)
+    static let mint = Color(red: 0.35, green: 0.90, blue: 0.65)
+    static let pink = Color(red: 1.00, green: 0.40, blue: 0.70)
+    static let orange = Color(red: 1.00, green: 0.55, blue: 0.15)
+    static let purple = Color(red: 0.65, green: 0.40, blue: 1.00)
+    static let gray = graphite
     
     static let brand = ink
-    static let easy = Color.green
-    static let medium = Color.orange
-    static let hard = Color.red
+    static let easy = mint
+    static let medium = orange
+    static let hard = coral
 }
 
 struct AppSurfaceBackground: View {
     var body: some View {
         ZStack {
-            AppColor.paperWarm
+            AppColor.paper
 
-            DotGridBackdrop()
-                .fill(AppColor.ink.opacity(0.1))
-                .padding(10)
+            DoodlePaperBackground()
+                .stroke(AppColor.ink.opacity(0.045), lineWidth: 1)
         }
         .ignoresSafeArea()
     }
 }
 
-struct DotGridBackdrop: Shape {
+struct DoodlePaperBackground: Shape {
     func path(in rect: CGRect) -> Path {
         var path = Path()
-        let step: CGFloat = 24
-        let dotSize: CGFloat = 2
+        let step: CGFloat = 28
+        
+        var x = rect.minX
+        while x <= rect.maxX {
+            path.move(to: CGPoint(x: x, y: rect.minY))
+            path.addLine(to: CGPoint(x: x, y: rect.maxY))
+            x += step
+        }
         
         var y = rect.minY
         while y <= rect.maxY {
-            var x = rect.minX
-            while x <= rect.maxX {
-                path.addEllipse(in: CGRect(x: x, y: y, width: dotSize, height: dotSize))
-                x += step
-            }
+            path.move(to: CGPoint(x: rect.minX, y: y))
+            path.addLine(to: CGPoint(x: rect.maxX, y: y))
             y += step
         }
         return path
@@ -55,8 +62,8 @@ struct DotGridBackdrop: Shape {
 // MARK: - Doodle Style Modifiers
 
 struct DoodlePanelStyle: ViewModifier {
-    var cornerRadius: CGFloat = 16
-    var shadowOffset: CGFloat = 4
+    var cornerRadius: CGFloat = 24
+    var shadowOffset: CGFloat = 4 // Kept parameter for API compatibility
 
     func body(content: Content) -> some View {
         content
@@ -66,13 +73,17 @@ struct DoodlePanelStyle: ViewModifier {
                 RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
                     .stroke(AppColor.ink, lineWidth: 3)
             }
-            .shadow(color: AppColor.ink, radius: 0, x: shadowOffset, y: shadowOffset)
+            .shadow(color: AppColor.ink.opacity(0.15), radius: 0, x: 5, y: 6)
     }
 }
 
 extension View {
-    func doodlePanel(cornerRadius: CGFloat = 16, shadowOffset: CGFloat = 4) -> some View {
+    func doodlePanel(cornerRadius: CGFloat = 24, shadowOffset: CGFloat = 4) -> some View {
         modifier(DoodlePanelStyle(cornerRadius: cornerRadius, shadowOffset: shadowOffset))
+    }
+    
+    func doodleFont() -> some View {
+        self.fontDesign(.rounded).fontWeight(.black)
     }
 }
 

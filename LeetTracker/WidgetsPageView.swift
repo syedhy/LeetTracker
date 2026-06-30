@@ -26,19 +26,33 @@ struct WidgetsPageView: View {
                     )
                 }
                 #else
-                HStack(alignment: .top, spacing: 20) {
-                    WidgetStudioHeroPanel(
-                        solvedText: viewModel.totalSolvedText,
-                        username: viewModel.displayUsername,
-                        refreshText: viewModel.widgetDashboardSummaryTitle
-                    )
-                    .frame(maxWidth: .infinity)
+                ViewThatFits(in: .horizontal) {
+                    HStack(alignment: .top, spacing: 20) {
+                        WidgetStudioHeroPanel(
+                            solvedText: viewModel.totalSolvedText,
+                            username: viewModel.displayUsername,
+                            refreshText: viewModel.widgetDashboardSummaryTitle
+                        )
+                        .frame(maxWidth: .infinity)
 
-                    WidgetSetupPanel(
-                        refreshText: viewModel.widgetDashboardSummaryTitle,
-                        dataText: viewModel.widgetDashboardSummaryDetail
-                    )
-                    .frame(minWidth: 300, idealWidth: 340, maxWidth: 380)
+                        WidgetSetupPanel(
+                            refreshText: viewModel.widgetDashboardSummaryTitle,
+                            dataText: viewModel.widgetDashboardSummaryDetail
+                        )
+                        .frame(minWidth: 300, idealWidth: 340, maxWidth: 380)
+                    }
+                    VStack(spacing: 20) {
+                        WidgetStudioHeroPanel(
+                            solvedText: viewModel.totalSolvedText,
+                            username: viewModel.displayUsername,
+                            refreshText: viewModel.widgetDashboardSummaryTitle
+                        )
+
+                        WidgetSetupPanel(
+                            refreshText: viewModel.widgetDashboardSummaryTitle,
+                            dataText: viewModel.widgetDashboardSummaryDetail
+                        )
+                    }
                 }
                 #endif
 

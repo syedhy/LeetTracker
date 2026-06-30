@@ -14,10 +14,17 @@ struct WidgetStudioHeroPanel: View {
                     .frame(maxWidth: .infinity, alignment: .center)
             }
             #else
-            HStack(alignment: .center, spacing: 24) {
-                heroCopy
-                Spacer(minLength: 12)
-                widgetStack
+            ViewThatFits(in: .horizontal) {
+                HStack(alignment: .center, spacing: 24) {
+                    heroCopy
+                    Spacer(minLength: 12)
+                    widgetStack
+                }
+                VStack(alignment: .leading, spacing: 22) {
+                    heroCopy
+                    widgetStack
+                        .frame(maxWidth: .infinity, alignment: .center)
+                }
             }
             #endif
         }

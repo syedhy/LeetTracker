@@ -63,9 +63,11 @@ struct StatsHighlightBoard: View {
     private func difficultyColumn(title: String, count: String, color: Color) -> some View {
         VStack(spacing: 8) {
             Text(count)
-                .font(.system(.title2, design: .rounded).weight(.bold))
+                .font(.system(size: 34, weight: .bold, design: .rounded))
                 .monospacedDigit()
                 .foregroundStyle(color)
+                .lineLimit(1)
+                .minimumScaleFactor(0.5)
             
             Text(title)
                 .font(.caption.weight(.bold))

@@ -149,10 +149,16 @@ struct PlannerOverviewPanel: View {
                 progressSummary
             }
             #else
-            HStack(alignment: .center, spacing: 24) {
-                overviewCopy
-                Spacer(minLength: 16)
-                progressSummary
+            ViewThatFits(in: .horizontal) {
+                HStack(alignment: .center, spacing: 24) {
+                    overviewCopy
+                    Spacer(minLength: 16)
+                    progressSummary
+                }
+                VStack(alignment: .leading, spacing: 20) {
+                    overviewCopy
+                    progressSummary
+                }
             }
             #endif
         }

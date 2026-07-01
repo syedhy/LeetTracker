@@ -81,7 +81,7 @@ fi
 
 echo "Preparing release folder..."
 rm -rf "$PACKAGE_DIR" "$ZIP_PATH" "$SHA_PATH"
-mkdir -p "$PACKAGE_DIR/Tools"
+mkdir -p "$PACKAGE_DIR"
 
 ditto --rsrc --extattr "$APP_SOURCE" "$PACKAGE_DIR/LeetTracker.app"
 
@@ -89,70 +89,10 @@ if [[ "$NOTARIZE" == "1" ]]; then
   notarize_app "$PACKAGE_DIR/LeetTracker.app"
 fi
 
-cp "$ROOT_DIR/scripts/install-background-refresh-agent.sh" "$PACKAGE_DIR/Tools/install-background-refresh-agent.sh"
-cp "$ROOT_DIR/scripts/uninstall-background-refresh-agent.sh" "$PACKAGE_DIR/Tools/uninstall-background-refresh-agent.sh"
-cp "$ROOT_DIR/README.md" "$PACKAGE_DIR/README.md"
-[[ -f "$ROOT_DIR/docs/privacy.md" ]] && cp "$ROOT_DIR/docs/privacy.md" "$PACKAGE_DIR/PRIVACY.md"
-chmod +x "$PACKAGE_DIR/Tools/"*.sh
-
-cat > "$PACKAGE_DIR/Install Background Refresh.command" <<'COMMAND'
-#!/bin/zsh
-set -euo pipefail
-
-SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-APP_PATH="/Applications/LeetTracker.app" "$SCRIPT_DIR/Tools/install-background-refresh-agent.sh"
-
-echo ""
-echo "LeetTracker background refresh is installed."
-echo "You can close this window."
-read -k 1 "?Press any key to close..."
-COMMAND
-
-cat > "$PACKAGE_DIR/Uninstall Background Refresh.command" <<'COMMAND'
-#!/bin/zsh
-set -euo pipefail
-
-SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-"$SCRIPT_DIR/Tools/uninstall-background-refresh-agent.sh"
-
-echo ""
-echo "LeetTracker background refresh is removed."
-echo "You can close this window."
-read -k 1 "?Press any key to close..."
-COMMAND
-
-chmod +x "$PACKAGE_DIR/"*.command
-
-cat > "$PACKAGE_DIR/README_INSTALL.txt" <<'README'
-LeetTracker for macOS
-
-Install:
-1. Move LeetTracker.app to your Applications folder.
-2. Open LeetTracker.app once.
-3. Enter your LeetCode username and press Refresh.
-4. Add the LeetTracker widget from macOS Edit Widgets.
-
-Background widget refresh:
-- Double-click "Install Background Refresh.command" after moving the app to Applications.
-- This lets the widget refresh every 2 hours while the app window is closed.
-- Double-click "Uninstall Background Refresh.command" to remove the helper.
-- Homebrew users can run leettracker-install-background-refresh instead.
-
-If macOS blocks the app:
-Open System Settings > Privacy & Security and allow LeetTracker.
-
-Data:
-- LeetTracker uses public LeetCode solved counts only.
-- Do not use LeetTracker to monitor accounts you do not own or have permission to track.
-- LeetTracker does not ask for LeetCode credentials or private cookies.
-
-LeetTracker is independent and is not affiliated with LeetCode.
-README
-
 echo "Creating $ZIP_PATH..."
 (
-  cd "$DIST_DIR"
-  ditto -c -k --norsrc --keepParent "$PACKAGE_NAME" "$ZIP_PATH"
+  cd "$PACKAGE_DIR"
+  ditto -c -k --keepParent "LeetTracker.app" "$ZIP_PATH"
 )
 
 shasum -a 256 "$ZIP_PATH" > "$SHA_PATH"

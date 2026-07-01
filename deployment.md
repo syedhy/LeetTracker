@@ -49,6 +49,9 @@ Homebrew is the best way for developers to install the app. We can also use it t
 
      app "LeetTracker.app"
 
+     binary "#{appdir}/LeetTracker.app/Contents/Resources/scripts/install-background-refresh-agent.sh", target: "leettracker-install-background-refresh"
+     binary "#{appdir}/LeetTracker.app/Contents/Resources/scripts/uninstall-background-refresh-agent.sh", target: "leettracker-uninstall-background-refresh"
+
      # THIS IS THE MAGIC LINE! It removes the Apple quarantine flag,
      # so users won't get the "Developer cannot be verified" warning.
      auto_updates true

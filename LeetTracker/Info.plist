@@ -42,7 +42,7 @@
 	</array>
 	<key>BGTaskSchedulerPermittedIdentifiers</key>
 	<array>
-		<string>com.hyder.LeetTracker.refresh</string>
+		<string>com.hyder.LeetTracker.background-refresh</string>
 	</array>
 </dict>
 </plist>

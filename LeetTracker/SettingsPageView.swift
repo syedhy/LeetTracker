@@ -129,7 +129,7 @@ struct SettingsPageView: View {
             VStack(alignment: .leading, spacing: 18) {
                 SectionHeader(title: "Background Refresh", systemImage: "arrow.triangle.2.circlepath")
 
-                Text("Enable background refresh to allow LeetTracker to update widgets reliably even when the app is completely closed. This installs a lightweight background task.")
+                Text("Enable background refresh to allow LeetTracker to update widgets about every 2 hours even when the app is completely closed. This installs a lightweight background task.")
                     .font(.callout)
                     .foregroundStyle(.secondary)
                     .fixedSize(horizontal: false, vertical: true)

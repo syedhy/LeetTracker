@@ -1,23 +1,14 @@
 import SwiftUI
+import Foundation
 
 #if os(macOS)
 class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
-        if CommandLine.arguments.contains("--background-refresh") {
-            // Run completely headless
-            NSApp.setActivationPolicy(.accessory)
-            
-            Task {
-                let result = await BackgroundRefreshRunner.refreshWidgetData()
-                fputs("[\(Date())] \(result.message)\n", stderr)
-                NSApp.terminate(nil)
-            }
-        }
+        // Normal app launch setup (if any)
     }
 }
 #endif
 
-@main
 struct LeetTrackerApp: App {
     #if os(macOS)
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
@@ -25,19 +16,32 @@ struct LeetTrackerApp: App {
 
     var body: some Scene {
         WindowGroup {
-            if !CommandLine.arguments.contains("--background-refresh") {
-                ContentView()
-            } else {
-                // Empty view for background refresh, though accessory policy hides the window.
-                Text("Background Refresh Running...")
-                    .frame(width: 0, height: 0)
-                    .hidden()
-            }
+            ContentView()
         }
         #if os(iOS)
-        .backgroundTask(.appRefresh("com.hyder.LeetTracker.refresh")) {
+        .backgroundTask(.appRefresh("com.hyder.LeetTracker.background-refresh")) {
             _ = await BackgroundRefreshRunner.refreshWidgetData()
         }
         #endif
+    }
+}
+
+@main
+enum AppMain {
+    static func main() {
+        if CommandLine.arguments.contains("--background-refresh") {
+            #if os(macOS)
+            // Run completely headless without initializing NSApplication or WindowGroup
+            Task {
+                let result = await BackgroundRefreshRunner.refreshWidgetData()
+                fputs("[\(Date())] \(result.message)\n", stderr)
+                exit(result.exitCode)
+            }
+            dispatchMain()
+            #endif
+        } else {
+            // Launch the normal SwiftUI app UI
+            LeetTrackerApp.main()
+        }
     }
 }

@@ -167,7 +167,7 @@ struct WidgetSetupPanel: View {
                 VStack(spacing: 12) {
                     WidgetSetupStep(number: "1", title: "Add Username", detail: "Enter your username in Settings and refresh data.")
                     WidgetSetupStep(number: "2", title: "Add Widgets", detail: "Control-click the desktop, choose Edit Widgets, and add LeetTracker.")
-                    WidgetSetupStep(number: "3", title: "Background Refresh", detail: "Enable Background Refresh in Settings to ensure data stays live.")
+                    WidgetSetupStep(number: "3", title: "Background Refresh", detail: "Enable Background Refresh in Settings. Widgets update \\(refreshText.lowercased()) (macOS controls exact timing).")
                 }
             }
             .frame(maxHeight: .infinity, alignment: .top)

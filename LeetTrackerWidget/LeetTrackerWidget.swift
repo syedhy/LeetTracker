@@ -121,13 +121,17 @@ struct LeetTrackerTimelineProvider: TimelineProvider {
             )
         } catch {
             if let cachedStats = snapshot.cachedStats {
+                let formatter = RelativeDateTimeFormatter()
+                formatter.unitsStyle = .short
+                let timeString = formatter.localizedString(for: cachedStats.lastUpdated, relativeTo: Date())
+                
                 return LeetTrackerEntry(
                     date: Date(),
                     username: cachedStats.username,
                     stats: WidgetStatsSnapshot(cachedStats: cachedStats),
                     goalSettings: snapshot.goalSettings,
                     hasGoalSettings: snapshot.hasGoalSettings,
-                    state: .offline(message: "Showing saved data")
+                    state: .offline(message: "Updated \\(timeString)")
                 )
             }
 

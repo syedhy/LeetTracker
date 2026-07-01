@@ -23,10 +23,6 @@ Then:
 4. Open macOS **Edit Widgets** and search for **LeetTracker**.
 5. Add the widgets you want.
 
-4. Open LeetTracker and enter your LeetCode username.
-5. Add widgets from macOS **Edit Widgets**.
-6. (Optional) Go to Settings in LeetTracker to enable Background Refresh.
-
 ### Build From Source
 
 Use this only if you are comfortable with Xcode.
@@ -53,6 +49,25 @@ In Xcode, select the `LeetTracker` scheme, choose **My Mac**, then build and run
 - Background widget refresh support
 - A focused macOS interface for LeetCode planning
 
+### Background Refresh
+
+To keep your widgets up to date even when the app is closed, you can enable background refresh. Widgets update about every 2 hours, but macOS controls the exact timing.
+
+**Recommended Method**
+Open LeetTracker, go to **Settings**, and click **Enable Background Refresh**.
+
+**For Power Users**
+If you prefer the terminal, you can manage the background LaunchAgent using the Homebrew commands:
+```zsh
+leettracker-install-background-refresh
+leettracker-uninstall-background-refresh
+```
+Or by running the manual scripts from the source directory:
+```zsh
+./scripts/install-background-refresh-agent.sh
+./scripts/uninstall-background-refresh-agent.sh
+```
+
 ## Privacy And Ethics
 
 LeetTracker uses public LeetCode profile data only. It does not use passwords, private cookies, private submissions, or hidden profile data.
@@ -69,4 +84,4 @@ If the widget does not show up immediately, open LeetTracker once from Applicati
 
 If macOS blocks the app after download, open **System Settings > Privacy & Security** and allow LeetTracker.
 
-If the widget seems stale, press **Refresh** in the app once. The widget refreshes automatically after that, but macOS controls the exact timing.
+If the widget seems stale, press **Refresh** in the app once. Widgets update about every 2 hours, but macOS controls the exact timing.

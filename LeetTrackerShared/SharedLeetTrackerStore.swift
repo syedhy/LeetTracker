@@ -64,18 +64,14 @@ struct SharedLeetTrackerSnapshot: Equatable {
 
 final class SharedLeetTrackerStore {
     static let appGroupIdentifier = "group.com.hyder.LeetTracker"
+    private static let storeKey = "SharedLeetTrackerPayloadKey"
 
-    private static let storeFileName = "LeetTrackerSharedStore.json"
-    private static let legacyPreferencesPath = "Library/Preferences/\(appGroupIdentifier).plist"
-
-    private let storeURL: URL
-    private let fileManager: FileManager
+    private let userDefaults: UserDefaults
     private let encoder = JSONEncoder()
     private let decoder = JSONDecoder()
 
-    init(fileManager: FileManager = .default) {
-        self.fileManager = fileManager
-        self.storeURL = Self.resolveStoreURL(fileManager: fileManager)
+    init() {
+        self.userDefaults = UserDefaults(suiteName: Self.appGroupIdentifier) ?? .standard
     }
 
     var snapshot: SharedLeetTrackerSnapshot {
@@ -148,26 +144,18 @@ final class SharedLeetTrackerStore {
 
     @discardableResult
     func synchronize() -> Bool {
-        true
-    }
-
-    private static func resolveStoreURL(fileManager: FileManager) -> URL {
-        let fallbackBaseURL = fileManager.urls(for: .applicationSupportDirectory, in: .userDomainMask).first ?? URL(fileURLWithPath: NSTemporaryDirectory())
-        let baseURL = fileManager.containerURL(forSecurityApplicationGroupIdentifier: appGroupIdentifier)
-            ?? fallbackBaseURL.appendingPathComponent("LeetTracker", isDirectory: true)
-
-        return baseURL.appendingPathComponent(storeFileName)
+        userDefaults.synchronize()
     }
 
     private func loadPayload() -> SharedLeetTrackerPayload {
         if
-            let data = try? Data(contentsOf: storeURL),
+            let data = userDefaults.data(forKey: Self.storeKey),
             let payload = try? decoder.decode(SharedLeetTrackerPayload.self, from: data)
         {
             return payload
         }
 
-        if let legacyPayload = loadLegacyPayload() {
+        if let legacyPayload = loadLegacyFilePayload() {
             savePayload(legacyPayload)
             return legacyPayload
         }
@@ -179,18 +167,25 @@ final class SharedLeetTrackerStore {
         guard let data = try? encoder.encode(payload) else {
             return
         }
-
-        do {
-            try fileManager.createDirectory(at: storeURL.deletingLastPathComponent(), withIntermediateDirectories: true)
-            try data.write(to: storeURL, options: [.atomic])
-        } catch {
-            return
-        }
+        
+        userDefaults.set(data, forKey: Self.storeKey)
     }
 
-    private func loadLegacyPayload() -> SharedLeetTrackerPayload? {
-        let preferencesURL = storeURL.deletingLastPathComponent()
-            .appendingPathComponent(Self.legacyPreferencesPath)
+    private func loadLegacyFilePayload() -> SharedLeetTrackerPayload? {
+        let fileManager = FileManager.default
+        let fallbackBaseURL = fileManager.urls(for: .applicationSupportDirectory, in: .userDomainMask).first ?? URL(fileURLWithPath: NSTemporaryDirectory())
+        let baseURL = fileManager.containerURL(forSecurityApplicationGroupIdentifier: Self.appGroupIdentifier)
+            ?? fallbackBaseURL.appendingPathComponent("LeetTracker", isDirectory: true)
+        let storeURL = baseURL.appendingPathComponent("LeetTrackerSharedStore.json")
+        
+        if let data = try? Data(contentsOf: storeURL),
+           let payload = try? decoder.decode(SharedLeetTrackerPayload.self, from: data) {
+            
+            try? fileManager.removeItem(at: storeURL)
+            return payload
+        }
+        
+        let preferencesURL = baseURL.appendingPathComponent("Library/Preferences/\\(Self.appGroupIdentifier).plist")
 
         guard
             let data = try? Data(contentsOf: preferencesURL),

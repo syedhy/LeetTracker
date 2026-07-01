@@ -18,12 +18,15 @@ struct SettingsPageView: View {
                     dataHealthSection
                 }
                 #else
-                HStack(alignment: .top, spacing: 20) {
-                    setupSection
-                        .frame(minWidth: 280, maxWidth: .infinity)
+                VStack(spacing: 20) {
+                    HStack(alignment: .top, spacing: 20) {
+                        setupSection
+                            .frame(minWidth: 280, maxWidth: .infinity)
 
-                    dataHealthSection
-                        .frame(minWidth: 300, idealWidth: 360, maxWidth: 420)
+                        dataHealthSection
+                            .frame(minWidth: 300, idealWidth: 360, maxWidth: 420)
+                    }
+                    backgroundRefreshSection
                 }
                 #endif
 
@@ -115,10 +118,47 @@ struct SettingsPageView: View {
 
                 DetailRow(title: "Cache", value: viewModel.cacheStatusText)
                 DetailRow(title: "Auto refresh", value: viewModel.refreshCadenceText)
-                DetailRow(title: "Background", value: "WidgetKit + helper")
+                DetailRow(title: "Background", value: viewModel.isBackgroundRefreshInstalled ? "Installed" : "Not Installed")
             }
         }
     }
+
+    #if os(macOS)
+    private var backgroundRefreshSection: some View {
+        Panel {
+            VStack(alignment: .leading, spacing: 18) {
+                SectionHeader(title: "Background Refresh", systemImage: "arrow.triangle.2.circlepath")
+
+                Text("Enable background refresh to allow LeetTracker to update widgets reliably even when the app is completely closed. This installs a lightweight background task.")
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+
+                DetailRow(title: "Status", value: viewModel.backgroundRefreshStatusMessage)
+                if let lastRun = viewModel.lastBackgroundRefreshDate {
+                    DetailRow(title: "Last Run", value: lastRun.formatted())
+                }
+                if let lastError = viewModel.lastBackgroundRefreshError {
+                    DetailRow(title: "Last Error", value: lastError)
+                }
+
+                HStack(spacing: 12) {
+                    if viewModel.isBackgroundRefreshInstalled {
+                        Button(action: viewModel.uninstallBackgroundRefresh) {
+                            Label("Disable", systemImage: "xmark.circle")
+                        }
+                        .buttonStyle(SecondaryActionButtonStyle())
+                    } else {
+                        Button(action: viewModel.installBackgroundRefresh) {
+                            Label("Enable Background Refresh", systemImage: "bolt.fill")
+                        }
+                        .buttonStyle(PrimaryActionButtonStyle())
+                    }
+                }
+            }
+        }
+    }
+    #endif
 
     private var privacyEthicsSection: some View {
         Panel {

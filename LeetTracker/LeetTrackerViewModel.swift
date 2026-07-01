@@ -18,6 +18,10 @@ final class LeetTrackerViewModel: ObservableObject {
     @Published private(set) var reminderPermissionText = "Notifications not requested yet."
     @Published private(set) var completedPlannerSessionIDs: Set<String> = []
     @Published private(set) var isLoading = false
+    @Published private(set) var isBackgroundRefreshInstalled = false
+    @Published private(set) var backgroundRefreshStatusMessage = "Status checking..."
+    @Published private(set) var lastBackgroundRefreshDate: Date? = nil
+    @Published private(set) var lastBackgroundRefreshError: String? = nil
 
     private let client: LeetCodeClient
     private let sharedStore: SharedLeetTrackerStore
@@ -283,6 +287,40 @@ final class LeetTrackerViewModel: ObservableObject {
             stats = LeetCodeStats(cachedStats: cachedStats)
             statusMessage = "Loaded \(cachedStats.username). Updated \(formatted(cachedStats.lastUpdated))."
         }
+        
+        lastBackgroundRefreshDate = snapshot.lastBackgroundRefreshDate
+        lastBackgroundRefreshError = snapshot.lastBackgroundRefreshError
+        
+        checkBackgroundRefreshStatus()
+    }
+
+    func checkBackgroundRefreshStatus() {
+        #if os(macOS)
+        isBackgroundRefreshInstalled = BackgroundRefreshManager.isInstalled
+        backgroundRefreshStatusMessage = isBackgroundRefreshInstalled ? "Installed and scheduled." : "Not installed."
+        #endif
+    }
+
+    func installBackgroundRefresh() {
+        #if os(macOS)
+        do {
+            try BackgroundRefreshManager.install()
+            checkBackgroundRefreshStatus()
+        } catch {
+            backgroundRefreshStatusMessage = "Install failed: \(error.localizedDescription)"
+        }
+        #endif
+    }
+
+    func uninstallBackgroundRefresh() {
+        #if os(macOS)
+        do {
+            try BackgroundRefreshManager.uninstall()
+            checkBackgroundRefreshStatus()
+        } catch {
+            backgroundRefreshStatusMessage = "Uninstall failed: \(error.localizedDescription)"
+        }
+        #endif
     }
 
     func saveGoalSettings() {

@@ -10,7 +10,7 @@ enum LeetTrackerWidgetConfiguration {
 
         if minutes >= 60, minutes.isMultiple(of: 60) {
             let hours = minutes / 60
-            return hours == 1 ? "Every hour" : "Every \(hours) hours"
+            return hours == 1 ? "About every hour" : "About every \(hours) hours"
         }
 
         return "Every \(minutes) min"
@@ -58,6 +58,8 @@ struct SharedLeetTrackerSnapshot: Equatable {
     let lastUpdated: Date?
     let goalSettings: SharedGoalSettings
     let hasGoalSettings: Bool
+    let lastBackgroundRefreshDate: Date?
+    let lastBackgroundRefreshError: String?
 }
 
 final class SharedLeetTrackerStore {
@@ -86,7 +88,9 @@ final class SharedLeetTrackerStore {
             cachedStats: payload.cachedStats,
             lastUpdated: payload.lastUpdated,
             goalSettings: payload.goalSettings ?? .default,
-            hasGoalSettings: payload.goalSettings != nil
+            hasGoalSettings: payload.goalSettings != nil,
+            lastBackgroundRefreshDate: payload.lastBackgroundRefreshDate,
+            lastBackgroundRefreshError: payload.lastBackgroundRefreshError
         )
     }
 
@@ -132,6 +136,13 @@ final class SharedLeetTrackerStore {
     func saveGoalSettings(_ settings: SharedGoalSettings) {
         var payload = loadPayload()
         payload.goalSettings = settings
+        savePayload(payload)
+    }
+
+    func saveBackgroundRefreshStatus(date: Date, error: String?) {
+        var payload = loadPayload()
+        payload.lastBackgroundRefreshDate = date
+        payload.lastBackgroundRefreshError = error
         savePayload(payload)
     }
 
@@ -212,4 +223,6 @@ private struct SharedLeetTrackerPayload: Codable, Equatable {
     var cachedStats: CachedLeetCodeStats?
     var lastUpdated: Date?
     var goalSettings: SharedGoalSettings?
+    var lastBackgroundRefreshDate: Date?
+    var lastBackgroundRefreshError: String?
 }

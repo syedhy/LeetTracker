@@ -23,28 +23,9 @@ Then:
 4. Open macOS **Edit Widgets** and search for **LeetTracker**.
 5. Add the widgets you want.
 
-Optional background refresh:
-
-```zsh
-leettracker-install-background-refresh
-```
-
-This lets LeetTracker refresh widget data every 2 hours while the app window is closed. Remove it with:
-
-```zsh
-leettracker-uninstall-background-refresh
-```
-
-### Alternative: GitHub Release
-
-1. Open the [latest release](https://github.com/syedhy/leettracker/releases/latest) on GitHub.
-2. Download `LeetTracker-<version>-macOS.zip`.
-3. Unzip it.
-4. Move `LeetTracker.app` to your **Applications** folder.
-5. Open LeetTracker and enter your LeetCode username.
-6. Add widgets from macOS **Edit Widgets**.
-
-The release zip also includes **Install Background Refresh.command**. Double-click it after moving the app to Applications if you want widget refresh while the app window is closed.
+4. Open LeetTracker and enter your LeetCode username.
+5. Add widgets from macOS **Edit Widgets**.
+6. (Optional) Go to Settings in LeetTracker to enable Background Refresh.
 
 ### Build From Source
 
@@ -53,7 +34,11 @@ Use this only if you are comfortable with Xcode.
 ```zsh
 git clone https://github.com/syedhy/leettracker.git
 cd LeetTracker
-open LeetTracker.xcodeproj
+```
+
+To build and package the DMG, run:
+```zsh
+./package_release.sh
 ```
 
 In Xcode, select the `LeetTracker` scheme, choose **My Mac**, then build and run.

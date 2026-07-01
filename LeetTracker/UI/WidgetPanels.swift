@@ -36,7 +36,7 @@ struct WidgetStudioHeroPanel: View {
     private var heroCopy: some View {
         VStack(alignment: .leading, spacing: 18) {
             HStack(spacing: 10) {
-                Text("3 live widgets")
+                Text("2 live widgets")
                     .font(.caption.weight(.black))
                     .foregroundStyle(AppColor.paper)
                     .textCase(.uppercase)
@@ -165,9 +165,9 @@ struct WidgetSetupPanel: View {
                 SectionHeader(title: "Desktop Setup", systemImage: "macwindow.on.rectangle")
 
                 VStack(spacing: 12) {
-                    WidgetSetupStep(number: "1", title: "Open widgets", detail: "Control-click the desktop and choose Edit Widgets.")
-                    WidgetSetupStep(number: "2", title: "Search LeetTracker", detail: "Add Progress in small or medium size, plus the compact Streak widget.")
-                    WidgetSetupStep(number: "3", title: "Let macOS refresh", detail: "\(refreshText). \(dataText)")
+                    WidgetSetupStep(number: "1", title: "Add Username", detail: "Enter your username in Settings and refresh data.")
+                    WidgetSetupStep(number: "2", title: "Add Widgets", detail: "Control-click the desktop, choose Edit Widgets, and add LeetTracker.")
+                    WidgetSetupStep(number: "3", title: "Background Refresh", detail: "Enable Background Refresh in Settings to ensure data stays live.")
                 }
             }
             .frame(maxHeight: .infinity, alignment: .top)

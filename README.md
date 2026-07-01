@@ -1,96 +1,118 @@
 # LeetTracker
 
-LeetTracker is a macOS app with desktop widgets for keeping your public LeetCode progress visible. Add your username once, then use the app for goals, reminders, analytics, and quick progress widgets.
+LeetTracker is a free macOS app that shows your LeetCode progress and streak in desktop widgets.
 
-LeetTracker does not ask for your LeetCode password.
+## Screenshots
 
-Requires macOS 14 or newer.
+![Main App Screenshot](placeholders/main-app.png)
+*Main Application View*
 
-## Install
+![Progress Widget Screenshot](placeholders/progress-widget.png)
+*Progress Widget*
 
-### FREE_UNSIGNED_RELEASE (Default)
+![Streak Widget Screenshot](placeholders/streak-widget.png)
+*Streak Widget*
 
-LeetTracker is currently distributed as a `FREE_UNSIGNED_RELEASE`. Because the app is unsigned, macOS Gatekeeper may block it the first time. To bypass this:
+![Settings Screenshot](placeholders/settings.png)
+*Settings & Background Refresh*
 
-1. Download and extract the app, then move **LeetTracker.app** to your **Applications** folder.
-2. **Right-Click** on LeetTracker in Applications and select **Open**.
-3. Click **Open** in the dialog box.
-4. You only need to do this once. Future launches will work normally.
+## Features
 
-### Recommended: Homebrew
+- **Track LeetCode stats**: View your solved problems (Easy, Medium, Hard) and overall rank.
+- **Progress widget**: A beautiful desktop widget showing your current problem-solving progress.
+- **Streak widget**: Keep yourself accountable with a daily streak widget on your desktop.
+- **Manual refresh**: Update your stats instantly from the app.
+- **Background Refresh**: Keeps your widgets updated automatically without keeping the app open.
+- **Easy installation**: Works from a normal ZIP download or Homebrew.
 
-```zsh
+## Install Option 1: Download ZIP
+
+1. Download `LeetTracker-1.0-macOS.zip` from the latest [GitHub Release](https://github.com/syedhy/LeetTracker/releases).
+2. Unzip the file.
+3. Move `LeetTracker.app` to your Applications folder.
+4. Since the app is currently unsigned, macOS may show a warning when you try to open it.
+5. If blocked, right-click `LeetTracker.app` in your Applications folder and choose **Open**.
+6. Click **Open** again on the prompt.
+7. Enter your LeetCode username in the app.
+8. Press **Refresh**.
+9. Add the widgets from your Mac's **Edit Widgets** menu.
+10. Enable **Background Refresh** from the app's Settings.
+
+## Install Option 2: Homebrew
+
+You can install LeetTracker easily using Homebrew:
+
+```bash
 brew tap syedhy/leettracker
 brew install --cask leettracker
 ```
 
-Then:
+After installation, open LeetTracker once, enter your username, press Refresh, add your widgets, and enable Background Refresh from Settings.
 
-1. Open LeetTracker.
-2. Enter your LeetCode username.
-3. Press **Refresh**.
-4. Open macOS **Edit Widgets** and search for **LeetTracker**.
-5. Add the widgets you want.
+## First Setup
 
-### Build From Source
+Getting started is quick and easy:
+- Open LeetTracker.
+- Enter your LeetCode username.
+- Press **Save / Refresh**.
+- Add the widgets to your desktop.
+- Enable **Background Refresh** in Settings to keep them updated automatically.
 
-Use this only if you are comfortable with Xcode.
+## How to Add Widgets
 
-```zsh
-git clone https://github.com/syedhy/leettracker.git
-cd LeetTracker
-```
+- Right-click anywhere on your Mac desktop.
+- Click **Edit Widgets**.
+- Search for **LeetTracker** in the widget gallery.
+- Add the **Progress** widget.
+- Add the **Streak** widget.
 
-To build and package the release, run:
-```zsh
-./package_release.sh
-```
+## Background Refresh
 
-In Xcode, select the `LeetTracker` scheme, choose **My Mac**, then build and run.
+- Background Refresh lets your widgets keep updating after the app is closed.
+- Enable it once from the **Settings** menu inside the app.
+- It runs roughly every 2 hours (macOS may adjust the exact timing to optimize battery life).
+- The main app does not need to stay open for background refresh to work.
 
-## What You Get
+## Unsigned App Warning
 
-- Public LeetCode solved-count tracking
-- Small and medium desktop widgets
-- Goal setting with difficulty targets
-- Practice reminders
-- Dashboard and analytics views
-- Background widget refresh support
-- A focused macOS interface for LeetCode planning
-
-### Background Refresh
-
-To keep your widgets up to date even when the app is closed, you can enable background refresh. Widgets update about every 2 hours, but macOS controls the exact timing.
-
-**Recommended Method**
-Open LeetTracker, go to **Settings**, and click **Enable Background Refresh**. This is the recommended and easiest method for most users.
-
-**For Power Users**
-If you prefer the terminal, you can manage the background LaunchAgent using the Homebrew commands:
-```zsh
-leettracker-install-background-refresh
-leettracker-uninstall-background-refresh
-```
-Or by running the manual scripts from the source directory:
-```zsh
-./scripts/install-background-refresh-agent.sh
-./scripts/uninstall-background-refresh-agent.sh
-```
-
-## Privacy And Ethics
-
-LeetTracker uses public LeetCode profile data only. It does not use passwords, private cookies, private submissions, or hidden profile data.
-
-Use LeetTracker with your own username or with a username you have permission to track. Do not use it for scraping, bulk lookups, account enumeration, or competitive monitoring.
-
-LeetTracker is independent and is not affiliated with, endorsed by, or sponsored by LeetCode.
-
-See [docs/privacy.md](docs/privacy.md) for the full privacy summary.
+- **The current version is unsigned.** This does not mean the app is broken or unsafe.
+- macOS shows a warning because the app is not yet notarized by Apple.
+- Right-clicking the app and selecting **Open** is required *only the first time* you launch it.
+- Future versions may be signed and notarized once an Apple Developer account is obtained.
 
 ## Troubleshooting
 
-If the widget does not show up immediately, open LeetTracker once from Applications, press **Refresh**, then open macOS **Edit Widgets** again. macOS can take a short moment to register new widget extensions.
+- **App cannot be opened**: Right-click the app in Finder and choose "Open" to bypass the macOS security warning for unsigned apps.
+- **Widgets do not appear**: Open the main app at least once. If they still don't appear in the widget gallery, restart your Mac.
+- **Widgets say "add username"**: Open the app, ensure your username is entered correctly, and press Refresh.
+- **Background Refresh does not enable**: Ensure the app is installed in the `/Applications` folder, not Downloads. You can check the app Diagnostics in Settings for specific errors.
+- **Widgets do not update immediately**: Widgets update on a schedule controlled by macOS. To force an immediate update, open the app and press Refresh.
+- **Homebrew install fails**: Ensure your Homebrew is up to date (`brew update`).
+- **How to reset app data**: Delete `/Users/YourUsername/Library/Application Support/LeetTrackerShared` and reopen the app.
 
-If macOS blocks the app after download, open **System Settings > Privacy & Security** and allow LeetTracker.
+## Privacy
 
-If the widget seems stale, press **Refresh** in the app once. Widgets update about every 2 hours, but macOS controls the exact timing.
+- LeetTracker only uses the LeetCode username you provide.
+- It only fetches public LeetCode profile and stat data.
+- All data is stored locally on your Mac.
+- No tracking or analytics of any kind.
+- No account login or password required.
+
+## Uninstall
+
+**Manual Uninstall:**
+1. Open LeetTracker, go to Settings, and click **Disable Background Refresh**.
+2. Delete `LeetTracker.app` from your Applications folder.
+
+**Homebrew Uninstall:**
+```bash
+brew uninstall --cask leettracker
+brew zap leettracker
+```
+
+## Developer Notes
+
+- Built with SwiftUI.
+- Uses WidgetKit for desktop widgets.
+- Uses a LaunchAgent for macOS background refresh.
+- Current release mode is `FREE_UNSIGNED_RELEASE`.

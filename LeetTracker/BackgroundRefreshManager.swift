@@ -1,6 +1,7 @@
 import Foundation
 import Darwin
 
+#if os(macOS)
 enum BackgroundRefreshManager {
     static let agentIdentifier = "com.hyder.LeetTracker.background-refresh"
     
@@ -134,3 +135,4 @@ enum BackgroundRefreshManager {
         }
     }
 }
+#endif

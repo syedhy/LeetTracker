@@ -131,7 +131,7 @@ struct LeetTrackerTimelineProvider: TimelineProvider {
                     stats: WidgetStatsSnapshot(cachedStats: cachedStats),
                     goalSettings: snapshot.goalSettings,
                     hasGoalSettings: snapshot.hasGoalSettings,
-                    state: .offline(message: "Updated \\(timeString)")
+                    state: .offline(message: "Updated \(timeString)")
                 )
             }
 

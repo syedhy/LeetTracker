@@ -16,17 +16,20 @@ struct SettingsPageView: View {
                 VStack(spacing: 20) {
                     setupSection
                     dataHealthSection
+                    diagnosticsSection
                 }
                 #else
                 VStack(spacing: 20) {
                     HStack(alignment: .top, spacing: 20) {
                         setupSection
-                            .frame(minWidth: 280, maxWidth: .infinity)
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
 
                         dataHealthSection
-                            .frame(minWidth: 300, idealWidth: 360, maxWidth: 420)
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
                     }
+                    .fixedSize(horizontal: false, vertical: true)
                     backgroundRefreshSection
+                    diagnosticsSection
                 }
                 #endif
 
@@ -108,7 +111,7 @@ struct SettingsPageView: View {
                 StatusPanel(message: viewModel.statusMessage, isLoading: viewModel.isLoading)
             }
         }
-        .frame(maxWidth: .infinity)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
     }
 
     private var dataHealthSection: some View {
@@ -120,6 +123,7 @@ struct SettingsPageView: View {
                 DetailRow(title: "Auto refresh", value: viewModel.refreshCadenceText)
                 DetailRow(title: "Background", value: viewModel.isBackgroundRefreshInstalled ? "Installed" : "Not Installed")
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         }
     }
 
@@ -159,6 +163,39 @@ struct SettingsPageView: View {
         }
     }
     #endif
+    
+    private var diagnosticsSection: some View {
+        Panel {
+            VStack(alignment: .leading, spacing: 14) {
+                SectionHeader(title: "Diagnostics", systemImage: "stethoscope")
+                
+                DetailRow(title: "Storage Mode", value: viewModel.isAppGroupWorking ? "App Group" : "Fallback JSON")
+                DetailRow(title: "Storage Path", value: viewModel.activeStoragePath)
+                DetailRow(title: "App Group Available", value: viewModel.isAppGroupWorking ? "true" : "false")
+                DetailRow(title: "Fallback Active", value: viewModel.isAppGroupWorking ? "false" : "true")
+                DetailRow(title: "Loaded Username", value: viewModel.displayUsername.isEmpty ? "None" : viewModel.displayUsername)
+                DetailRow(title: "Stats Cache Present", value: viewModel.statsSnapshot != nil ? "true" : "false")
+                
+                if let cacheTime = viewModel.statsSnapshot?.lastUpdated {
+                    DetailRow(title: "Last Cache Write", value: cacheTime.formatted())
+                } else {
+                    DetailRow(title: "Last Cache Write", value: "Never")
+                }
+                
+                if let reloadRequest = viewModel.lastWidgetReloadRequest {
+                    DetailRow(title: "Widget Reload Req", value: reloadRequest.formatted())
+                } else {
+                    DetailRow(title: "Widget Reload Req", value: "Never")
+                }
+                
+                #if os(macOS)
+                DetailRow(title: "Plist Path", value: viewModel.backgroundRefreshPlistPath)
+                DetailRow(title: "Plist Installed", value: viewModel.isBackgroundRefreshInstalled ? "Yes" : "No")
+                DetailRow(title: "Service Loaded", value: viewModel.isBackgroundRefreshLoaded ? "Yes" : "No")
+                #endif
+            }
+        }
+    }
 
     private var privacyEthicsSection: some View {
         Panel {

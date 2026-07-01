@@ -6,8 +6,15 @@ SCHEME="${SCHEME:-LeetTracker}"
 CONFIGURATION="${CONFIGURATION:-Release}"
 DERIVED_DATA_PATH="${DERIVED_DATA_PATH:-$ROOT_DIR/build}"
 DIST_DIR="${DIST_DIR:-$ROOT_DIR/dist}"
-PUBLIC_RELEASE="${PUBLIC_RELEASE:-0}"
-NOTARIZE="${NOTARIZE:-$PUBLIC_RELEASE}"
+
+PUBLIC_SIGNED_RELEASE="${PUBLIC_SIGNED_RELEASE:-0}"
+if [[ "$PUBLIC_SIGNED_RELEASE" == "1" ]]; then
+  FREE_UNSIGNED_RELEASE=0
+else
+  FREE_UNSIGNED_RELEASE="${FREE_UNSIGNED_RELEASE:-1}"
+fi
+
+NOTARIZE="${NOTARIZE:-$PUBLIC_SIGNED_RELEASE}"
 NOTARY_KEYCHAIN_PROFILE="${NOTARY_KEYCHAIN_PROFILE:-}"
 APPLE_ID="${APPLE_ID:-}"
 APPLE_TEAM_ID="${APPLE_TEAM_ID:-}"
@@ -20,8 +27,8 @@ ZIP_PATH="$DIST_DIR/$PACKAGE_NAME.zip"
 SHA_PATH="$ZIP_PATH.sha256"
 APP_SOURCE="$DERIVED_DATA_PATH/Build/Products/$CONFIGURATION/LeetTracker.app"
 
-if [[ "$PUBLIC_RELEASE" == "1" && "$NOTARIZE" != "1" ]]; then
-  echo "PUBLIC_RELEASE=1 requires notarization. Do not disable NOTARIZE for public builds." >&2
+if [[ "$PUBLIC_SIGNED_RELEASE" == "1" && "$NOTARIZE" != "1" ]]; then
+  echo "PUBLIC_SIGNED_RELEASE=1 requires notarization. Do not disable NOTARIZE for public builds." >&2
   exit 1
 fi
 
@@ -58,12 +65,22 @@ notarize_app() {
 }
 
 echo "Building $SCHEME ($CONFIGURATION)..."
-xcodebuild \
-  -scheme "$SCHEME" \
-  -configuration "$CONFIGURATION" \
-  -derivedDataPath "$DERIVED_DATA_PATH" \
-  CODE_SIGN_STYLE=Automatic \
-  build
+XCODEBUILD_ARGS=(
+  -scheme "$SCHEME"
+  -configuration "$CONFIGURATION"
+  -derivedDataPath "$DERIVED_DATA_PATH"
+  OTHER_SWIFT_FLAGS="-Xfrontend -file-prefix-map -Xfrontend $ROOT_DIR=."
+)
+
+if [[ "$FREE_UNSIGNED_RELEASE" == "1" ]]; then
+  XCODEBUILD_ARGS+=( CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO CODE_SIGN_STYLE=Manual )
+else
+  XCODEBUILD_ARGS+=( CODE_SIGN_STYLE=Automatic )
+fi
+
+XCODEBUILD_ARGS+=( DEPLOYMENT_POSTPROCESSING=YES STRIP_INSTALLED_PRODUCT=YES )
+
+xcodebuild "${XCODEBUILD_ARGS[@]}" build
 
 if [[ ! -d "$APP_SOURCE" ]]; then
   echo "Built app not found at: $APP_SOURCE" >&2
@@ -72,7 +89,7 @@ fi
 
 SIGNING_INFO="$(codesign -dv --verbose=4 "$APP_SOURCE" 2>&1 || true)"
 
-if [[ "$PUBLIC_RELEASE" == "1" ]] && ! grep -q "Authority=Developer ID Application" <<<"$SIGNING_INFO"; then
+if [[ "$PUBLIC_SIGNED_RELEASE" == "1" ]] && ! grep -q "Authority=Developer ID Application" <<<"$SIGNING_INFO"; then
   echo "Public releases must be signed with a Developer ID Application certificate." >&2
   echo "Current signing info:" >&2
   echo "$SIGNING_INFO" >&2
@@ -85,14 +102,36 @@ mkdir -p "$PACKAGE_DIR"
 
 ditto --rsrc --extattr "$APP_SOURCE" "$PACKAGE_DIR/LeetTracker.app"
 
+if [[ "$FREE_UNSIGNED_RELEASE" == "1" ]]; then
+  echo "Applying ad-hoc signature with entitlements to the app and widget..."
+  
+  WIDGET_PATH="$PACKAGE_DIR/LeetTracker.app/Contents/PlugIns/LeetTrackerWidgetExtension.appex"
+  if [[ -d "$WIDGET_PATH" ]]; then
+    codesign --force -s - --entitlements "$ROOT_DIR/LeetTrackerWidget/LeetTrackerWidgetExtension.entitlements" "$WIDGET_PATH"
+  fi
+  
+  codesign --force -s - --entitlements "$ROOT_DIR/LeetTracker/LeetTracker.entitlements" "$PACKAGE_DIR/LeetTracker.app"
+fi
+
 if [[ "$NOTARIZE" == "1" ]]; then
   notarize_app "$PACKAGE_DIR/LeetTracker.app"
 fi
 
+# Copy additional files to the release package
+cp "$ROOT_DIR/scripts/install-background-refresh-agent.sh" "$PACKAGE_DIR/" 2>/dev/null || true
+cp "$ROOT_DIR/scripts/uninstall-background-refresh-agent.sh" "$PACKAGE_DIR/" 2>/dev/null || true
+
+if [[ -f "$ROOT_DIR/README_INSTALL.txt" ]]; then
+  cp "$ROOT_DIR/README_INSTALL.txt" "$PACKAGE_DIR/"
+else
+  echo "To install LeetTracker, move LeetTracker.app to your Applications folder." > "$PACKAGE_DIR/README_INSTALL.txt"
+fi
+
 echo "Creating $ZIP_PATH..."
 (
-  cd "$PACKAGE_DIR"
-  ditto -c -k --keepParent "LeetTracker.app" "$ZIP_PATH"
+  cd "$DIST_DIR"
+  # Use zip with -X to prevent AppleDouble files and exclude hidden files
+  zip -q -r -X "$(basename "$ZIP_PATH")" "$PACKAGE_NAME" -x "*/.*" -x "__MACOSX"
 )
 
 shasum -a 256 "$ZIP_PATH" > "$SHA_PATH"
@@ -101,7 +140,7 @@ echo "Release package ready:"
 echo "$ZIP_PATH"
 echo "$SHA_PATH"
 
-if [[ "$PUBLIC_RELEASE" != "1" ]]; then
+if [[ "$PUBLIC_SIGNED_RELEASE" != "1" ]]; then
   echo ""
-  echo "Note: this package may be development-signed. Use PUBLIC_RELEASE=1 with a Developer ID signed build before publishing."
+  echo "Note: this package is ad-hoc signed. Use PUBLIC_SIGNED_RELEASE=1 with a Developer ID signed build before publishing."
 fi

@@ -66,12 +66,34 @@ final class SharedLeetTrackerStore {
     static let appGroupIdentifier = "group.com.hyder.LeetTracker"
     private static let storeKey = "SharedLeetTrackerPayloadKey"
 
-    private let userDefaults: UserDefaults
+    private let userDefaults: UserDefaults?
     private let encoder = JSONEncoder()
     private let decoder = JSONDecoder()
 
+    private var fallbackStoreURL: URL {
+        let url = URL(fileURLWithPath: Self.realHomeDirectory + "/Library/Application Support/LeetTrackerShared")
+        try? FileManager.default.createDirectory(at: url, withIntermediateDirectories: true)
+        return url.appendingPathComponent("LeetTrackerSharedStore.json")
+    }
+    
+    static var realHomeDirectory: String {
+        if let pw = getpwuid(getuid()), let dir = pw.pointee.pw_dir {
+            return String(cString: dir)
+        }
+        return NSHomeDirectory()
+    }
+
     init() {
-        self.userDefaults = UserDefaults(suiteName: Self.appGroupIdentifier) ?? .standard
+        self.userDefaults = UserDefaults(suiteName: Self.appGroupIdentifier)
+    }
+
+    var isAppGroupWorking: Bool {
+        #if os(macOS)
+        // Force fallback JSON store on macOS since Ad-Hoc App Groups fail silently
+        return false
+        #else
+        return userDefaults != nil
+        #endif
     }
 
     var snapshot: SharedLeetTrackerSnapshot {
@@ -144,15 +166,20 @@ final class SharedLeetTrackerStore {
 
     @discardableResult
     func synchronize() -> Bool {
-        userDefaults.synchronize()
+        userDefaults?.synchronize() ?? false
     }
 
     private func loadPayload() -> SharedLeetTrackerPayload {
-        if
-            let data = userDefaults.data(forKey: Self.storeKey),
-            let payload = try? decoder.decode(SharedLeetTrackerPayload.self, from: data)
-        {
-            return payload
+        if isAppGroupWorking {
+            if let data = userDefaults?.data(forKey: Self.storeKey),
+               let payload = try? decoder.decode(SharedLeetTrackerPayload.self, from: data) {
+                return payload
+            }
+        } else {
+            if let data = try? Data(contentsOf: fallbackStoreURL),
+               let payload = try? decoder.decode(SharedLeetTrackerPayload.self, from: data) {
+                return payload
+            }
         }
 
         if let legacyPayload = loadLegacyFilePayload() {
@@ -168,7 +195,11 @@ final class SharedLeetTrackerStore {
             return
         }
         
-        userDefaults.set(data, forKey: Self.storeKey)
+        if isAppGroupWorking {
+            userDefaults?.set(data, forKey: Self.storeKey)
+        } else {
+            try? data.write(to: fallbackStoreURL, options: .atomic)
+        }
     }
 
     private func loadLegacyFilePayload() -> SharedLeetTrackerPayload? {

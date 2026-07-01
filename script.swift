@@ -134,3 +134,10 @@ enum BackgroundRefreshManager {
         }
     }
 }
+
+print("Installing...")
+try! BackgroundRefreshManager.install()
+print("Installed!")
+print("Uninstalling...")
+try! BackgroundRefreshManager.uninstall()
+print("Uninstalled!")

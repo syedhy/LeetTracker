@@ -19,9 +19,26 @@ final class LeetTrackerViewModel: ObservableObject {
     @Published private(set) var completedPlannerSessionIDs: Set<String> = []
     @Published private(set) var isLoading = false
     @Published private(set) var isBackgroundRefreshInstalled = false
+    @Published private(set) var isBackgroundRefreshLoaded = false
     @Published private(set) var backgroundRefreshStatusMessage = "Status checking..."
     @Published private(set) var lastBackgroundRefreshDate: Date? = nil
     @Published private(set) var lastBackgroundRefreshError: String? = nil
+    @Published private(set) var lastWidgetReloadRequest: Date? = nil
+    var activeStoragePath: String {
+        if isAppGroupWorking {
+            return "App Group Container"
+        } else {
+            return SharedLeetTrackerStore.realHomeDirectory + "/Library/Application Support/LeetTrackerShared/LeetTrackerSharedStore.json"
+        }
+    }
+    
+    var backgroundRefreshPlistPath: String {
+        #if os(macOS)
+        return BackgroundRefreshManager.launchAgentURL.path
+        #else
+        return "N/A"
+        #endif
+    }
 
     private let client: LeetCodeClient
     private let sharedStore: SharedLeetTrackerStore
@@ -240,6 +257,10 @@ final class LeetTrackerViewModel: ObservableObject {
         stats
     }
 
+    var isAppGroupWorking: Bool {
+        sharedStore.isAppGroupWorking
+    }
+
     var currentSolvedValue: Int? {
         stats?.totalSolved
     }
@@ -297,7 +318,12 @@ final class LeetTrackerViewModel: ObservableObject {
     func checkBackgroundRefreshStatus() {
         #if os(macOS)
         isBackgroundRefreshInstalled = BackgroundRefreshManager.isInstalled
-        backgroundRefreshStatusMessage = isBackgroundRefreshInstalled ? "Installed and scheduled." : "Not installed."
+        isBackgroundRefreshLoaded = BackgroundRefreshManager.isLoaded
+        if isBackgroundRefreshInstalled {
+            backgroundRefreshStatusMessage = isBackgroundRefreshLoaded ? "Installed and running." : "Installed but not loaded."
+        } else {
+            backgroundRefreshStatusMessage = "Not installed."
+        }
         #endif
     }
 
@@ -415,6 +441,7 @@ final class LeetTrackerViewModel: ObservableObject {
         }
 
         sharedStore.synchronize()
+        lastWidgetReloadRequest = date
         statusMessage = "Updated \(stats.username). Widget reload requested at \(formatted(date)). Saved \(stats.totalSolved) solved."
     }
 

@@ -4,31 +4,23 @@ This document outlines the end-to-end deployment strategy for LeetTracker. It st
 
 ---
 
-## Phase 1: Free Distribution (Unsigned DMG)
-Since we are skipping the paid Apple Developer Program for now, the app will be "unsigned." macOS's security system (Gatekeeper) will try to block it, so we have to use specific techniques to distribute it.
+## Phase 1: FREE_UNSIGNED_RELEASE Distribution
+Since we are skipping the paid Apple Developer Program for now, the default release mode is `FREE_UNSIGNED_RELEASE` (an unsigned `.app` bundle, often distributed as a `.zip`). macOS's security system (Gatekeeper) will try to block it, so we have to use specific techniques to distribute it.
 
 ### 1. Building and Packaging
 1. **Build the Release App:** In Xcode, select the `Release` configuration and build the app. This generates the `LeetTracker.app` file.
-2. **Create the DMG:** We will use a command-line tool like `create-dmg` (available via Homebrew) to package `LeetTracker.app` into a drag-and-drop installer:
+2. **Create a Zip Archive:** Compress `LeetTracker.app` into a zip archive for distribution:
    ```bash
-   create-dmg \
-     --volname "LeetTracker Installer" \
-     --window-pos 200 120 \
-     --window-size 600 400 \
-     --icon-size 100 \
-     --icon "LeetTracker.app" 175 190 \
-     --hide-extension "LeetTracker.app" \
-     --app-drop-link 425 190 \
-     "LeetTracker.dmg" \
-     "path/to/build/LeetTracker.app"
+   cd path/to/build
+   zip -r LeetTracker.zip LeetTracker.app
    ```
 
 ### 2. Hosting the File
-Upload the generated `LeetTracker.dmg` to **GitHub Releases** on your repository. This provides a free, fast, permanent download URL that we can use for the website and Homebrew.
+Upload the generated `LeetTracker.zip` to **GitHub Releases** on your repository. This provides a free, fast, permanent download URL that we can use for the website and Homebrew.
 
 ### 3. The Gatekeeper Warning
 Because the app is unsigned, users who double-click it will see a warning: *"LeetTracker cannot be opened because the developer cannot be verified."*
-**The Fix:** Users must **Right-Click -> Open** the app from their Applications folder the first time. You must put this instruction on your website.
+**The Fix:** To bypass Gatekeeper, users must **Right-Click -> Open** the app from their Applications folder the first time. You must put this instruction on your website.
 
 ---
 
@@ -40,9 +32,9 @@ Homebrew is the best way for developers to install the app. We can also use it t
    ```ruby
    cask "leettracker" do
      version "1.0.0"
-     sha256 "THE_SHA_256_HASH_OF_YOUR_DMG_FILE"
+     sha256 "THE_SHA_256_HASH_OF_YOUR_ZIP_FILE"
 
-     url "https://github.com/syedhy/LeetTracker/releases/download/v#{version}/LeetTracker.dmg"
+     url "https://github.com/syedhy/LeetTracker/releases/download/v#{version}/LeetTracker.zip"
      name "LeetTracker"
      desc "Your personal LeetCode tracker and planner"
      homepage "https://your-website-url.com"
@@ -85,8 +77,27 @@ Vercel created Next.js. You can link your GitHub repository to Vercel, and it wi
 
 ### Website Content
 - **Hero Section:** A massive, high-quality screenshot/mockup of the macOS app.
-- **Primary CTA (Call to Action):** A large "Download for macOS (Free)" button pointing directly to your GitHub Releases DMG link. Include a small subtext: *(See instructions to bypass macOS security)*.
+- **Primary CTA (Call to Action):** A large "Download for macOS (Free)" button pointing directly to your GitHub Releases zip link. Include a small subtext: *(See instructions to bypass macOS security)*.
 - **Homebrew Section:** A sleek, dark-mode terminal window UI showing the exact `brew install` command, complete with a "Copy to clipboard" icon.
+
+---
+
+## Optional: DMG Packaging
+
+If you prefer to distribute a `.dmg` file in the future instead of a `.zip`, you can use a tool like `create-dmg` (available via Homebrew) to package `LeetTracker.app`:
+
+```bash
+create-dmg \
+  --volname "LeetTracker Installer" \
+  --window-pos 200 120 \
+  --window-size 600 400 \
+  --icon-size 100 \
+  --icon "LeetTracker.app" 175 190 \
+  --hide-extension "LeetTracker.app" \
+  --app-drop-link 425 190 \
+  "LeetTracker.dmg" \
+  "path/to/build/LeetTracker.app"
+```
 
 ---
 

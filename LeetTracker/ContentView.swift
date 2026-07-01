@@ -66,6 +66,7 @@ struct ContentView: View {
             }
             .padding(14)
             .navigationTitle("LeetTracker")
+            .navigationSplitViewColumnWidth(min: 220, ideal: 240, max: 300)
         } detail: {
             ZStack {
                 AppSurfaceBackground()

@@ -8,6 +8,15 @@ Requires macOS 14 or newer.
 
 ## Install
 
+### FREE_UNSIGNED_RELEASE (Default)
+
+LeetTracker is currently distributed as a `FREE_UNSIGNED_RELEASE`. Because the app is unsigned, macOS Gatekeeper may block it the first time. To bypass this:
+
+1. Download and extract the app, then move **LeetTracker.app** to your **Applications** folder.
+2. **Right-Click** on LeetTracker in Applications and select **Open**.
+3. Click **Open** in the dialog box.
+4. You only need to do this once. Future launches will work normally.
+
 ### Recommended: Homebrew
 
 ```zsh
@@ -32,7 +41,7 @@ git clone https://github.com/syedhy/leettracker.git
 cd LeetTracker
 ```
 
-To build and package the DMG, run:
+To build and package the release, run:
 ```zsh
 ./package_release.sh
 ```
@@ -54,7 +63,7 @@ In Xcode, select the `LeetTracker` scheme, choose **My Mac**, then build and run
 To keep your widgets up to date even when the app is closed, you can enable background refresh. Widgets update about every 2 hours, but macOS controls the exact timing.
 
 **Recommended Method**
-Open LeetTracker, go to **Settings**, and click **Enable Background Refresh**.
+Open LeetTracker, go to **Settings**, and click **Enable Background Refresh**. This is the recommended and easiest method for most users.
 
 **For Power Users**
 If you prefer the terminal, you can manage the background LaunchAgent using the Homebrew commands:

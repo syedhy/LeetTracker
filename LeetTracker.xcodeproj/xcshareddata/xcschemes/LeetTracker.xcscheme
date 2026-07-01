@@ -43,6 +43,16 @@
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES">
       <Testables>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "1AF5703A5C0770E57EFD77BF"
+               BuildableName = "LeetTrackerTests.xctest"
+               BlueprintName = "LeetTrackerTests"
+               ReferencedContainer = "container:LeetTracker.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction
